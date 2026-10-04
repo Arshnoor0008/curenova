@@ -80,64 +80,64 @@
   :root {
     color-scheme: light;
 
-    /* Semantic Surfaces (Light) */
-    --color-surface-ground: #f8fafc;
+    /* Semantic Surfaces (Light) — Tinted slate for richness */
+    --color-surface-ground: #eef2f7;
     --color-surface-card: #ffffff;
     --color-surface-overlay: #ffffff;
-    --color-surface-hover: #f1f5f9;
-    --color-surface-sunken: #f1f5f9;
+    --color-surface-hover: #e2eaf4;
+    --color-surface-sunken: #dde5f0;
 
     /* Semantic Borders (Light) */
-    --color-border-subtle: #e2e8f0;
-    --color-border-strong: #cbd5e1;
+    --color-border-subtle: #c8d6e8;
+    --color-border-strong: #a8bbcf;
     --color-border-focus: #0284c7;
 
     /* Semantic Text (Light) */
     --color-text-primary: #0b132b;
-    --color-text-secondary: #475569;
-    --color-text-muted: #64748b;
+    --color-text-secondary: #3a4d66;
+    --color-text-muted: #5b7083;
     --color-text-inverse: #ffffff;
 
-    /* Brand Primary / Medical Cyan-Teal */
-    --color-brand-primary: #0284c7;
-    --color-brand-primary-hover: #0369a1;
-    --color-brand-secondary: #0d9488;
-    --color-brand-surface: #f0f9ff;
-    --color-brand-border: #bae6fd;
-    --color-brand-text: #0369a1;
+    /* Brand Primary / Medical Cyan-Teal — more vivid */
+    --color-brand-primary: #0271b0;
+    --color-brand-primary-hover: #025f93;
+    --color-brand-secondary: #0b8b7e;
+    --color-brand-surface: #dbeeff;
+    --color-brand-border: #93cef4;
+    --color-brand-text: #025f93;
 
-    /* Status: Critical Hazard (Strictly for High Risk / Severe Overdose / Black Box) */
+    /* Status: Critical Hazard */
     --color-status-critical: #dc2626;
     --color-status-critical-bg: #fef2f2;
     --color-status-critical-border: #fecaca;
     --color-status-critical-text: #991b1b;
     --color-status-critical-rail: #b91c1c;
 
-    /* Status: Warning (Strictly for Moderate Risk / Drug Interaction Alert) */
-    --color-status-warning: #d97706;
-    --color-status-warning-bg: #fffbeb;
-    --color-status-warning-border: #fde68a;
-    --color-status-warning-text: #92400e;
+    /* Status: Warning */
+    --color-status-warning: #c96b00;
+    --color-status-warning-bg: #fff7e6;
+    --color-status-warning-border: #fcd89a;
+    --color-status-warning-text: #7c3800;
     --color-status-warning-rail: #b45309;
 
-    /* Status: Safe / Verified (Strictly for Monitored / No Direct Conflict / Active) */
-    --color-status-safe: #059669;
-    --color-status-safe-bg: #f0fdf4;
-    --color-status-safe-border: #bbf7d0;
-    --color-status-safe-text: #166534;
-    --color-status-safe-rail: #047857;
+    /* Status: Safe / Verified */
+    --color-status-safe: #047857;
+    --color-status-safe-bg: #ecfdf5;
+    --color-status-safe-border: #6ee7b7;
+    --color-status-safe-text: #065f46;
+    --color-status-safe-rail: #059669;
 
-    /* Status: Info / Informational (Study Evidence / Trial Notes) */
-    --color-status-info: #2563eb;
+    /* Status: Info */
+    --color-status-info: #1d4ed8;
     --color-status-info-bg: #eff6ff;
-    --color-status-info-border: #bfdbfe;
-    --color-status-info-text: #1e40af;
-    --color-status-info-rail: #1d4ed8;
+    --color-status-info-border: #93c5fd;
+    --color-status-info-text: #1e3a8a;
+    --color-status-info-rail: #2563eb;
 
-    /* Elevation & Shadows */
-    --shadow-base: 0 1px 3px 0 rgba(11, 19, 43, 0.05), 0 1px 2px -1px rgba(11, 19, 43, 0.05);
-    --shadow-raised: 0 4px 6px -1px rgba(11, 19, 43, 0.07), 0 2px 4px -2px rgba(11, 19, 43, 0.05);
-    --shadow-overlay: 0 20px 25px -5px rgba(11, 19, 43, 0.12), 0 8px 10px -6px rgba(11, 19, 43, 0.08);
+    /* Elevation & Shadows — colored glow for depth */
+    --shadow-base: 0 1px 3px 0 rgba(2, 113, 176, 0.08), 0 1px 2px -1px rgba(11, 19, 43, 0.06);
+    --shadow-raised: 0 4px 12px -1px rgba(2, 113, 176, 0.12), 0 2px 6px -2px rgba(11, 19, 43, 0.07);
+    --shadow-overlay: 0 20px 40px -5px rgba(2, 113, 176, 0.18), 0 8px 16px -6px rgba(11, 19, 43, 0.10);
 
     /* Radii */
     --radius-sm: 6px;

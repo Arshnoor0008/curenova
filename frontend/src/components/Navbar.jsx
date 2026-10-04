@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Activity,
   Search,
-  Share2,
   Stethoscope,
   Microscope,
   HeartHandshake,
@@ -12,12 +11,8 @@ import {
   ChevronDown,
   Menu,
   X,
-  ShieldCheck,
-  CheckCircle2,
   Sun,
   Moon,
-  Database,
-  ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -61,53 +56,6 @@ export const Navbar = () => {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-card)]/95 backdrop-blur-md transition-colors duration-200">
-        {/* Slim Clinical Status Strip */}
-        <div className="hidden lg:flex items-center justify-between px-6 py-1 bg-[#0b132b] text-[11px] text-slate-300 border-b border-[#1c2541]">
-          <div className="flex items-center gap-4">
-            <Tooltip content="LangGraph 4-agent stateful workflow orchestrator: Retrieval, Reasoning, Safety, Recommendation">
-              <span className="flex items-center gap-1.5 font-medium cursor-help text-[#34d399]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse" />
-                LangGraph Engine: Operational
-              </span>
-            </Tooltip>
-
-            <span className="text-[#334155]">|</span>
-
-            <div className="flex items-center gap-3 text-slate-400">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Evidence Sources:</span>
-              <Tooltip content="PubMed / MEDLINE: 36M+ peer-reviewed biomedical citations">
-                <span className="hover:text-slate-200 cursor-help transition-colors flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-[#38bdf8]" /> PubMed
-                </span>
-              </Tooltip>
-              <Tooltip content="EMBL-EBI ChEMBL: 2.4M+ bioactive molecules with drug mechanisms">
-                <span className="hover:text-slate-200 cursor-help transition-colors flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-[#2dd4bf]" /> ChEMBL
-                </span>
-              </Tooltip>
-              <Tooltip content="FDA openFDA: Real-time adverse events, boxed warnings & recalls">
-                <span className="hover:text-slate-200 cursor-help transition-colors flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-[#fbbf24]" /> openFDA
-                </span>
-              </Tooltip>
-              <Tooltip content="Reactome Pathway Database: Curated biological pathways & reactions">
-                <span className="hover:text-slate-200 cursor-help transition-colors flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-[#818cf8]" /> Reactome
-                </span>
-              </Tooltip>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 text-slate-400">
-            <span className="tabular font-mono text-[10px]">CureNova v1.0.0</span>
-            <span className="text-[#334155]">|</span>
-            <Tooltip content="CureNova does not generate prescriptions or replace licensed clinical diagnostic judgment">
-              <span className="text-[#fbbf24] flex items-center gap-1 cursor-help font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#fbbf24]" /> Non-Prescribing Mode Active
-              </span>
-            </Tooltip>
-          </div>
-        </div>
 
         {/* Main Navbar */}
         <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto flex h-14 sm:h-16 items-center justify-between gap-4">

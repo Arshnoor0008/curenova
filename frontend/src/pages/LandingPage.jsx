@@ -87,58 +87,60 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen bg-[var(--color-surface-ground)] text-[var(--color-text-primary)] transition-colors duration-200">
       {/* SECTION 1: HERO SECTION */}
-      <section className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24 border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-ground)]">
-        {/* Subtle Background Pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.03] dark:opacity-[0.06] pointer-events-none" />
+      <section className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24 border-b border-white/10 bg-gradient-to-br from-[#0b1e3d] via-[#0a2d4a] to-[#073d3d] dark:from-[#070d19] dark:via-[#0c1628] dark:to-[#050912]">
+        {/* Ambient glow orbs */}
+        <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-[#0271b0]/20 blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -right-20 w-80 h-80 rounded-full bg-[#0b8b7e]/20 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-64 h-64 rounded-full bg-[#1d4ed8]/15 blur-3xl pointer-events-none" />
+        {/* Dot grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
         <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             {/* Left Hero Content */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] text-xs font-medium shadow-2xs">
-                <span className="flex h-2 w-2 rounded-full bg-[#0284c7] animate-pulse" />
-                <span className="font-semibold text-[var(--color-text-primary)]">CureNova AI</span>
-                <span className="text-[var(--color-border-strong)]">|</span>
-                <span className="text-[var(--color-text-muted)]">Biomedical Medication Intelligence Platform</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/80 text-xs font-medium shadow-2xs">
+                <span className="flex h-2 w-2 rounded-full bg-[#34d399] animate-pulse" />
+                <span className="font-semibold text-white">CureNova AI</span>
+                <span className="text-white/40">|</span>
+                <span className="text-white/70">Biomedical Medication Intelligence Platform</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--color-text-primary)] leading-[1.12]">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
                 Turn Biomedical Evidence Into{' '}
-                <span className="bg-gradient-to-r from-[#0284c7] via-[#0d9488] to-[#059669] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#38bdf8] via-[#2dd4bf] to-[#34d399] bg-clip-text text-transparent">
                   Actionable Intelligence.
                 </span>
               </h1>
 
-              <p className="max-w-[60ch] text-base sm:text-lg text-[var(--color-text-secondary)] leading-relaxed font-normal">
+              <p className="max-w-[60ch] text-base sm:text-lg text-white/70 leading-relaxed font-normal">
                 CureNova links fragmented biomedical publications, pharmacological databases, and multi-agent AI reasoning to help clinicians evaluate complex polypharmacy regimens and researchers identify viable therapeutic repurposing candidates with transparent evidence grounding.
               </p>
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  icon={Stethoscope}
+                <button
                   onClick={() => handleRoleQuickStart('doctor')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-[#0271b0] font-semibold text-sm shadow-lg hover:bg-white/90 transition-all duration-150 active:scale-95"
                 >
+                  <Stethoscope className="w-4 h-4" />
                   Launch Clinician Workspace
-                </Button>
+                </button>
 
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  icon={Search}
+                <button
                   onClick={() => navigate('/evidence')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white font-semibold text-sm hover:bg-white/20 transition-all duration-150"
                 >
+                  <Search className="w-4 h-4" />
                   Explore Evidence Sources
-                </Button>
+                </button>
               </div>
 
               {/* Regulatory Notice Banner */}
-              <div className="p-3 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] border-l-4 border-l-[var(--color-status-warning)] text-xs text-[var(--color-text-secondary)] flex items-start gap-2.5 max-w-xl shadow-2xs">
-                <ShieldAlert className="w-4 h-4 text-[var(--color-status-warning)] shrink-0 mt-0.5" />
+              <div className="p-3 rounded-xl bg-white/10 border border-white/20 text-xs text-white/80 flex items-start gap-2.5 max-w-xl">
+                <ShieldAlert className="w-4 h-4 text-[#fbbf24] shrink-0 mt-0.5" />
                 <span className="leading-relaxed">
-                  <strong className="text-[var(--color-text-primary)]">Clinical Decision Support Prototype:</strong> Not a prescribing engine. All outputs require independent verification by licensed physicians.
+                  <strong className="text-white">Clinical Decision Support Prototype:</strong> Not a prescribing engine. All outputs require independent verification by licensed physicians.
                 </span>
               </div>
             </div>
@@ -294,28 +296,28 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* TRUST ROW: MONOCHROME DATABASE MARKS */}
-      <section className="py-6 bg-[var(--color-surface-card)] border-b border-[var(--color-border-subtle)]">
+      {/* TRUST ROW: EVIDENCE DATABASE MARKS */}
+      <section className="py-5 bg-[#0b1e3d] border-b border-white/10">
         <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
-            <span className="text-[var(--color-text-muted)] font-mono font-semibold uppercase tracking-wider text-[11px]">
+            <span className="text-white/50 font-mono font-semibold uppercase tracking-wider text-[11px]">
               Grounded In Peer-Reviewed Repositories:
             </span>
-            <div className="flex flex-wrap items-center gap-6 sm:gap-8 font-medium text-[var(--color-text-secondary)]">
-              <span className="flex items-center gap-1.5 hover:text-[var(--color-text-primary)] transition-colors">
-                <Database className="w-3.5 h-3.5 text-[var(--color-text-muted)]" /> PubMed (36M+ Citations)
+            <div className="flex flex-wrap items-center gap-6 sm:gap-8 font-medium text-white/60">
+              <span className="flex items-center gap-1.5 hover:text-white/90 transition-colors">
+                <span className="w-2 h-2 rounded-full bg-[#38bdf8]" /> PubMed (36M+ Citations)
               </span>
-              <span className="flex items-center gap-1.5 hover:text-[var(--color-text-primary)] transition-colors">
-                <Database className="w-3.5 h-3.5 text-[var(--color-text-muted)]" /> openFDA FAERS
+              <span className="flex items-center gap-1.5 hover:text-white/90 transition-colors">
+                <span className="w-2 h-2 rounded-full bg-[#fbbf24]" /> openFDA FAERS
               </span>
-              <span className="flex items-center gap-1.5 hover:text-[var(--color-text-primary)] transition-colors">
-                <Database className="w-3.5 h-3.5 text-[var(--color-text-muted)]" /> EMBL-EBI ChEMBL
+              <span className="flex items-center gap-1.5 hover:text-white/90 transition-colors">
+                <span className="w-2 h-2 rounded-full bg-[#2dd4bf]" /> EMBL-EBI ChEMBL
               </span>
-              <span className="flex items-center gap-1.5 hover:text-[var(--color-text-primary)] transition-colors">
-                <Database className="w-3.5 h-3.5 text-[var(--color-text-muted)]" /> Reactome Pathways
+              <span className="flex items-center gap-1.5 hover:text-white/90 transition-colors">
+                <span className="w-2 h-2 rounded-full bg-[#818cf8]" /> Reactome Pathways
               </span>
-              <span className="flex items-center gap-1.5 hover:text-[var(--color-text-primary)] transition-colors">
-                <Database className="w-3.5 h-3.5 text-[var(--color-text-muted)]" /> ClinicalTrials.gov
+              <span className="flex items-center gap-1.5 hover:text-white/90 transition-colors">
+                <span className="w-2 h-2 rounded-full bg-[#34d399]" /> ClinicalTrials.gov
               </span>
             </div>
           </div>
@@ -338,12 +340,12 @@ export const LandingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card elevation="raised" className="p-6 space-y-4">
+            <Card elevation="raised" className="p-6 space-y-4 border-t-4 border-t-[#0271b0]">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] flex items-center justify-center font-mono font-bold text-sm text-[var(--color-brand-primary)]">
+                <div className="w-10 h-10 rounded-xl bg-[#0271b0] flex items-center justify-center font-mono font-bold text-sm text-white shadow-md">
                   01
                 </div>
-                <Search className="w-5 h-5 text-[var(--color-text-muted)]" />
+                <Search className="w-5 h-5 text-[#0271b0]" />
               </div>
               <h3 className="text-base font-bold text-[var(--color-text-primary)]">
                 Evidence Aggregation & Ingestion
@@ -353,12 +355,12 @@ export const LandingPage = () => {
               </p>
             </Card>
 
-            <Card elevation="raised" className="p-6 space-y-4">
+            <Card elevation="raised" className="p-6 space-y-4 border-t-4 border-t-[#0b8b7e]">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] flex items-center justify-center font-mono font-bold text-sm text-[#0d9488]">
+                <div className="w-10 h-10 rounded-xl bg-[#0b8b7e] flex items-center justify-center font-mono font-bold text-sm text-white shadow-md">
                   02
                 </div>
-                <Cpu className="w-5 h-5 text-[var(--color-text-muted)]" />
+                <Cpu className="w-5 h-5 text-[#0b8b7e]" />
               </div>
               <h3 className="text-base font-bold text-[var(--color-text-primary)]">
                 Multi-Agent Reasoning & Synthesis
@@ -368,12 +370,12 @@ export const LandingPage = () => {
               </p>
             </Card>
 
-            <Card elevation="raised" className="p-6 space-y-4">
+            <Card elevation="raised" className="p-6 space-y-4 border-t-4 border-t-[#047857]">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] flex items-center justify-center font-mono font-bold text-sm text-[#059669]">
+                <div className="w-10 h-10 rounded-xl bg-[#047857] flex items-center justify-center font-mono font-bold text-sm text-white shadow-md">
                   03
                 </div>
-                <ShieldCheck className="w-5 h-5 text-[var(--color-text-muted)]" />
+                <ShieldCheck className="w-5 h-5 text-[#047857]" />
               </div>
               <h3 className="text-base font-bold text-[var(--color-text-primary)]">
                 Explainable Clinical Delivery
@@ -387,99 +389,91 @@ export const LandingPage = () => {
       </section>
 
       {/* SECTION 3: CAPABILITY SHOWCASE (TWIN PILLARS) */}
-      <section className="py-16 sm:py-20 bg-[var(--color-surface-card)] border-b border-[var(--color-border-subtle)]">
+      <section className="py-16 sm:py-20 border-b border-white/10 bg-gradient-to-br from-[#0f1f3d] via-[#0a2a40] to-[#0d2d2d] dark:from-[#070d19] dark:via-[#0c1628] dark:to-[#050912]">
         <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-brand-primary)]">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#38bdf8]">
               Core Capabilities
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
               Dual Intelligence Engines
             </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Pillar 1: Drug Repurposing */}
-            <Card elevation="raised" className="p-7 space-y-6">
+            <div className="p-7 space-y-6 rounded-2xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0d9488]">
+                <div className="p-2.5 rounded-xl bg-[#0b8b7e]/25 border border-[#0b8b7e]/40 text-[#2dd4bf]">
                   <Microscope className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Drug Repurposing Engine</h3>
-                  <span className="text-xs text-[#0d9488] font-medium">For Translational Scientists & Clinical Researchers</span>
+                  <h3 className="text-lg font-bold text-white">Drug Repurposing Engine</h3>
+                  <span className="text-xs text-[#2dd4bf] font-medium">For Translational Scientists &amp; Clinical Researchers</span>
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
                 Connect target diseases to clinically approved compounds through target binding profiles, pathway concurrence, and published clinical trials to accelerate translational discovery.
               </p>
 
-              <div className="p-4 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-2 text-xs">
-                <div className="flex justify-between font-bold text-[var(--color-text-primary)]">
+              <div className="p-4 rounded-xl bg-white/5 border border-[#0b8b7e]/30 space-y-2 text-xs">
+                <div className="flex justify-between font-bold text-white">
                   <span>Candidate: Metformin in Alzheimer's Disease</span>
-                  <span className="font-mono tabular text-[#0d9488]">Score: 92.4 / 100</span>
+                  <span className="font-mono tabular text-[#2dd4bf]">Score: 92.4 / 100</span>
                 </div>
-                <p className="text-[var(--color-text-secondary)]">
+                <p className="text-white/60">
                   Activates AMPK, regulates GSK-3β tau hyperphosphorylation, and enhances cerebral glucose uptake.
                 </p>
-                <div className="text-[11px] text-[var(--color-text-muted)] font-mono">
+                <div className="text-[11px] text-white/40 font-mono">
                   Grounding: 48 PubMed publications · 2 Active Phase II/III Clinical Trials
                 </div>
               </div>
 
-              <Button
-                variant="secondary"
-                size="md"
-                className="w-full"
-                icon={ChevronRight}
-                iconPosition="right"
+              <button
                 onClick={() => handleRoleQuickStart('researcher')}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0b8b7e] text-white font-semibold text-sm hover:bg-[#0d9488] transition-all duration-150"
               >
-                Open Drug Repurposing Portal
-              </Button>
-            </Card>
+                Open Drug Repurposing Portal <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
 
             {/* Pillar 2: Polypharmacy / Medication Safety */}
-            <Card elevation="raised" className="p-7 space-y-6">
+            <div className="p-7 space-y-6 rounded-2xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7]">
+                <div className="p-2.5 rounded-xl bg-[#dc2626]/20 border border-[#dc2626]/30 text-[#f87171]">
                   <ShieldAlert className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Polypharmacy & Medication Safety</h3>
-                  <span className="text-xs text-[#0284c7] font-medium">For Clinicians, Hospital Pharmacy & Caregivers</span>
+                  <h3 className="text-lg font-bold text-white">Polypharmacy &amp; Medication Safety</h3>
+                  <span className="text-xs text-[#f87171] font-medium">For Clinicians, Hospital Pharmacy &amp; Caregivers</span>
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
                 Simulate multi-drug combinations with pairwise pharmacokinetic matrices, higher-order synergistic alerts (e.g. Triple Whammy), and Patient Medication Digital Twin "what-if" testing.
               </p>
 
-              <div className="p-4 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-2 text-xs">
-                <div className="flex justify-between font-bold text-[var(--color-text-primary)]">
+              <div className="p-4 rounded-xl bg-[#dc2626]/10 border border-[#dc2626]/25 space-y-2 text-xs">
+                <div className="flex justify-between font-bold text-white">
                   <span>Regimen: Aspirin + Warfarin + Metformin</span>
-                  <span className="font-mono tabular text-[#dc2626]">High Risk (75/100)</span>
+                  <span className="font-mono tabular text-[#f87171]">High Risk (75/100)</span>
                 </div>
-                <p className="text-[var(--color-text-secondary)]">
+                <p className="text-white/60">
                   Dual antihemostatic synergism multiplying gastrointestinal mucosal bleeding hazard (openFDA ROR 3.84).
                 </p>
-                <div className="text-[11px] text-[var(--color-text-muted)] font-mono">
+                <div className="text-[11px] text-white/40 font-mono">
                   Feature: Digital Twin scenario simulator tests risk delta before regimen updates
                 </div>
               </div>
 
-              <Button
-                variant="secondary"
-                size="md"
-                className="w-full"
-                icon={ChevronRight}
-                iconPosition="right"
+              <button
                 onClick={() => handleRoleQuickStart('doctor')}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#dc2626] text-white font-semibold text-sm hover:bg-[#b91c1c] transition-all duration-150"
               >
-                Open Medication Safety Portal
-              </Button>
-            </Card>
+                Open Medication Safety Portal <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -501,9 +495,9 @@ export const LandingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Doctor */}
-            <Card elevation="raised" className="p-6 space-y-4 flex flex-col justify-between">
+            <Card elevation="raised" className="p-6 space-y-4 flex flex-col justify-between border-t-4 border-t-[#0271b0]">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#0271b0] text-white flex items-center justify-center shadow-md">
                   <Stethoscope className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-[var(--color-text-primary)]">Clinician / Doctor</h3>
@@ -522,9 +516,9 @@ export const LandingPage = () => {
             </Card>
 
             {/* Researcher */}
-            <Card elevation="raised" className="p-6 space-y-4 flex flex-col justify-between">
+            <Card elevation="raised" className="p-6 space-y-4 flex flex-col justify-between border-t-4 border-t-[#0b8b7e]">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0d9488] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#0b8b7e] text-white flex items-center justify-center shadow-md">
                   <Microscope className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-[var(--color-text-primary)]">Biomedical Researcher</h3>
@@ -543,12 +537,12 @@ export const LandingPage = () => {
             </Card>
 
             {/* Patient */}
-            <Card elevation="raised" className="p-6 space-y-4 flex flex-col justify-between">
+            <Card elevation="raised" className="p-6 space-y-4 flex flex-col justify-between border-t-4 border-t-[#047857]">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#059669] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#047857] text-white flex items-center justify-center shadow-md">
                   <HeartHandshake className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-[var(--color-text-primary)]">Patient & Caregiver</h3>
+                <h3 className="text-base font-bold text-[var(--color-text-primary)]">Patient &amp; Caregiver</h3>
                 <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
                   Plain-language medication schedules, warning symptoms in human terms, questions to ask the doctor, and printable appointment companion sheets.
                 </p>
