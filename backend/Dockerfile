@@ -6,13 +6,15 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV DEMO_MODE=true
 
-COPY backend/requirements.txt .
+# Install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend /app/backend
-COPY data /app/data
+# Copy backend app code
+COPY app ./app
 
-WORKDIR /app/backend
+# Copy demo data (one level up from backend, so we handle it via env or copy here)
+COPY data ./data
 
 EXPOSE 8000
 

@@ -5,8 +5,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = BASE_DIR / "data"
+# backend/app/config.py lives at: <repo_root>/backend/app/config.py
+_THIS_FILE = Path(__file__).resolve()          # .../backend/app/config.py
+_BACKEND_DIR = _THIS_FILE.parent.parent        # .../backend/
+_REPO_ROOT = _BACKEND_DIR.parent              # .../
+
+# data/ folder may be at repo root OR copied alongside backend on the host
+def _find_data_dir() -> Path:
+    env_path = os.getenv("DATA_PATH")
+    if env_path:
+        return Path(env_path)
+    # repo root layout: <repo_root>/data/
+    repo_data = _REPO_ROOT / "data"
+    if repo_data.exists():
+        return repo_data
+    # Render native: backend/ is rootDir, data/ is alongside app/
+    backend_data = _BACKEND_DIR / "data"
+    if backend_data.exists():
+        return backend_data
+    return repo_data  # fallback
 
 class Settings(BaseModel):
     PROJECT_NAME: str = "CureNova"
@@ -30,7 +47,7 @@ class Settings(BaseModel):
     LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "mock")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
     
-    # Path to curated demo data
-    DATA_PATH: Path = DATA_DIR
+    # Path to curated demo data — resolves correctly both locally and on Render
+    DATA_PATH: Path = _find_data_dir()
 
 settings = Settings()
