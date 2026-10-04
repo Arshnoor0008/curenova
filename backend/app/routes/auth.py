@@ -11,7 +11,7 @@ def login(payload: LoginRequest):
     if not user or not verify_password(payload.password, user["password_hash"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials. For demo mode, try doctor@curenova.ai / doctor123",
+            detail="Invalid email or password. Please check your credentials or register a new account.",
         )
     
     # If a specific role was requested in login, verify role matches

@@ -21,31 +21,33 @@ export const PatientResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const data = location.state?.patientData || {
-    analysis_id: 'ana-patient-01',
-    overall_risk_score: 75,
-    overall_risk_category: 'Important Safety Consideration',
-    summary_headline: 'A potential medication interaction was noted that should be reviewed with your doctor.',
-    normalized_drugs: [
-      { canonical_name: 'Aspirin' },
-      { canonical_name: 'Warfarin' },
-      { canonical_name: 'Metformin' }
-    ],
-    patient_friendly_summary: [
-      {
-        medications_involved: 'Aspirin and Warfarin',
-        severity_badge: 'High Risk',
-        what_was_detected: 'A potential interaction was detected between Aspirin and Warfarin.',
-        why_it_matters: 'Both of these medicines make it harder for your blood to clot. Taking them together significantly increases your risk of bleeding or bruising, such as nosebleeds or stomach bleeding.',
-        recommended_action: 'Do NOT stop taking your medicine on your own. Discuss this combination with your doctor or pharmacist at your next appointment.'
-      }
-    ],
-    patient_questions_for_doctor: [
-      'Are both of these blood-thinning medicines still needed for my current heart health?',
-      'Are there specific symptoms or warning signs (such as unusual bruising or dark stools) I should watch for?',
-      'Do I need regular blood tests (like an INR or kidney check) to keep this combination safe?'
-    ]
-  };
+  const data = location.state?.patientData;
+
+  if (!data) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)]">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+            <HeartHandshake className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
+            No Medication Check Selected
+          </h2>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-md mx-auto">
+            You reached this page without running an active medication safety review. Enter your medications to view plain-language safety insights and discussion questions for your doctor.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="primary"
+              onClick={() => navigate('/patient/medication-safety')}
+            >
+              Start Medication Safety Check
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const handlePrint = () => {
     window.print();

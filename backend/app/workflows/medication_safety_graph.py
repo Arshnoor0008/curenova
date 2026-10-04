@@ -24,6 +24,8 @@ class MedicationSafetyWorkflowState(TypedDict):
     higher_order_patterns: List[Dict[str, Any]]
     interaction_matrix: List[Dict[str, Any]]
     safety_results: Dict[str, Any]
+    adverse_event_overlap: List[Dict[str, Any]]
+    patient_context_considerations: List[str]
     clinician_discussion_points: List[str]
     patient_friendly_summary: List[Dict[str, Any]]
     patient_questions_for_doctor: List[str]
@@ -103,6 +105,8 @@ def node_safety_validation(state: MedicationSafetyWorkflowState) -> Dict[str, An
     return {
         "safety_results": safety_eval,
         "higher_order_patterns": safety_eval.get("detected_higher_order", []),
+        "adverse_event_overlap": safety_eval.get("adverse_event_overlap", []),
+        "patient_context_considerations": safety_eval.get("context_alerts", []),
         "overall_risk_score": safety_eval["overall_risk_score"],
         "overall_risk_category": safety_eval["overall_risk_category"],
         "summary_headline": safety_eval["summary_headline"],
@@ -176,6 +180,8 @@ def execute_medication_safety_analysis(
         "higher_order_patterns": [],
         "interaction_matrix": [],
         "safety_results": {},
+        "adverse_event_overlap": [],
+        "patient_context_considerations": [],
         "clinician_discussion_points": [],
         "patient_friendly_summary": [],
         "patient_questions_for_doctor": [],

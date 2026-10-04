@@ -26,52 +26,33 @@ export const ResearcherResults = () => {
   const navigate = useNavigate();
   const [reportModalOpen, setReportModalOpen] = useState(false);
 
-  // Fallback demo data if accessed directly
-  const data = location.state?.candidateData || {
-    drug_name: 'Metformin',
-    original_indication: 'Type 2 Diabetes Mellitus',
-    disease: "Alzheimer's Disease",
-    status_label: 'Potential Repurposing Candidate',
-    curenova_ranking: 92.4,
-    evidence_strength: 'Strong Evidence',
-    confidence_score: 0.88,
-    mechanism: 'AMPK activation improves neuronal metabolic resilience, reduces tau hyperphosphorylation via GSK3β inhibition, and suppresses microglial neuroinflammation.',
-    targets: ['AMPK (PRKAA1)', 'GSK3B', 'mTORC1'],
-    pathways: ['Neuronal glucose utilization', 'Tau hyperphosphorylation regulation', 'Autophagy clearance'],
-    supporting_papers: [
-      {
-        pmid: '33188177',
-        title: 'Metformin treatment is associated with reduced dementia incidence in large electronic health records cohort',
-        journal: 'Lancet Healthy Longev',
-        year: 2021,
-        citation: 'Shi, Q. et al. (2021) Lancet Healthy Longev, 2(11):e712-e722.'
-      },
-      {
-        pmid: '35447192',
-        title: 'Effects of Metformin on cerebral glucose metabolism in mild cognitive impairment: Phase II biomarker analysis',
-        journal: 'JAMA Neurology',
-        year: 2022,
-        citation: 'Koenig, A. M. et al. (2022) JAMA Neurol, 79(6):592-602.'
-      }
-    ],
-    clinical_trials: [
-      {
-        nct_id: 'NCT04098666',
-        title: 'Metformin in Preventing Cognitive Decline in Older Adults (MAP4AD)',
-        phase: 'Phase II/III',
-        status: 'Active, Recruiting',
-        enrollment: 370
-      }
-    ],
-    safety_signals: [
-      'Monitor renal function (eGFR < 30 mL/min contraindicated)',
-      'Long-term use may reduce Vitamin B12 absorption in elderly cohorts'
-    ],
-    limitations: [
-      'Clinical benefit in non-diabetic cognitive cohorts requires Phase III confirmation',
-      'Blood-brain barrier transport kinetics remain under active investigation'
-    ]
-  };
+  const data = location.state?.candidateData;
+
+  if (!data) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)]">
+          <div className="w-16 h-16 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-600 flex items-center justify-center mx-auto mb-4">
+            <Microscope className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
+            No Repurposing Candidate Selected
+          </h2>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-md mx-auto">
+            You reached this dossier page directly without selecting a repurposing candidate. Explore target diseases or analyze a biomedical query to inspect evidence rankings and clinical trial dossiers.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="primary"
+              onClick={() => navigate('/researcher/drug-repurposing')}
+            >
+              Go to Drug Repurposing Pipeline
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -9,213 +9,191 @@ import {
   Lock,
   Mail,
   User,
-  Building,
-  ShieldCheck,
-  CheckCircle2
+  Building
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import Select from '../components/ui/Select';
-import Card from '../components/ui/Card';
+
+const ROLES = [
+  {
+    role: 'doctor',
+    label: 'Clinician',
+    icon: Stethoscope,
+    accentColor: '#0284c7',
+  },
+  {
+    role: 'researcher',
+    label: 'Researcher',
+    icon: Microscope,
+    accentColor: '#0d9488',
+  },
+  {
+    role: 'patient',
+    label: 'Patient',
+    icon: HeartHandshake,
+    accentColor: '#10b981',
+  },
+];
 
 export const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const [role, setRole] = useState('doctor');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('doctor');
   const [organization, setOrganization] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const activeRoleMeta = ROLES.find((r) => r.role === role) || ROLES[0];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setError('Please provide your name, email, and password.');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
       const user = await register({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         password,
         role,
-        organization,
+        organization: organization.trim(),
       });
       navigate(`/${user.role}/dashboard`);
     } catch (err) {
-      setError(err.message || 'Registration failed.');
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4.25rem)] flex items-center justify-center p-4 sm:p-6 lg:p-10 bg-[var(--color-surface-ground)]">
-      <div className="w-full max-w-5xl rounded-3xl border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] shadow-[var(--shadow-overlay)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-        {/* Left Side: Role Info Panel */}
-        <div className="lg:col-span-5 bg-[#0b132b] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
-          <div className="space-y-6 relative z-10">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0284c7] text-white font-bold shadow-md shadow-[#0284c7]/20">
-                <Activity className="h-5 w-5" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-white">CureNova</span>
-            </div>
-
-            <div className="space-y-2">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#38bdf8]">
-                Enterprise Access
-              </span>
-              <h3 className="text-2xl font-extrabold tracking-tight leading-snug text-white">
-                Join the Biomedical Intelligence Platform
-              </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Gain access to multi-agent drug repurposing, pharmacokinetic interaction matrices, and patient digital twin simulations.
-              </p>
-            </div>
-
-            {/* Role Options Descriptions */}
-            <div className="space-y-3 pt-2">
-              <div
-                onClick={() => setRole('doctor')}
-                className={`p-3 rounded-xl border transition-all cursor-pointer ${
-                  role === 'doctor'
-                    ? 'border-[#0284c7] bg-[#1c2541] text-white'
-                    : 'border-[#334155] bg-transparent text-slate-400 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2 font-bold text-xs">
-                  <Stethoscope className="w-4 h-4 text-[#38bdf8]" />
-                  <span>Clinician / Hospital Physician</span>
-                </div>
-                <p className="text-[11px] text-slate-300 mt-1">
-                  Polypharmacy screening, interaction matrix & patient digital twin
-                </p>
-              </div>
-
-              <div
-                onClick={() => setRole('researcher')}
-                className={`p-3 rounded-xl border transition-all cursor-pointer ${
-                  role === 'researcher'
-                    ? 'border-[#0d9488] bg-[#1c2541] text-white'
-                    : 'border-[#334155] bg-transparent text-slate-400 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2 font-bold text-xs">
-                  <Microscope className="w-4 h-4 text-[#2dd4bf]" />
-                  <span>Biomedical Researcher</span>
-                </div>
-                <p className="text-[11px] text-slate-300 mt-1">
-                  Target alignment, Reactome pathway cascades & candidate ranking
-                </p>
-              </div>
-
-              <div
-                onClick={() => setRole('patient')}
-                className={`p-3 rounded-xl border transition-all cursor-pointer ${
-                  role === 'patient'
-                    ? 'border-[#059669] bg-[#1c2541] text-white'
-                    : 'border-[#334155] bg-transparent text-slate-400 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2 font-bold text-xs">
-                  <HeartHandshake className="w-4 h-4 text-[#34d399]" />
-                  <span>Patient & Consumer</span>
-                </div>
-                <p className="text-[11px] text-slate-300 mt-1">
-                  Plain-language medication safety guide & appointment companion
-                </p>
-              </div>
-            </div>
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 bg-[var(--color-surface-ground)]">
+      <div className="w-full max-w-md bg-[var(--color-surface-card)] rounded-2xl border border-[var(--color-border-subtle)] p-6 sm:p-8 shadow-[var(--shadow-card)] transition-colors">
+        
+        {/* Brand Icon & Heading */}
+        <div className="text-center mb-6">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-brand-primary)] text-white shadow-md shadow-[var(--color-brand-primary)]/20 mb-3">
+            <Activity className="h-6 w-6" />
           </div>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
+            Create Your Account
+          </h1>
+          <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+            Register to access your specialized workspace
+          </p>
+        </div>
 
-          <div className="pt-6 border-t border-[#1c2541] text-[10px] text-slate-400 space-y-1 relative z-10">
-            <div className="flex items-center gap-1.5 font-semibold text-slate-300">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#34d399]" />
-              <span>Evidence-Grounded Architecture</span>
-            </div>
-            <p>Strict Non-Prescribing Guardrails · Human Clinical Oversight Required</p>
+        {/* Role Selector Segmented Tabs */}
+        <div className="mb-5">
+          <label className="block text-[11px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2 text-center">
+            Select Your Role
+          </label>
+          <div className="grid grid-cols-3 gap-1.5 p-1 bg-[var(--color-surface-sunken)] rounded-xl border border-[var(--color-border-subtle)]">
+            {ROLES.map((r) => {
+              const Icon = r.icon;
+              const isSelected = role === r.role;
+              return (
+                <button
+                  key={r.role}
+                  type="button"
+                  onClick={() => {
+                    setRole(r.role);
+                    setError('');
+                  }}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-[var(--color-surface-card)] text-[var(--color-text-primary)] font-semibold shadow-sm border border-[var(--color-border-subtle)]'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                  }`}
+                >
+                  <Icon
+                    className="w-3.5 h-3.5 shrink-0"
+                    style={{ color: isSelected ? r.accentColor : 'inherit' }}
+                  />
+                  <span>{r.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Right Side: Registration Form */}
-        <div className="lg:col-span-7 p-8 sm:p-10 flex flex-col justify-center space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
-              Create Your Account
-            </h2>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">
-              Complete the registration details to access your specialized workspace.
-            </p>
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] text-[var(--color-status-critical-text)] text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#dc2626]" />
+            <span>{error}</span>
           </div>
+        )}
 
-          {error && (
-            <div className="p-3.5 rounded-xl bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] text-[var(--color-status-critical-text)] text-xs font-medium flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-[#dc2626]" />
-              <span>{error}</span>
-            </div>
-          )}
+        {/* Registration Form */}
+        <form onSubmit={handleSubmit} className="space-y-3.5">
+          <Input
+            label="Full Name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Dr. Jane Doe"
+            icon={User}
+            required
+            autoFocus
+          />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Full Name / Clinical Title"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Dr. Sarah Lin, MD"
-              icon={User}
-              required
-            />
+          <Input
+            label="Email Address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@institution.org"
+            icon={Mail}
+            required
+          />
 
-            <Input
-              label="Work / Institutional Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. doctor@curenova.ai"
-              icon={Mail}
-              required
-            />
+          <Input
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            icon={Lock}
+            required
+          />
 
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              icon={Lock}
-              required
-            />
+          <Input
+            label="Hospital / Organization (Optional)"
+            type="text"
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+            placeholder="e.g. University Hospital"
+            icon={Building}
+          />
 
-            <Input
-              label="Hospital / Institution / University"
-              type="text"
-              value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
-              placeholder="e.g. Stanford Medical Center"
-              icon={Building}
-            />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs text-white bg-[var(--color-brand-primary)] hover:bg-[var(--color-brand-secondary)] transition-colors shadow-sm cursor-pointer disabled:opacity-50 mt-2"
+          >
+            {loading ? 'Creating Account…' : `Register as ${activeRoleMeta.label}`}
+          </button>
+        </form>
 
-            <div className="pt-2">
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                loading={loading}
-                className="w-full"
-              >
-                Register Workspace Account
-              </Button>
-            </div>
-          </form>
-
-          <div className="text-center text-xs text-[var(--color-text-muted)]">
-            Already have an enterprise account?{' '}
-            <Link to="/login" className="text-[#0284c7] hover:underline font-semibold">
+        {/* Sign In Footer */}
+        <div className="text-center mt-6 pt-4 border-t border-[var(--color-border-subtle)]">
+          <p className="text-xs text-[var(--color-text-muted)]">
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="font-semibold text-[var(--color-brand-primary)] hover:underline"
+            >
               Sign In
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>

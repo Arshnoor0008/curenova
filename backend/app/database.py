@@ -24,6 +24,7 @@ class InMemoryDatabase:
         self.graph_data: Dict[str, Any] = {}
         self.evidence_data: List[Dict[str, Any]] = []
         self.is_loaded: bool = False
+        self.load_demo_data()
 
     def load_demo_data(self):
         demo_dir = settings.DATA_PATH / "demo"
@@ -70,37 +71,8 @@ class InMemoryDatabase:
         self.is_loaded = True
 
     def seed_demo_users(self):
-        default_users = [
-            {
-                "id": "usr-doctor-01",
-                "email": "doctor@curenova.ai",
-                "name": "Dr. Sarah Chen, MD, FACC",
-                "password_hash": hash_password("doctor123"),
-                "role": "doctor",
-                "organization": "Academic Medical Center",
-                "created_at": datetime.now(timezone.utc).isoformat()
-            },
-            {
-                "id": "usr-researcher-01",
-                "email": "researcher@curenova.ai",
-                "name": "Dr. Marcus Vance, PhD",
-                "password_hash": hash_password("researcher123"),
-                "role": "researcher",
-                "organization": "Institute for Translational Therapeutics",
-                "created_at": datetime.now(timezone.utc).isoformat()
-            },
-            {
-                "id": "usr-patient-01",
-                "email": "patient@curenova.ai",
-                "name": "Eleanor Jenkins",
-                "password_hash": hash_password("patient123"),
-                "role": "patient",
-                "organization": "Self",
-                "created_at": datetime.now(timezone.utc).isoformat()
-            }
-        ]
-        for u in default_users:
-            self.users[u["email"]] = u
+        # No pre-seeded demo accounts. Users register and log into their own accounts.
+        pass
 
     def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         return self.users.get(email.lower().strip())

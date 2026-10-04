@@ -30,74 +30,36 @@ export const DoctorResults = () => {
   const navigate = useNavigate();
   const [reportModalOpen, setReportModalOpen] = useState(false);
 
-  // Fallback demo data if navigated directly
-  const data = location.state?.analysisData || {
-    analysis_id: 'ana-med-cardio01',
-    overall_risk_score: 75,
-    overall_risk_category: 'High Risk',
-    summary_headline: 'Significant Polypharmacy Safety Alerts (1 High-Risk Interaction Identified)',
-    normalized_drugs: [
-      { raw_input: 'Aspirin', canonical_name: 'Aspirin', rxcui: '1191', drug_class: 'Antiplatelet / NSAID', target: 'COX-1, COX-2' },
-      { raw_input: 'Warfarin', canonical_name: 'Warfarin', rxcui: '11289', drug_class: 'Vitamin K Antagonist', target: 'VKORC1' },
-      { raw_input: 'Metformin', canonical_name: 'Metformin', rxcui: '6809', drug_class: 'Biguanide Antidiabetic', target: 'AMPK' },
-    ],
-    pairwise_interactions: [
-      {
-        drug_a: 'Aspirin',
-        drug_b: 'Warfarin',
-        severity: 'High Risk',
-        risk_level: 'severe',
-        interaction_type: 'Pharmacodynamic Synergism',
-        mechanism: 'Dual antihemostatic mechanism: Aspirin irreversibly inhibits platelet COX-1 (thromboxane A2 synthesis), while Warfarin impairs hepatic synthesis of coagulation factors II, VII, IX, and X. Concurrent administration exponentially elevates gastrointestinal mucosal and systemic major bleeding hazards without additive antithrombotic benefit in most chronic settings.',
-        adverse_events: ['Major Gastrointestinal Bleeding', 'Intracranial Hemorrhage', 'Gastric Ulceration'],
-        evidence_level: 'Strong Evidence',
-        confidence_score: 0.96,
-        citations: [
-          {
-            source: 'PubMed / CHEST Guidelines',
-            pmid: '22315268',
-            title: 'Antithrombotic therapy in atrial fibrillation: Antithrombotic Therapy and Prevention of Thrombosis, 9th ed: ACCP Guidelines',
-            citation: 'You, J. J. et al. (2012) Chest, 141(2 Suppl):e531S-e575S.'
-          },
-          {
-            source: 'openFDA Adverse Event Reporting System',
-            fda_signal: 'Increased reporting ratio (ROR 3.84, 95% CI 3.61-4.08) for upper gastrointestinal hemorrhage',
-            citation: 'openFDA Pharmacovigilance API Analytics (2024)'
-          }
-        ],
-        doctor_guidance: 'Assess INR frequently; evaluate indication for dual therapy (e.g., mechanical prosthetic valve vs vascular stenting). Consider proton pump inhibitor gastroprotection if combination is strictly required by specialty protocol.',
-        uncertainty: 'Low clinical uncertainty; well-established pharmacodynamic synergistic hazard across large prospective cohorts.'
-      }
-    ],
-    higher_order_patterns: [],
-    interaction_matrix: [
-      { drug_row: 'Aspirin', drug_col: 'Aspirin', severity: 'None', has_interaction: false, summary: 'Self' },
-      { drug_row: 'Aspirin', drug_col: 'Warfarin', severity: 'High Risk', has_interaction: true, summary: 'Dual antihemostatic synergism multiplying bleeding risk' },
-      { drug_row: 'Aspirin', drug_col: 'Metformin', severity: 'None', has_interaction: false, summary: 'No direct pharmacokinetic conflict' },
-      { drug_row: 'Warfarin', drug_col: 'Aspirin', severity: 'High Risk', has_interaction: true, summary: 'Dual antihemostatic synergism multiplying bleeding risk' },
-      { drug_row: 'Warfarin', drug_col: 'Warfarin', severity: 'None', has_interaction: false, summary: 'Self' },
-      { drug_row: 'Warfarin', drug_col: 'Metformin', severity: 'None', has_interaction: false, summary: 'No direct pharmacokinetic conflict' },
-      { drug_row: 'Metformin', drug_col: 'Aspirin', severity: 'None', has_interaction: false, summary: 'No direct pharmacokinetic conflict' },
-      { drug_row: 'Metformin', drug_col: 'Warfarin', severity: 'None', has_interaction: false, summary: 'No direct pharmacokinetic conflict' },
-      { drug_row: 'Metformin', drug_col: 'Metformin', severity: 'None', has_interaction: false, summary: 'Self' },
-    ],
-    adverse_event_overlap: [
-      { adverse_event: 'Major Gastrointestinal Bleeding', frequency_count: 1, contributing_pairs: ['Aspirin + Warfarin'], hazard_level: 'High' },
-      { adverse_event: 'Gastric Ulceration', frequency_count: 1, contributing_pairs: ['Aspirin + Warfarin'], hazard_level: 'High' }
-    ],
-    clinician_discussion_points: [
-      'Evaluate clinical indication for co-prescribing Aspirin and Warfarin. Assess INR frequently; evaluate indication for dual therapy.',
-      'Check renal function (eGFR) periodically to ensure safety of Metformin and clearance reserve.'
-    ],
-    patient_context_considerations: [
-      'Geriatric Patient (Age 72): Increased susceptibility to polypharmacy anticholinergic burden and bleeding events.',
-      'Renal Impairment (eGFR 52 mL/min/1.73m²): Renally cleared drugs require surveillance.'
-    ],
-    human_review_required: true,
-  };
+  const data = location.state?.analysisData;
+
+  if (!data) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)]">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
+            No Active Polypharmacy Analysis
+          </h2>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-md mx-auto">
+            You navigated directly to the results view without running an active medication evaluation. Select medications or choose a preset clinical regimen to view comprehensive interaction results.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="primary"
+              onClick={() => navigate('/doctor/medication-safety')}
+            >
+              Go to Medication Safety Workspace
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const drugNames = data.normalized_drugs?.map((d) => d.canonical_name) || [];
-  const isHighRisk = data.overall_risk_score >= 65;
+  const isHighRisk = (data.overall_risk_score ?? 0) >= 65;
 
   return (
     <div className="space-y-6">

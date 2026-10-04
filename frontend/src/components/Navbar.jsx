@@ -13,6 +13,8 @@ import {
   X,
   Sun,
   Moon,
+  Share2,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -76,90 +78,13 @@ export const Navbar = () => {
               </div>
             </Link>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1 text-xs font-medium">
-              <Link
-                to="/evidence"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
-                  isActive('/evidence')
-                    ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold border border-[var(--color-border-subtle)]'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                }`}
-              >
-                <Search className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />
-                Evidence Explorer
-              </Link>
 
-              <Link
-                to="/knowledge-graph"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
-                  isActive('/knowledge-graph')
-                    ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold border border-[var(--color-border-subtle)]'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                }`}
-              >
-                <Share2 className="h-3.5 w-3.5 text-[var(--color-text-muted)]" />
-                Knowledge Graph
-              </Link>
-
-              {user?.role === 'doctor' && (
-                <Link
-                  to="/doctor/dashboard"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
-                    isActive('/doctor')
-                      ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold border border-[var(--color-border-subtle)]'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                  }`}
-                >
-                  <Stethoscope className="h-3.5 w-3.5 text-[#0284c7]" />
-                  Clinician Workspace
-                </Link>
-              )}
-
-              {user?.role === 'researcher' && (
-                <Link
-                  to="/researcher/dashboard"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
-                    isActive('/researcher')
-                      ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold border border-[var(--color-border-subtle)]'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                  }`}
-                >
-                  <Microscope className="h-3.5 w-3.5 text-[#0d9488]" />
-                  Researcher Workspace
-                </Link>
-              )}
-
-              {user?.role === 'patient' && (
-                <Link
-                  to="/patient/dashboard"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
-                    isActive('/patient')
-                      ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold border border-[var(--color-border-subtle)]'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                  }`}
-                >
-                  <HeartHandshake className="h-3.5 w-3.5 text-[#059669]" />
-                  Patient Workspace
-                </Link>
-              )}
-
-              <Link
-                to="/about"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
-                  isActive('/about')
-                    ? 'bg-[var(--color-surface-hover)] text-[var(--color-text-primary)] font-semibold'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                }`}
-              >
-                About
-              </Link>
-            </nav>
           </div>
 
-          {/* Right Actions: Cmd+K Search trigger + Unified Avatar Menu */}
+          {/* Right Actions: Cmd+K Search trigger (logged-in only) + Avatar/Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Cmd+K Quick Launcher Button */}
+            {/* Cmd+K Quick Launcher — only visible when authenticated */}
+            {user && (
             <button
               type="button"
               onClick={() => setCommandPaletteOpen(true)}
@@ -172,6 +97,7 @@ export const Navbar = () => {
                 ⌘K
               </kbd>
             </button>
+            )}
 
             {/* Theme Toggle Button */}
             <button
@@ -231,60 +157,13 @@ export const Navbar = () => {
                       </div>
                     </div>
 
-                    {/* Switch Persona Options */}
-                    <div className="space-y-1 mb-2">
-                      <div className="px-2 py-1 text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">
-                        Switch Clinical Role
+                    {/* Organization & Account Info */}
+                    {user.organization && (
+                      <div className="p-2 mb-1 bg-[var(--color-surface-sunken)] rounded-xl border border-[var(--color-border-subtle)] text-[11px] text-[var(--color-text-secondary)]">
+                        <span className="text-[10px] text-[var(--color-text-muted)] uppercase block tracking-wider font-semibold">Affiliation</span>
+                        <span className="font-medium text-[var(--color-text-primary)]">{user.organization}</span>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleRoleChange('doctor')}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-colors cursor-pointer ${
-                          user.role === 'doctor'
-                            ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold'
-                            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Stethoscope className="w-4 h-4 text-[#0284c7]" />
-                          <span>Clinician / Doctor</span>
-                        </div>
-                        {user.role === 'doctor' && <CheckCircle2 className="w-3.5 h-3.5 text-[#0284c7]" />}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleRoleChange('researcher')}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-colors cursor-pointer ${
-                          user.role === 'researcher'
-                            ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold'
-                            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Microscope className="w-4 h-4 text-[#0d9488]" />
-                          <span>Biomedical Researcher</span>
-                        </div>
-                        {user.role === 'researcher' && <CheckCircle2 className="w-3.5 h-3.5 text-[#0d9488]" />}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleRoleChange('patient')}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-colors cursor-pointer ${
-                          user.role === 'patient'
-                            ? 'bg-[var(--color-surface-hover)] text-[var(--color-brand-primary)] font-semibold'
-                            : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <HeartHandshake className="w-4 h-4 text-[#059669]" />
-                          <span>Patient / Consumer</span>
-                        </div>
-                        {user.role === 'patient' && <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />}
-                      </button>
-                    </div>
+                    )}
 
                     {/* Divider & Signout */}
                     <div className="border-t border-[var(--color-border-subtle)] pt-1 space-y-1">
@@ -314,71 +193,31 @@ export const Navbar = () => {
                         className="w-full flex items-center gap-2 p-2 rounded-lg text-xs text-[#dc2626] dark:text-[#f87171] hover:bg-[var(--color-status-critical-bg)] cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" />
-                        <span>Sign Out of Platform</span>
+                        <span>Sign Out</span>
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#0284c7] hover:bg-[#0369a1] transition-colors shadow-2xs"
-              >
-                Sign In
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-[var(--color-brand-primary)] hover:bg-[var(--color-brand-secondary)] transition-colors shadow-sm"
+                >
+                  Register
+                </Link>
+              </div>
             )}
 
-            {/* Mobile menu toggle */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] rounded-lg"
-              aria-label="Toggle navigation menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
         </div>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] px-5 py-4 space-y-3">
-            <Link
-              to="/evidence"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-2 text-sm font-medium text-[var(--color-text-primary)]"
-            >
-              <Search className="w-4 h-4 text-[var(--color-brand-primary)]" />
-              Evidence Explorer
-            </Link>
-            <Link
-              to="/knowledge-graph"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-2 text-sm font-medium text-[var(--color-text-primary)]"
-            >
-              <Share2 className="w-4 h-4 text-[var(--color-brand-primary)]" />
-              Knowledge Graph
-            </Link>
-            {user && (
-              <Link
-                to={`/${user.role}/dashboard`}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 py-2 text-sm font-semibold text-[var(--color-brand-primary)] capitalize"
-              >
-                <Activity className="w-4 h-4" />
-                My Workspace ({user.role})
-              </Link>
-            )}
-            <Link
-              to="/about"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-2 text-sm font-medium text-[var(--color-text-secondary)]"
-            >
-              About CureNova
-            </Link>
-          </div>
-        )}
       </header>
 
       {/* Global Command Palette */}

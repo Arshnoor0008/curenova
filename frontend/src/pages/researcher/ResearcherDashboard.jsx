@@ -42,68 +42,55 @@ export const ResearcherDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0d9488]">
-              <Microscope className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
+      {/* ── Colorful Hero Banner ── */}
+      <div
+        className="relative overflow-hidden rounded-3xl p-7 text-white shadow-2xl"
+        style={{
+          background: 'linear-gradient(135deg, #0a2e2b 0%, #0d9488 55%, #0891b2 100%)',
+        }}
+      >
+        <div className="absolute top-[-30px] right-[-30px] w-52 h-52 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+        <div className="absolute bottom-[-20px] left-[40%] w-40 h-40 rounded-full bg-[#2dd4bf]/20 blur-2xl pointer-events-none" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
+                <Microscope className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-widest text-white/60">Researcher Dashboard</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
               Translational Research Portal
             </h1>
+            <p className="text-sm text-white/65 max-w-[55ch]">
+              Welcome, <strong className="text-white">{user?.name || 'Researcher'}</strong>. Discover repurposing candidates through target-disease alignment and peer-reviewed evidence.
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-1">
-            Welcome, {user?.name || 'Dr. Marcus Vance, PhD'}. Evidence-grounded drug repurposing and target alignment.
-          </p>
-        </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          icon={Sparkles}
-          onClick={() => navigate('/researcher/drug-repurposing')}
-          className="shrink-0 !bg-[#0d9488] hover:!bg-[#0f766e]"
-        >
-          New Repurposing Query
-        </Button>
+          <div className="flex flex-wrap gap-3 shrink-0">
+            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
+              <div className="text-2xl font-black tabular-nums">4</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Disease Models</div>
+            </div>
+            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
+              <div className="text-2xl font-black tabular-nums">12</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Candidates Ranked</div>
+            </div>
+            <Button
+              variant="primary"
+              size="md"
+              icon={Sparkles}
+              onClick={() => navigate('/researcher/drug-repurposing')}
+              className="shrink-0 !bg-white !text-[#0d9488] hover:!bg-white/90 self-center"
+            >
+              New Query
+            </Button>
+          </div>
+        </div>
       </div>
 
       <SafetyDisclaimer variant="compact" />
-
-      {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Curated Disease Models"
-          value="4 Models"
-          subtitle="Neurodegenerative, oncology & metabolic"
-          icon={Database}
-        />
-
-        <StatCard
-          title="Ranked Candidates"
-          value="12 Compounds"
-          change="+4 Novel"
-          changeType="positive"
-          subtitle="Scored via CureNova target alignment"
-          icon={Layers}
-        />
-
-        <StatCard
-          title="Clinical Trials Indexed"
-          value="8 Trials"
-          subtitle="Phase II & III interventional registries"
-          icon={Activity}
-        />
-
-        <StatCard
-          title="Literature Grounding"
-          value="100%"
-          subtitle="Verified by PubMed & ChEMBL assays"
-          badgeText="Verified"
-          icon={CheckCircle2}
-        />
-      </div>
 
       {/* Main Grid: Disease Models & Hypothesis Ranking */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

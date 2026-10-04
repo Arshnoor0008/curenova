@@ -32,31 +32,52 @@ export const PatientDashboard = () => {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      {/* Warm Patient Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#059669]">
-              <HeartHandshake className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
+      {/* ── Colorful Hero Banner ── */}
+      <div
+        className="relative overflow-hidden rounded-3xl p-7 text-white shadow-2xl"
+        style={{
+          background: 'linear-gradient(135deg, #052e16 0%, #059669 55%, #0891b2 100%)',
+        }}
+      >
+        <div className="absolute top-[-30px] right-[-30px] w-52 h-52 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+        <div className="absolute bottom-[-10px] left-[35%] w-36 h-36 rounded-full bg-[#34d399]/20 blur-2xl pointer-events-none" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
+                <HeartHandshake className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-widest text-white/60">Patient Dashboard</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
               My Medication Guide
             </h1>
+            <p className="text-sm text-white/65 max-w-[55ch]">
+              Hello, <strong className="text-white">{user?.name || 'there'}</strong>! Here's a clear, safe guide to how your medications work together.
+            </p>
           </div>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            Hello, {user?.name || 'Eleanor'}. Clear, safe guidance on how your medications work together.
-          </p>
-        </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          icon={ShieldCheck}
-          onClick={() => navigate('/patient/medication-safety')}
-          className="shrink-0 !bg-[#059669] hover:!bg-[#047857]"
-        >
-          Check My Medicines
-        </Button>
+          <div className="flex flex-wrap gap-3 shrink-0">
+            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
+              <div className="text-2xl font-black tabular-nums">3</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Active Meds</div>
+            </div>
+            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
+              <div className="text-2xl font-black tabular-nums">1</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Alert to Review</div>
+            </div>
+            <Button
+              variant="primary"
+              size="md"
+              icon={ShieldCheck}
+              onClick={() => navigate('/patient/medication-safety')}
+              className="shrink-0 !bg-white !text-[#059669] hover:!bg-white/90 self-center"
+            >
+              Check My Medicines
+            </Button>
+          </div>
+        </div>
       </div>
 
       <SafetyDisclaimer variant="compact" />

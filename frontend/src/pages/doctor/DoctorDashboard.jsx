@@ -87,73 +87,56 @@ export const DoctorDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Clinical Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7]">
-              <Stethoscope className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
-              Clinician Medication Safety Workspace
-            </h1>
-          </div>
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-1">
-            Active evaluation environment for {user?.name || 'Dr. Sarah Chen, MD'}. Evidence-grounded polypharmacy decision support.
-          </p>
-        </div>
+      {/* ── Colorful Hero Banner ── */}
+      <div
+        className="relative overflow-hidden rounded-3xl p-7 text-white shadow-2xl"
+        style={{
+          background: 'linear-gradient(135deg, #0c2e52 0%, #0284c7 55%, #0369a1 100%)',
+        }}
+      >
+        {/* decorative orbs */}
+        <div className="absolute top-[-30px] right-[-30px] w-52 h-52 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+        <div className="absolute bottom-[-20px] left-[30%] w-36 h-36 rounded-full bg-[#38bdf8]/20 blur-2xl pointer-events-none" />
 
-        <Button
-          variant="primary"
-          size="md"
-          icon={Activity}
-          onClick={() => navigate('/doctor/medication-safety')}
-          className="shrink-0"
-        >
-          New Polypharmacy Analysis
-        </Button>
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
+                <Stethoscope className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-widest text-white/60">Clinician Dashboard</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+              Medication Safety Workspace
+            </h1>
+            <p className="text-sm text-white/65 max-w-[55ch]">
+              Welcome, <strong className="text-white">{user?.name || 'Doctor'}</strong>. Evidence-grounded polypharmacy decision support with Digital Twin simulations.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3 shrink-0">
+            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
+              <div className="text-2xl font-black tabular-nums">2</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Critical Alerts</div>
+            </div>
+            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
+              <div className="text-2xl font-black tabular-nums">14</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Regimens Evaluated</div>
+            </div>
+            <Button
+              variant="primary"
+              size="md"
+              icon={Activity}
+              onClick={() => navigate('/doctor/medication-safety')}
+              className="shrink-0 !bg-white !text-[#0284c7] hover:!bg-white/90 self-center"
+            >
+              New Analysis
+            </Button>
+          </div>
+        </div>
       </div>
 
       <SafetyDisclaimer variant="compact" />
-
-      {/* Metric Cards: Critical Regimen Alerts uses priority hazard rail */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Critical Regimen Alerts"
-          value="2"
-          subtitle="Immediate clinical reconciliation required"
-          priority={true}
-          icon={AlertTriangle}
-          onClick={() => setFilterSeverity('High')}
-        />
-
-        <StatCard
-          title="Evaluated Regimens"
-          value="14"
-          change="+18%"
-          changeType="positive"
-          subtitle="Cardiology and internal medicine cohorts"
-          icon={Users}
-        />
-
-        <StatCard
-          title="Digital Twin Simulations"
-          value="8"
-          change="75% Risk Delta"
-          changeType="positive"
-          subtitle="Alternative regimen scenarios evaluated"
-          icon={Cpu}
-          onClick={() => navigate('/doctor/medication-safety?tab=twin')}
-        />
-
-        <StatCard
-          title="Evidence Citations Grounded"
-          value="100%"
-          subtitle="Zero unverified or fabricated assertions"
-          badgeText="Verified"
-          icon={CheckCircle2}
-        />
-      </div>
 
       {/* Main Layout: Triage Table + Digital Twin Simulator Rail */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
