@@ -1,19 +1,231 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 'Inter Tight', 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-surface-ground: var(--color-surface-ground);
+  --color-surface-card: var(--color-surface-card);
+  --color-surface-overlay: var(--color-surface-overlay);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-surface-sunken: var(--color-surface-sunken);
+
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border-strong: var(--color-border-strong);
+  --color-border-focus: var(--color-border-focus);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-inverse: var(--color-text-inverse);
+
+  --color-brand-primary: var(--color-brand-primary);
+  --color-brand-primary-hover: var(--color-brand-primary-hover);
+  --color-brand-secondary: var(--color-brand-secondary);
+  --color-brand-surface: var(--color-brand-surface);
+  --color-brand-border: var(--color-brand-border);
+  --color-brand-text: var(--color-brand-text);
+
+  --color-status-critical: var(--color-status-critical);
+  --color-status-critical-bg: var(--color-status-critical-bg);
+  --color-status-critical-border: var(--color-status-critical-border);
+  --color-status-critical-text: var(--color-status-critical-text);
+  --color-status-critical-rail: var(--color-status-critical-rail);
+
+  --color-status-warning: var(--color-status-warning);
+  --color-status-warning-bg: var(--color-status-warning-bg);
+  --color-status-warning-border: var(--color-status-warning-border);
+  --color-status-warning-text: var(--color-status-warning-text);
+  --color-status-warning-rail: var(--color-status-warning-rail);
+
+  --color-status-safe: var(--color-status-safe);
+  --color-status-safe-bg: var(--color-status-safe-bg);
+  --color-status-safe-border: var(--color-status-safe-border);
+  --color-status-safe-text: var(--color-status-safe-text);
+  --color-status-safe-rail: var(--color-status-safe-rail);
+
+  --color-status-info: var(--color-status-info);
+  --color-status-info-bg: var(--color-status-info-bg);
+  --color-status-info-border: var(--color-status-info-border);
+  --color-status-info-text: var(--color-status-info-text);
+  --color-status-info-rail: var(--color-status-info-rail);
+
+  --shadow-base: var(--shadow-base);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
+}
+
+@utility bg-surface-ground { background-color: var(--color-surface-ground); }
+@utility bg-surface-card { background-color: var(--color-surface-card); }
+@utility bg-surface-overlay { background-color: var(--color-surface-overlay); }
+@utility bg-surface-hover { background-color: var(--color-surface-hover); }
+@utility bg-surface-sunken { background-color: var(--color-surface-sunken); }
+
+@utility border-subtle { border-color: var(--color-border-subtle); }
+@utility border-strong { border-color: var(--color-border-strong); }
+@utility border-focus { border-color: var(--color-border-focus); }
+
+@utility text-status-critical { color: var(--color-status-critical); }
+@utility text-status-warning { color: var(--color-status-warning); }
+@utility text-status-safe { color: var(--color-status-safe); }
+@utility text-status-info { color: var(--color-status-info); }
+
+@utility bg-status-critical-bg { background-color: var(--color-status-critical-bg); }
+@utility bg-status-warning-bg { background-color: var(--color-status-warning-bg); }
+@utility bg-status-safe-bg { background-color: var(--color-status-safe-bg); }
+@utility bg-status-info-bg { background-color: var(--color-status-info-bg); }
+
 @layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color-scheme: light;
+
+    /* Semantic Surfaces (Light) */
+    --color-surface-ground: #f8fafc;
+    --color-surface-card: #ffffff;
+    --color-surface-overlay: #ffffff;
+    --color-surface-hover: #f1f5f9;
+    --color-surface-sunken: #f1f5f9;
+
+    /* Semantic Borders (Light) */
+    --color-border-subtle: #e2e8f0;
+    --color-border-strong: #cbd5e1;
+    --color-border-focus: #0284c7;
+
+    /* Semantic Text (Light) */
+    --color-text-primary: #0b132b;
+    --color-text-secondary: #475569;
+    --color-text-muted: #64748b;
+    --color-text-inverse: #ffffff;
+
+    /* Brand Primary / Medical Cyan-Teal */
+    --color-brand-primary: #0284c7;
+    --color-brand-primary-hover: #0369a1;
+    --color-brand-secondary: #0d9488;
+    --color-brand-surface: #f0f9ff;
+    --color-brand-border: #bae6fd;
+    --color-brand-text: #0369a1;
+
+    /* Status: Critical Hazard (Strictly for High Risk / Severe Overdose / Black Box) */
+    --color-status-critical: #dc2626;
+    --color-status-critical-bg: #fef2f2;
+    --color-status-critical-border: #fecaca;
+    --color-status-critical-text: #991b1b;
+    --color-status-critical-rail: #b91c1c;
+
+    /* Status: Warning (Strictly for Moderate Risk / Drug Interaction Alert) */
+    --color-status-warning: #d97706;
+    --color-status-warning-bg: #fffbeb;
+    --color-status-warning-border: #fde68a;
+    --color-status-warning-text: #92400e;
+    --color-status-warning-rail: #b45309;
+
+    /* Status: Safe / Verified (Strictly for Monitored / No Direct Conflict / Active) */
+    --color-status-safe: #059669;
+    --color-status-safe-bg: #f0fdf4;
+    --color-status-safe-border: #bbf7d0;
+    --color-status-safe-text: #166534;
+    --color-status-safe-rail: #047857;
+
+    /* Status: Info / Informational (Study Evidence / Trial Notes) */
+    --color-status-info: #2563eb;
+    --color-status-info-bg: #eff6ff;
+    --color-status-info-border: #bfdbfe;
+    --color-status-info-text: #1e40af;
+    --color-status-info-rail: #1d4ed8;
+
+    /* Elevation & Shadows */
+    --shadow-base: 0 1px 3px 0 rgba(11, 19, 43, 0.05), 0 1px 2px -1px rgba(11, 19, 43, 0.05);
+    --shadow-raised: 0 4px 6px -1px rgba(11, 19, 43, 0.07), 0 2px 4px -2px rgba(11, 19, 43, 0.05);
+    --shadow-overlay: 0 20px 25px -5px rgba(11, 19, 43, 0.12), 0 8px 10px -6px rgba(11, 19, 43, 0.08);
+
+    /* Radii */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+
+    /* Motion */
+    --duration-fast: 150ms;
+    --duration-normal: 200ms;
+    --duration-slow: 250ms;
+    --ease-out-clinical: cubic-bezier(0.16, 1, 0.3, 1);
   }
-  
+
+  .dark {
+    color-scheme: dark;
+
+    /* Semantic Surfaces (Dark) */
+    --color-surface-ground: #070d19;
+    --color-surface-card: #0c1628;
+    --color-surface-overlay: #111e38;
+    --color-surface-hover: #162544;
+    --color-surface-sunken: #050912;
+
+    /* Semantic Borders (Dark) */
+    --color-border-subtle: #1e293b;
+    --color-border-strong: #334155;
+    --color-border-focus: #38bdf8;
+
+    /* Semantic Text (Dark) */
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-text-inverse: #070d19;
+
+    /* Brand Primary (Dark) */
+    --color-brand-primary: #38bdf8;
+    --color-brand-primary-hover: #7dd3fc;
+    --color-brand-secondary: #2dd4bf;
+    --color-brand-surface: rgba(56, 189, 248, 0.1);
+    --color-brand-border: rgba(56, 189, 248, 0.25);
+    --color-brand-text: #7dd3fc;
+
+    /* Status: Critical Hazard (Dark) */
+    --color-status-critical: #f87171;
+    --color-status-critical-bg: rgba(220, 38, 38, 0.15);
+    --color-status-critical-border: rgba(248, 113, 113, 0.3);
+    --color-status-critical-text: #fca5a5;
+    --color-status-critical-rail: #ef4444;
+
+    /* Status: Warning (Dark) */
+    --color-status-warning: #fbbf24;
+    --color-status-warning-bg: rgba(217, 119, 6, 0.15);
+    --color-status-warning-border: rgba(251, 191, 36, 0.3);
+    --color-status-warning-text: #fde68a;
+    --color-status-warning-rail: #f59e0b;
+
+    /* Status: Safe (Dark) */
+    --color-status-safe: #34d399;
+    --color-status-safe-bg: rgba(5, 150, 105, 0.15);
+    --color-status-safe-border: rgba(52, 211, 153, 0.3);
+    --color-status-safe-text: #a7f3d0;
+    --color-status-safe-rail: #10b981;
+
+    /* Status: Info (Dark) */
+    --color-status-info: #60a5fa;
+    --color-status-info-bg: rgba(37, 99, 235, 0.15);
+    --color-status-info-border: rgba(96, 165, 250, 0.3);
+    --color-status-info-text: #bfdbfe;
+    --color-status-info-rail: #3b82f6;
+
+    /* Elevation & Shadows (Dark) */
+    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+    --shadow-raised: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-overlay: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  }
+
   body {
+    background-color: var(--color-surface-ground);
+    color: var(--color-text-primary);
     font-family: var(--font-sans);
-    background-color: #f8fafc;
-    color: #0f172a;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    transition: background-color var(--duration-normal) var(--ease-out-clinical),
+                color var(--duration-normal) var(--ease-out-clinical);
   }
 
   #root {
@@ -21,79 +233,79 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 100%;
     margin: 0;
     border: none;
     text-align: left;
   }
 }
 
-/* Custom Scrollbar */
+/* Tabular Numerals Utility for Clinical Data & Scores */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1;
+}
+
+/* Headings tracking */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
+  font-feature-settings: "cv02" 1, "cv03" 1, "cv04" 1;
+}
+
+/* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--color-surface-sunken);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-border-strong);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-text-muted);
 }
 
-/* Glassmorphism & Accent Surfaces */
-.glass-surface {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+/* Shimmer Animation for Skeletons */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-.hero-gradient {
-  background: 
-    radial-gradient(1000px 500px at 50% 0%, rgba(14, 165, 233, 0.08) 0%, rgba(248, 250, 252, 0) 100%),
-    radial-gradient(600px 400px at 15% 20%, rgba(13, 148, 136, 0.05) 0%, rgba(248, 250, 252, 0) 100%),
-    radial-gradient(600px 400px at 85% 30%, rgba(99, 102, 241, 0.04) 0%, rgba(248, 250, 252, 0) 100%);
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.animate-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.8s infinite;
 }
 
-.dark-hero-gradient {
-  background: 
-    radial-gradient(800px 400px at 50% 0%, rgba(14, 165, 233, 0.15) 0%, rgba(15, 23, 42, 0) 100%),
-    radial-gradient(600px 300px at 20% 30%, rgba(13, 148, 136, 0.12) 0%, rgba(15, 23, 42, 0) 100%);
+.dark .animate-shimmer::after {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
-.subtle-grid {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(226, 232, 240, 0.6) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
+/* Pulse Glow Effect for Critical Hazard State */
+@keyframes pulse-critical {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
 }
 
-.subtle-grid-dark {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(51, 65, 85, 0.4) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(51, 65, 85, 0.4) 1px, transparent 1px);
-}
-
-/* Micro-animations */
-@keyframes float-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-.animate-float {
-  animation: float-gentle 4s ease-in-out infinite;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 0.4; }
-  100% { transform: scale(0.95); opacity: 0.8; }
-}
-
-.animate-pulse-ring {
-  animation: pulse-ring 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.pulse-critical {
+  animation: pulse-critical 2.4s infinite;
 }

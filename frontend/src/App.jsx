@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './components/ui/Toast';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -31,11 +33,13 @@ import PatientResults from './pages/patient/PatientResults';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-sky-500 selection:text-white">
-          <Navbar />
-          <div className="flex-1 flex flex-col">
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <Router>
+            <div className="min-h-screen flex flex-col bg-[var(--color-surface-ground)] text-[var(--color-text-primary)] font-sans antialiased">
+              <Navbar />
+              <div className="flex-1 flex flex-col">
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
@@ -94,11 +98,13 @@ function App() {
               {/* Catch-all redirect */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            </div>
           </div>
-        </div>
-      </Router>
-    </AuthProvider>
-  );
+        </Router>
+      </AuthProvider>
+    </ToastProvider>
+  </ThemeProvider>
+);
 }
 
 export default App;
