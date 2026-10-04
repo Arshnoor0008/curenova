@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import {
   Microscope,
   FileText,
@@ -7,14 +7,23 @@ import {
   Share2,
   ExternalLink,
   BookOpen,
-  ArrowRight
+  ArrowRight,
+  GitFork,
+  Dna,
+  ShieldAlert,
+  HelpCircle,
+  Activity
 } from 'lucide-react';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
 import RiskBadge from '../../components/RiskBadge';
 import ReportModal from '../../components/ReportModal';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 
 export const ResearcherResults = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [reportModalOpen, setReportModalOpen] = useState(false);
 
   // Fallback demo data if accessed directly
@@ -60,7 +69,7 @@ export const ResearcherResults = () => {
     ],
     limitations: [
       'Clinical benefit in non-diabetic cognitive cohorts requires Phase III confirmation',
-      'Blood-brain barrier transport kinetics remain under investigation'
+      'Blood-brain barrier transport kinetics remain under active investigation'
     ]
   };
 
@@ -71,175 +80,221 @@ export const ResearcherResults = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/researcher/drug-repurposing"
-            className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors"
+            className="p-2 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors cursor-pointer"
             title="Back to Discovery"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
               Candidate Repurposing Dossier: {data.drug_name}
             </h1>
-            <p className="text-xs text-slate-500">
-              Target Condition: {data.disease || "Alzheimer's Disease"} · Label: {data.status_label}
+            <p className="text-xs text-[var(--color-text-muted)] font-mono">
+              Target Condition: {data.disease} · Evaluated by CureNova Repurposing Engine
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="secondary"
+            size="md"
+            icon={FileText}
             onClick={() => setReportModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
           >
-            <FileText className="w-4 h-4 text-teal-700" />
-            <span>Export Dossier (PDF)</span>
-          </button>
-          <Link
-            to="/knowledge-graph"
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 rounded-xl transition-colors shadow-2xs cursor-pointer"
+            Export Dossier (PDF)
+          </Button>
+          <Button
+            variant="primary"
+            size="md"
+            icon={Share2}
+            onClick={() => navigate('/knowledge-graph')}
+            className="!bg-[#0d9488] hover:!bg-[#0f766e]"
           >
-            <Share2 className="w-4 h-4" />
-            <span>Open in Knowledge Graph</span>
-          </Link>
+            Inspect Network
+          </Button>
         </div>
       </div>
 
       <SafetyDisclaimer variant="compact" />
 
-      {/* Dossier Card */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+      {/* Hero Dossier Card */}
+      <Card elevation="raised" className="p-6 border-l-4 border-l-[#0d9488]">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="info" size="md">
                 {data.status_label}
-              </span>
+              </Badge>
               <RiskBadge severity={data.evidence_strength} size="sm" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mt-2">{data.drug_name}</h2>
-            <p className="text-xs text-slate-500">Original Indication: {data.original_indication}</p>
+            <h2 className="text-xl font-bold text-[var(--color-text-primary)]">
+              {data.drug_name} in {data.disease}
+            </h2>
+            <div className="text-xs text-[var(--color-text-secondary)] flex flex-wrap gap-2">
+              <span className="text-[var(--color-text-muted)]">Approved Indication:</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{data.original_indication}</span>
+            </div>
           </div>
-          <div className="text-right">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-              CureNova Ranking
+
+          <div className="sm:text-right shrink-0">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--color-text-muted)] block">
+              CureNova Congruence Ranking
             </span>
-            <span className="text-3xl font-extrabold text-teal-700 font-mono">
+            <div className="text-3xl font-extrabold tabular text-[#0d9488]">
               {data.curenova_ranking}
-              <span className="text-sm font-normal text-slate-400"> / 100</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Biological Mechanism */}
-        <div className="space-y-2">
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-            Biological Mechanism & Target Engagement
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed p-4 rounded-xl bg-slate-50 border border-slate-200">
-            {data.mechanism}
-          </p>
-        </div>
-
-        {/* Targets & Pathways */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Validated Target Proteins</h4>
-            <div className="flex flex-wrap gap-1.5">
-              {data.targets?.map((t, i) => (
-                <span key={i} className="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 text-xs font-mono font-semibold border border-teal-100">
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Reactome Pathways Involved</h4>
-            <div className="flex flex-wrap gap-1.5">
-              {data.pathways?.map((p, i) => (
-                <span key={i} className="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 text-xs font-medium border border-sky-100">
-                  {p}
-                </span>
-              ))}
+              <span className="text-sm font-normal text-[var(--color-text-muted)]"> / 100</span>
             </div>
           </div>
         </div>
+      </Card>
 
-        {/* Supporting Literature Table */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-            Supporting Publications (PubMed / ChEMBL)
-          </h3>
-          <div className="space-y-2">
-            {data.supporting_papers?.map((paper, idx) => (
-              <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-start justify-between gap-3 text-xs">
-                <div>
-                  <div className="font-semibold text-slate-800">{paper.title}</div>
-                  <div className="text-slate-500 text-[11px] mt-0.5">{paper.citation}</div>
+      {/* Main Dossier Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column: Biological Mechanism & Literature */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Pharmacological Rationale */}
+          <Card elevation="raised" className="p-6 space-y-4">
+            <CardTitle>Biological Mechanism & Target Concordance</CardTitle>
+            <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              {data.mechanism}
+            </p>
+
+            <div className="space-y-3 pt-2">
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider block mb-1">
+                  Validated Biological Targets (ChEMBL / UniProt)
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {data.targets?.map((t, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-md bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] border border-[var(--color-border-subtle)] font-mono text-xs font-semibold"
+                    >
+                      {t}
+                    </span>
+                  ))}
                 </div>
-                {paper.pmid && (
-                  <a
-                    href={`https://pubmed.ncbi.nlm.nih.gov/${paper.pmid}/`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 flex items-center gap-1 font-mono text-xs text-teal-700 font-bold hover:underline"
-                  >
-                    PMID: {paper.pmid} <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Clinical Trials Table */}
-        {data.clinical_trials?.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-              Clinical Trial Precedents (ClinicalTrials.gov)
-            </h3>
-            <div className="space-y-2">
-              {data.clinical_trials.map((trial, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 text-xs">
-                  <div>
-                    <div className="font-bold text-slate-800 flex items-center gap-2">
-                      <span className="font-mono text-teal-700">{trial.nct_id}</span>
-                      <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px]">{trial.phase}</span>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider block mb-1">
+                  Reactome Pathway Cascades
+                </span>
+                <div className="space-y-1 text-xs">
+                  {data.pathways?.map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="p-2.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] flex items-center gap-2"
+                    >
+                      <GitFork className="w-3.5 h-3.5 text-[#0d9488] shrink-0" />
+                      <span>{p}</span>
                     </div>
-                    <div className="text-slate-600 text-xs mt-0.5">{trial.title}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Supporting Publications */}
+          <Card elevation="raised" className="p-6 space-y-4">
+            <CardTitle>Supporting Peer-Reviewed Literature (PubMed)</CardTitle>
+            <div className="space-y-3">
+              {data.supporting_papers?.map((paper, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-1.5 text-xs"
+                >
+                  <div className="flex items-center justify-between font-semibold text-[var(--color-text-primary)]">
+                    <span className="font-bold">{paper.journal} ({paper.year})</span>
+                    <a
+                      href={`https://pubmed.ncbi.nlm.nih.gov/${paper.pmid}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#0d9488] hover:underline flex items-center gap-1 font-mono text-[10px] bg-[var(--color-surface-card)] px-1.5 py-0.5 rounded border border-[var(--color-border-subtle)]"
+                    >
+                      PMID: {paper.pmid} <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
-                  <span className="text-[11px] font-semibold text-slate-500 shrink-0">{trial.status}</span>
+                  <p className="text-[var(--color-text-secondary)] font-medium leading-relaxed">{paper.title}</p>
+                  <p className="text-[10px] text-[var(--color-text-muted)] italic font-mono">{paper.citation}</p>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </Card>
+        </div>
 
-        {/* Safety Signals */}
-        <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/70 text-xs text-amber-950 space-y-1.5">
-          <span className="font-bold block uppercase tracking-wider text-[10px] text-amber-800">
-            Preclinical & Regulatory Safety Signals:
-          </span>
-          {data.safety_signals?.map((s, i) => (
-            <div key={i}>• {s}</div>
-          ))}
-          {data.limitations?.map((l, i) => (
-            <div key={i} className="text-amber-800">• {l}</div>
-          ))}
+        {/* Right Column: Clinical Trials & Safety Rails */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* Clinical Trials Status */}
+          <Card elevation="raised" className="p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-[#0d9488]" />
+              <CardTitle>Clinical Trials Pipeline</CardTitle>
+            </div>
+            <div className="space-y-3 text-xs">
+              {data.clinical_trials?.map((trial, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-1.5"
+                >
+                  <div className="flex items-center justify-between font-bold text-[var(--color-text-primary)]">
+                    <span className="font-mono text-[#0d9488]">{trial.nct_id}</span>
+                    <Badge variant="info" size="sm">{trial.phase}</Badge>
+                  </div>
+                  <p className="text-[var(--color-text-secondary)] font-medium">{trial.title}</p>
+                  <div className="text-[10px] text-[var(--color-text-muted)] flex justify-between pt-1 border-t border-[var(--color-border-subtle)]">
+                    <span>Status: {trial.status}</span>
+                    <span className="font-mono tabular">N={trial.enrollment}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Safety Signals & Contraindications */}
+          <Card elevation="raised" className="p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-[#d97706]" />
+              <CardTitle>Known Safety Signals</CardTitle>
+            </div>
+            <div className="space-y-2 text-xs">
+              {data.safety_signals?.map((sig, idx) => (
+                <div
+                  key={idx}
+                  className="p-2.5 rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] leading-relaxed"
+                >
+                  {sig}
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Translational Limitations */}
+          <Card elevation="raised" className="p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 text-[var(--color-text-muted)] text-xs" />
+              <CardTitle>Evidence Limitations</CardTitle>
+            </div>
+            <div className="space-y-2 text-xs">
+              {data.limitations?.map((lim, idx) => (
+                <div
+                  key={idx}
+                  className="p-2.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] leading-relaxed"
+                >
+                  {lim}
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
       </div>
 
-      {/* Report Modal */}
       <ReportModal
         isOpen={reportModalOpen}
         onClose={() => setReportModalOpen(false)}
         reportType="researcher"
-        data={{
-          analysis_id: 'DOSSIER-EXP',
-          disease_detected: data.disease || "Alzheimer's Disease",
-          candidates: [data],
-          total_evidence_count: 12
-        }}
+        data={{ candidates: [data], query: data.disease }}
       />
     </div>
   );

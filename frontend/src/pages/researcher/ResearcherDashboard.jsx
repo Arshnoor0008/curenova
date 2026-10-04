@@ -11,13 +11,16 @@ import {
   Activity,
   CheckCircle2,
   Layers,
-  HelpCircle,
-  Database
+  Database,
+  GitFork
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { repurposingService } from '../../services/api';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
-import RiskBadge from '../../components/RiskBadge';
+import StatCard from '../../components/ui/StatCard';
+import Button from '../../components/ui/Button';
+import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import Badge from '../../components/ui/Badge';
 
 export const ResearcherDashboard = () => {
   const { user } = useAuth();
@@ -43,134 +46,178 @@ export const ResearcherDashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1 rounded-md bg-teal-100 text-teal-700">
-              <Microscope className="w-4 h-4" />
+            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0d9488]">
+              <Microscope className="w-5 h-5" />
             </span>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
               Translational Research Portal
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Welcome, {user?.name || 'Dr. Marcus Vance'}. AI-driven drug repurposing hypothesis exploration.
+          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-1">
+            Welcome, {user?.name || 'Dr. Marcus Vance, PhD'}. Evidence-grounded drug repurposing and target alignment.
           </p>
         </div>
 
-        <Link
-          to="/researcher/drug-repurposing"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 transition-all shadow-xs hover:shadow-md cursor-pointer shrink-0"
+        <Button
+          variant="primary"
+          size="md"
+          icon={Sparkles}
+          onClick={() => navigate('/researcher/drug-repurposing')}
+          className="shrink-0 !bg-[#0d9488] hover:!bg-[#0f766e]"
         >
-          <Sparkles className="w-4 h-4" />
-          <span>New Repurposing Query</span>
-        </Link>
+          New Repurposing Query
+        </Button>
       </div>
 
       <SafetyDisclaimer variant="compact" />
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
-            <span>Target Disease Models</span>
-            <span className="p-1 rounded-md bg-teal-50 text-teal-600">
-              <Database className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-900">4 Curated</div>
-          <div className="text-[11px] text-teal-600 font-medium">Neurodegenerative, oncology & metabolic</div>
-        </div>
+        <StatCard
+          title="Curated Disease Models"
+          value="4 Models"
+          subtitle="Neurodegenerative, oncology & metabolic"
+          icon={Database}
+        />
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
-            <span>Ranked Candidates</span>
-            <span className="p-1 rounded-md bg-sky-50 text-sky-600">
-              <Layers className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-900">12 Molecules</div>
-          <div className="text-[11px] text-slate-500">Labeled as Potential Repurposing Candidates</div>
-        </div>
+        <StatCard
+          title="Ranked Candidates"
+          value="12 Compounds"
+          change="+4 Novel"
+          changeType="positive"
+          subtitle="Scored via CureNova target alignment"
+          icon={Layers}
+        />
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
-            <span>Clinical Trials Indexed</span>
-            <span className="p-1 rounded-md bg-indigo-50 text-indigo-600">
-              <Activity className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-900">8 Trials</div>
-          <div className="text-[11px] text-indigo-600 font-medium">Phase II/III interventional studies</div>
-        </div>
+        <StatCard
+          title="Clinical Trials Indexed"
+          value="8 Trials"
+          subtitle="Phase II & III interventional registries"
+          icon={Activity}
+        />
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
-            <span>Evidence Validation</span>
-            <span className="p-1 rounded-md bg-emerald-50 text-emerald-600">
-              <CheckCircle2 className="w-4 h-4" />
-            </span>
-          </div>
-          <div className="text-3xl font-extrabold text-slate-900">100%</div>
-          <div className="text-[11px] text-slate-500">Peer-reviewed PubMed & ChEMBL citations</div>
-        </div>
+        <StatCard
+          title="Literature Grounding"
+          value="100%"
+          subtitle="Verified by PubMed & ChEMBL assays"
+          badgeText="Verified"
+          icon={CheckCircle2}
+        />
       </div>
 
-      {/* Target Diseases Grid */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div>
-            <h3 className="text-base font-bold text-slate-900">Curated Disease Repurposing Profiles</h3>
-            <p className="text-xs text-slate-500">Select any target indication to initiate multi-agent evidence exploration</p>
-          </div>
-          <Link
-            to="/researcher/drug-repurposing"
-            className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1"
-          >
-            Custom Query <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {diseases.map((d) => (
-            <div
-              key={d.id}
-              onClick={() => handleLaunchDisease(d.name)}
-              className="p-5 rounded-2xl border border-slate-200/80 bg-slate-50/50 hover:bg-teal-50/20 hover:border-teal-300 hover:shadow-xs transition-all cursor-pointer space-y-3 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-slate-200/80 text-slate-700">
-                  MeSH: {d.mesh_id || 'D000544'}
-                </span>
-                <span className="text-xs font-bold text-teal-700 bg-teal-100/60 px-2 py-0.5 rounded-full">
-                  {d.candidate_count} Repurposing Candidates
-                </span>
-              </div>
-
+      {/* Main Grid: Disease Models & Hypothesis Ranking */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Curated Disease Models */}
+        <div className="lg:col-span-8">
+          <Card elevation="raised">
+            <CardHeader className="flex items-center justify-between">
               <div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                  {d.name}
-                </h4>
-                <p className="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">
-                  {d.summary}
+                <CardTitle>Curated Target Disease Models</CardTitle>
+                <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                  Pre-compiled biological targets, cellular pathways, and known small-molecule candidates
                 </p>
               </div>
+              <Button
+                variant="subtle"
+                size="sm"
+                icon={ArrowRight}
+                iconPosition="right"
+                onClick={() => navigate('/researcher/drug-repurposing')}
+              >
+                Custom Search
+              </Button>
+            </CardHeader>
 
-              <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs text-teal-700 font-semibold">
-                <span>Evaluate Candidates & Mechanism</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {diseases.map((d, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => handleLaunchDisease(d.name)}
+                    className="p-5 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] hover:border-[#0d9488] hover:shadow-xs transition-all cursor-pointer space-y-3 group"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="text-sm font-bold text-[var(--color-text-primary)] group-hover:text-[#0d9488] transition-colors">
+                          {d.name}
+                        </h4>
+                        <span className="text-[11px] text-[var(--color-text-muted)] font-mono">
+                          {d.category || 'Pathology Model'}
+                        </span>
+                      </div>
+                      <Badge variant="info" size="sm">
+                        {d.total_candidates || 3} Candidates
+                      </Badge>
+                    </div>
+
+                    <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                      {d.pathophysiology || 'Complex multifactorial disease with multiple druggable molecular targets.'}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[var(--color-border-subtle)] text-xs text-[#0d9488] font-semibold">
+                      <span>Explore Repurposing Dossier</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Rail: Intelligence Tools */}
+        <div className="lg:col-span-4 space-y-4">
+          <Card elevation="raised" className="p-5 space-y-4 border-l-4 border-l-[#0d9488]">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0d9488]">
+                <Share2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-[var(--color-text-primary)]">
+                  Knowledge Graph Explorer
+                </h4>
+                <p className="text-xs text-[var(--color-text-muted)]">Multi-Relational Network Visualizer</p>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Explainable Hypothesis Generation Notice */}
-      <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-2 text-xs">
-        <h4 className="font-bold text-slate-800">CureNova Evidence Ranking Methodology</h4>
-        <p className="text-slate-600 leading-relaxed">
-          The CureNova Evidence Ranking computes a multi-factorial score (0–100) reflecting target binding affinity,
-          biological pathway congruence, volume of peer-reviewed publications, and clinical trial progression. All
-          outputs are strictly designated as <strong>"Potential Repurposing Candidates"</strong> to ensure ethical and
-          scientific rigor.
-        </p>
+            <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+              Explore interconnected nodes representing chemical compounds, protein targets, Reactome biological pathways, and clinical trial evidence.
+            </p>
+
+            <Button
+              variant="secondary"
+              size="md"
+              className="w-full"
+              icon={ArrowRight}
+              iconPosition="right"
+              onClick={() => navigate('/knowledge-graph')}
+            >
+              Launch Knowledge Graph
+            </Button>
+          </Card>
+
+          <Card elevation="raised" className="p-5 space-y-3">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+              Biomedical Evidence Sources
+            </h4>
+            <div className="space-y-2 text-xs">
+              <Link
+                to="/evidence"
+                className="block p-3 rounded-xl hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-colors"
+              >
+                <strong className="text-[var(--color-text-primary)] block">EMBL-EBI ChEMBL</strong>
+                <span className="text-[var(--color-text-muted)] text-[11px]">2.4M+ bioactive molecules with binding assays</span>
+              </Link>
+              <Link
+                to="/evidence"
+                className="block p-3 rounded-xl hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-colors"
+              >
+                <strong className="text-[var(--color-text-primary)] block">Reactome Pathway Database</strong>
+                <span className="text-[var(--color-text-muted)] text-[11px]">Curated human biochemical reaction cascades</span>
+              </Link>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

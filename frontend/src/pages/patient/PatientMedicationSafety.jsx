@@ -7,11 +7,16 @@ import {
   Trash2,
   AlertTriangle,
   ArrowRight,
-  Info
+  Info,
+  Pill,
+  X
 } from 'lucide-react';
 import { safetyService } from '../../services/api';
 import AnalysisProgress from '../../components/AnalysisProgress';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 
 export const PatientMedicationSafety = () => {
   const navigate = useNavigate();
@@ -20,7 +25,15 @@ export const PatientMedicationSafety = () => {
   const [executing, setExecuting] = useState(false);
   const [error, setError] = useState('');
 
-  const commonMeds = ['Aspirin', 'Warfarin', 'Metformin', 'Omeprazole (Prilosec)', 'Lisinopril', 'Ibuprofen (Advil)', 'Atorvastatin (Lipitor)'];
+  const commonMeds = [
+    'Aspirin',
+    'Warfarin',
+    'Metformin',
+    'Omeprazole (Prilosec)',
+    'Lisinopril',
+    'Ibuprofen (Advil)',
+    'Atorvastatin (Lipitor)'
+  ];
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -55,7 +68,7 @@ export const PatientMedicationSafety = () => {
       setTimeout(() => {
         setExecuting(false);
         navigate('/patient/results', { state: { patientData: response } });
-      }, 2400);
+      }, 2200);
     } catch (err) {
       setExecuting(false);
       setError(err.message || 'Safety check failed. Please try again.');
@@ -67,15 +80,15 @@ export const PatientMedicationSafety = () => {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="p-1 rounded-md bg-emerald-100 text-emerald-700">
-            <ShieldCheck className="w-4 h-4" />
+          <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#059669]">
+            <ShieldCheck className="w-5 h-5" />
           </span>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
             Check Your Medicine Safety
           </h1>
         </div>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Type or select the medicines and supplements you take to learn how they interact safely.
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+          Type or select the medicines and supplements you take to learn how they interact in everyday plain language.
         </p>
       </div>
 
@@ -84,109 +97,113 @@ export const PatientMedicationSafety = () => {
       {executing && (
         <div className="py-8">
           <AnalysisProgress
-            title="Checking Medicine Safety"
-            subtitle="Reviewing known safety guidelines and preparing clear talking points for your doctor"
+            title="Checking Your Medicine Safety"
+            subtitle="Reviewing Published Medical Guides and Safety Guidelines"
           />
         </div>
       )}
 
       {!executing && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-6">
-          {/* Input Form */}
-          <div className="space-y-2">
-            <label className="block text-sm font-bold text-slate-900">
-              What medicines do you currently take?
-            </label>
-            <form onSubmit={handleAdd} className="flex gap-2">
+        <div className="space-y-6">
+          {/* Main Input Card */}
+          <Card elevation="raised" className="p-6 sm:p-7 space-y-5">
+            <div>
+              <h3 className="text-base font-bold text-[var(--color-text-primary)]">Your Current Medicines</h3>
+              <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                Add prescription tablets, eye drops, injections, or over-the-counter vitamins you take regularly
+              </p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleAdd} className="flex gap-2.5">
               <input
                 type="text"
                 value={newMed}
                 onChange={(e) => setNewMed(e.target.value)}
-                placeholder="Type a medicine name (for example: Aspirin, Warfarin, Metformin)..."
-                className="flex-1 px-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-hidden"
+                placeholder="Type medicine name (e.g. Aspirin, Metformin, Vitamin D)..."
+                className="flex-1 px-4 py-3 text-sm rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#059669]"
               />
-              <button
+              <Button
                 type="submit"
-                className="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors shadow-xs cursor-pointer flex items-center gap-1.5"
+                variant="primary"
+                size="md"
+                icon={Plus}
+                className="!bg-[#059669] hover:!bg-[#047857]"
               >
-                <Plus className="w-4 h-4" /> Add
-              </button>
+                Add Medicine
+              </Button>
             </form>
-          </div>
 
-          {/* Quick Select Buttons */}
-          <div className="space-y-1.5">
-            <span className="text-xs font-semibold text-slate-400 block">Click to quickly add common medicines:</span>
-            <div className="flex flex-wrap gap-1.5">
-              {commonMeds.map((m, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleAddPreset(m)}
-                  className="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 text-xs transition-colors cursor-pointer"
-                >
-                  + {m}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Current List Pills */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <span className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
-              Your Entered Medicines ({medications.length}):
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {medications.map((m, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50/60 text-emerald-950 text-xs font-medium"
-                >
-                  <span>{m}</span>
+            {/* Quick-Add Popular Medicines */}
+            <div className="space-y-2 pt-1">
+              <span className="text-xs font-semibold text-[var(--color-text-muted)] block">
+                Quick Select Common Medicines:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {commonMeds.map((med) => (
                   <button
+                    key={med}
                     type="button"
-                    onClick={() => handleRemove(idx)}
-                    className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                    title={`Remove ${m}`}
+                    onClick={() => handleAddPreset(med)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-colors cursor-pointer"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    + {med}
                   </button>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
-              <span>{error}</span>
+            {/* Active Medicine Chips */}
+            <div className="pt-2">
+              <span className="text-xs font-semibold text-[var(--color-text-muted)] block mb-2">
+                Medicines Ready to Check ({medications.length}):
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {medications.map((med, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] text-sm font-semibold shadow-2xs"
+                  >
+                    <Pill className="w-4 h-4 text-[#059669]" />
+                    <span>{med}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(idx)}
+                      className="text-[var(--color-text-muted)] hover:text-[#dc2626] transition-colors cursor-pointer ml-1"
+                      title={`Remove ${med}`}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
 
-          {/* Action Button */}
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="text-xs text-slate-500">
-              Clear, easy-to-understand explanations. No medical jargon.
+            {error && (
+              <div className="p-3.5 rounded-lg bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] text-[var(--color-status-critical-text)] text-xs font-medium flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-[#dc2626]" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Submit Action */}
+            <div className="pt-4 border-t border-[var(--color-border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <span className="text-xs text-[var(--color-text-muted)]">
+                Plain language safety guidance grounded in peer-reviewed medical evidence
+              </span>
+              <Button
+                variant="primary"
+                size="lg"
+                icon={ShieldCheck}
+                onClick={handleCheckSafety}
+                className="w-full sm:w-auto !bg-[#059669] hover:!bg-[#047857]"
+              >
+                Check My Medicine Safety
+              </Button>
             </div>
-            <button
-              onClick={handleCheckSafety}
-              className="flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-md cursor-pointer"
-            >
-              <span>Check My Medicine Safety</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+          </Card>
         </div>
       )}
-
-      {/* Reassurance Callout */}
-      <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 leading-relaxed flex items-start gap-2.5">
-        <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-        <div>
-          <strong>Please note:</strong> This tool is meant to help you have informed conversations with your doctor.
-          Never stop, start, or adjust your dose without talking to your doctor or pharmacist first.
-        </div>
-      </div>
     </div>
   );
 };

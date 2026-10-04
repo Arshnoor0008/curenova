@@ -5,7 +5,6 @@ import {
   Stethoscope,
   Microscope,
   HeartHandshake,
-  ArrowRight,
   AlertCircle,
   Lock,
   Mail,
@@ -15,6 +14,10 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import Select from '../components/ui/Select';
+import Card from '../components/ui/Card';
 
 export const Register = () => {
   const { register } = useAuth();
@@ -48,183 +51,168 @@ export const Register = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-10 bg-slate-50">
-      <div className="w-full max-w-5xl rounded-3xl border border-slate-200/90 bg-white shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+    <div className="min-h-[calc(100vh-4.25rem)] flex items-center justify-center p-4 sm:p-6 lg:p-10 bg-[var(--color-surface-ground)]">
+      <div className="w-full max-w-5xl rounded-3xl border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] shadow-[var(--shadow-overlay)] overflow-hidden grid grid-cols-1 lg:grid-cols-12">
         {/* Left Side: Role Info Panel */}
-        <div className="lg:col-span-5 bg-slate-900 text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden dark-hero-gradient">
+        <div className="lg:col-span-5 bg-[#0b132b] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
           <div className="space-y-6 relative z-10">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 text-white font-bold shadow-md shadow-sky-500/20">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0284c7] text-white font-bold shadow-md shadow-[#0284c7]/20">
                 <Activity className="h-5 w-5" />
               </div>
-              <span className="text-xl font-bold tracking-tight">CureNova</span>
+              <span className="text-xl font-bold tracking-tight text-white">CureNova</span>
             </div>
 
             <div className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-teal-400">
-                Institutional Onboarding
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#38bdf8]">
+                Enterprise Access
               </span>
-              <h3 className="text-2xl font-extrabold tracking-tight leading-snug">
-                Join the Evidence-Grounded Healthcare Network
+              <h3 className="text-2xl font-extrabold tracking-tight leading-snug text-white">
+                Join the Biomedical Intelligence Platform
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Connect your clinical practice, research laboratory, or personal health regimen to verifiable biomedical intelligence.
+                Gain access to multi-agent drug repurposing, pharmacokinetic interaction matrices, and patient digital twin simulations.
               </p>
             </div>
 
+            {/* Role Options Descriptions */}
             <div className="space-y-3 pt-2">
-              <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700 text-xs space-y-1">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <Stethoscope className="w-3.5 h-3.5 text-sky-400" /> For Clinicians
-                </span>
-                <p className="text-slate-400 text-[11px]">
-                  Polypharmacy matrices, adverse event overlap, and Digital Twin scenario modeling.
+              <div
+                onClick={() => setRole('doctor')}
+                className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                  role === 'doctor'
+                    ? 'border-[#0284c7] bg-[#1c2541] text-white'
+                    : 'border-[#334155] bg-transparent text-slate-400 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2 font-bold text-xs">
+                  <Stethoscope className="w-4 h-4 text-[#38bdf8]" />
+                  <span>Clinician / Hospital Physician</span>
+                </div>
+                <p className="text-[11px] text-slate-300 mt-1">
+                  Polypharmacy screening, interaction matrix & patient digital twin
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700 text-xs space-y-1">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <Microscope className="w-3.5 h-3.5 text-teal-400" /> For Researchers
-                </span>
-                <p className="text-slate-400 text-[11px]">
-                  Target-disease congruence, Reactome pathway mapping, and CureNova Evidence Ranking.
+              <div
+                onClick={() => setRole('researcher')}
+                className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                  role === 'researcher'
+                    ? 'border-[#0d9488] bg-[#1c2541] text-white'
+                    : 'border-[#334155] bg-transparent text-slate-400 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2 font-bold text-xs">
+                  <Microscope className="w-4 h-4 text-[#2dd4bf]" />
+                  <span>Biomedical Researcher</span>
+                </div>
+                <p className="text-[11px] text-slate-300 mt-1">
+                  Target alignment, Reactome pathway cascades & candidate ranking
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700 text-xs space-y-1">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <HeartHandshake className="w-3.5 h-3.5 text-emerald-400" /> For Patients
-                </span>
-                <p className="text-slate-400 text-[11px]">
-                  Plain-language interaction warnings and actionable doctor discussion points.
+              <div
+                onClick={() => setRole('patient')}
+                className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                  role === 'patient'
+                    ? 'border-[#059669] bg-[#1c2541] text-white'
+                    : 'border-[#334155] bg-transparent text-slate-400 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2 font-bold text-xs">
+                  <HeartHandshake className="w-4 h-4 text-[#34d399]" />
+                  <span>Patient & Consumer</span>
+                </div>
+                <p className="text-[11px] text-slate-300 mt-1">
+                  Plain-language medication safety guide & appointment companion
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-800 text-[10px] text-slate-400 relative z-10">
-            Protected by Strict Non-Prescribing Guardrails · Multi-Source Verified
+          <div className="pt-6 border-t border-[#1c2541] text-[10px] text-slate-400 space-y-1 relative z-10">
+            <div className="flex items-center gap-1.5 font-semibold text-slate-300">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#34d399]" />
+              <span>Evidence-Grounded Architecture</span>
+            </div>
+            <p>Strict Non-Prescribing Guardrails · Human Clinical Oversight Required</p>
           </div>
         </div>
 
-        {/* Right Side: Form */}
+        {/* Right Side: Registration Form */}
         <div className="lg:col-span-7 p-8 sm:p-10 flex flex-col justify-center space-y-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-              Create Your CureNova Account
+            <h2 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
+              Create Your Account
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Select your persona and complete institutional registration.
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
+              Complete the registration details to access your specialized workspace.
             </p>
           </div>
 
           {error && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="p-3.5 rounded-xl bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] text-[var(--color-status-critical-text)] text-xs font-medium flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-[#dc2626]" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-            {/* Role Cards (Strictly 3 roles - NO ADMIN) */}
-            <div>
-              <label className="block font-bold text-slate-700 mb-1.5">
-                Select Your Role <span className="text-rose-500">*</span>
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { id: 'doctor', label: 'Doctor', icon: Stethoscope },
-                  { id: 'researcher', label: 'Researcher', icon: Microscope },
-                  { id: 'patient', label: 'Patient', icon: HeartHandshake },
-                ].map((r) => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRole(r.id)}
-                    className={`p-3 rounded-2xl border flex flex-col items-center gap-1.5 cursor-pointer transition-all ${
-                      role === r.id
-                        ? 'border-sky-600 bg-sky-50 text-sky-950 font-bold shadow-xs ring-1 ring-sky-500/20'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    <r.icon className={`w-5 h-5 ${role === r.id ? 'text-sky-600' : 'text-slate-400'}`} />
-                    <span className="text-xs capitalize">{r.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Full Name / Clinical Title"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Dr. Sarah Lin, MD"
+              icon={User}
+              required
+            />
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Dr. Jordan Taylor, MD"
-                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-hidden"
-                />
-              </div>
-            </div>
+            <Input
+              label="Work / Institutional Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. doctor@curenova.ai"
+              icon={Mail}
+              required
+            />
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="jordan.taylor@hospital.org"
-                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-hidden"
-                />
-              </div>
-            </div>
+            <Input
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              icon={Lock}
+              required
+            />
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Institution / Practice / Affiliation</label>
-              <div className="relative">
-                <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  placeholder="Academic Medical Center / Cancer Institute / Self"
-                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-hidden"
-                />
-              </div>
-            </div>
+            <Input
+              label="Hospital / Institution / University"
+              type="text"
+              value={organization}
+              onChange={(e) => setOrganization(e.target.value)}
+              placeholder="e.g. Stanford Medical Center"
+              icon={Building}
+            />
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 6 characters"
-                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-hidden"
-                />
-              </div>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                loading={loading}
+                className="w-full"
+              >
+                Register Workspace Account
+              </Button>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50 mt-2"
-            >
-              {loading ? 'Creating Account...' : 'Complete Registration'}
-            </button>
           </form>
 
-          <div className="text-center text-xs text-slate-500">
-            Already have an account?{' '}
-            <Link to="/login" className="font-bold text-sky-600 hover:underline">
+          <div className="text-center text-xs text-[var(--color-text-muted)]">
+            Already have an enterprise account?{' '}
+            <Link to="/login" className="text-[#0284c7] hover:underline font-semibold">
               Sign In
             </Link>
           </div>
