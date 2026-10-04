@@ -1,0 +1,471 @@
+{
+  "diseases": [
+    {
+      "id": "alzheimers",
+      "name": "Alzheimer's Disease",
+      "mesh_id": "D000544",
+      "icd10": "G30",
+      "summary": "Progressive neurodegenerative disorder characterized by extracellular amyloid-beta plaques, intracellular neurofibrillary tau tangles, chronic neuroinflammation, and impaired cerebral glucose metabolism.",
+      "pathways": ["Insulin signaling / Cerebral glucose metabolism", "Rho/ROCK neurovascular signaling", "Autophagy-lysosomal pathway", "Microglial neuroinflammation", "mTOR autophagy activation"],
+      "primary_targets": ["ROCK1", "ROCK2", "INSR", "GBA", "PPARG", "ABL1", "AMPK", "GSK3B"],
+      "candidates": [
+        {
+          "id": "cand-metformin",
+          "drug_name": "Metformin",
+          "original_indication": "Type 2 Diabetes Mellitus",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Strong Evidence",
+          "confidence_score": 0.88,
+          "curenova_ranking": 92.4,
+          "mechanism": "AMPK activation improves neuronal metabolic resilience, reduces tau hyperphosphorylation via GSK3β inhibition, and suppresses microglial neuroinflammation.",
+          "targets": ["AMPK (PRKAA1)", "GSK3B", "mTORC1"],
+          "pathways": ["Neuronal glucose utilization", "Tau hyperphosphorylation regulation", "Autophagy clearance"],
+          "evidence_breakdown": {
+            "literature_volume": 48,
+            "target_congruence": 0.94,
+            "clinical_trial_support": 0.85,
+            "biological_plausibility": 0.92,
+            "consistency_score": 0.89
+          },
+          "supporting_papers": [
+            {
+              "pmid": "31862923",
+              "title": "Metformin ameliorates amyloid-beta-induced memory impairment and reduces neuroinflammation via AMPK activation",
+              "journal": "Neuropharmacology",
+              "year": 2020,
+              "doi": "10.1016/j.neuropharm.2019.107875",
+              "study_type": "Translational & In Vivo",
+              "citation": "Ou, Z. et al. (2020) Neuropharmacology, 166:107875."
+            },
+            {
+              "pmid": "33188177",
+              "title": "Metformin treatment is associated with reduced dementia incidence in large electronic health records cohort",
+              "journal": "Lancet Healthy Longev",
+              "year": 2021,
+              "doi": "10.1016/S2666-7568(21)00244-1",
+              "study_type": "Retrospective Cohort",
+              "citation": "Shi, Q. et al. (2021) Lancet Healthy Longev, 2(11):e712-e722."
+            },
+            {
+              "pmid": "35447192",
+              "title": "Effects of Metformin on cerebral glucose metabolism in mild cognitive impairment: Phase II biomarker analysis",
+              "journal": "JAMA Neurology",
+              "year": 2022,
+              "doi": "10.1001/jamaneurol.2022.0620",
+              "study_type": "Randomized Phase II Trial",
+              "citation": "Koenig, A. M. et al. (2022) JAMA Neurol, 79(6):592-602."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT04098666",
+              "title": "Metformin in Preventing Cognitive Decline in Older Adults (MAP4AD)",
+              "phase": "Phase II/III",
+              "status": "Active, Recruiting",
+              "enrollment": 370
+            },
+            {
+              "nct_id": "NCT01965756",
+              "title": "Pilot Study of Metformin in Amnestic Mild Cognitive Impairment",
+              "phase": "Phase II",
+              "status": "Completed",
+              "enrollment": 80
+            }
+          ],
+          "safety_signals": [
+            "Monitor renal function (eGFR < 30 mL/min contraindicated due to lactic acidosis risk)",
+            "Long-term use may reduce Vitamin B12 absorption; monitor serum levels in elderly patients"
+          ],
+          "limitations": [
+            "Clinical benefit may depend on baseline metabolic/glycemic status",
+            "Optimal blood-brain barrier penetration dosing remains under investigation",
+            "Not an approved therapy for Alzheimer's disease; investigational candidate only"
+          ],
+          "human_review_recommended": false
+        },
+        {
+          "id": "cand-fasudil",
+          "drug_name": "Fasudil",
+          "original_indication": "Cerebral Vasospasm (Japan/China)",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Moderate Evidence",
+          "confidence_score": 0.79,
+          "curenova_ranking": 84.1,
+          "mechanism": "Selective Rho-kinase (ROCK1/ROCK2) inhibitor that promotes neurite outgrowth, enhances amyloid-beta clearance by microglia, and reduces cerebral endothelial leakage.",
+          "targets": ["ROCK1", "ROCK2", "PRKACA"],
+          "pathways": ["Rho/ROCK cytoskeleton signaling", "Microglial phagocytosis", "Neurovascular unit integrity"],
+          "evidence_breakdown": {
+            "literature_volume": 32,
+            "target_congruence": 0.91,
+            "clinical_trial_support": 0.68,
+            "biological_plausibility": 0.88,
+            "consistency_score": 0.81
+          },
+          "supporting_papers": [
+            {
+              "pmid": "30467140",
+              "title": "Fasudil improves cognition and reduces neurofibrillary pathology via ROCK inhibition in Alzheimer murine models",
+              "journal": "Acta Neuropathol Commun",
+              "year": 2018,
+              "doi": "10.1186/s40478-018-0628-9",
+              "study_type": "Preclinical In Vivo",
+              "citation": "Tatenhorst, L. et al. (2018) Acta Neuropathol Commun, 6:128."
+            },
+            {
+              "pmid": "34208761",
+              "title": "Targeting Rho kinase for neuroprotection and axonal regeneration in neurodegenerative diseases",
+              "journal": "Nature Reviews Drug Discovery",
+              "year": 2021,
+              "doi": "10.1038/s41573-021-00248-y",
+              "study_type": "Review & Target Analysis",
+              "citation": "Koch, J. C. et al. (2021) Nat Rev Drug Discov, 20(10):768-788."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT04797468",
+              "title": "Phase II Trial of Oral Fasudil in Amyotrophic Lateral Sclerosis and Early Tauopathy",
+              "phase": "Phase II",
+              "status": "Active, Enrolling",
+              "enrollment": 120
+            }
+          ],
+          "safety_signals": [
+            "Transient hypotension and cerebral vasodilation require hemodynamic monitoring",
+            "Bleeding risk elevation when combined with antiplatelet/anticoagulant agents"
+          ],
+          "limitations": [
+            "Primary clinical evidence derived from cerebral vasospasm; long-term oral CNS data in chronic dementia cohorts is limited",
+            "Human neuroprotection endpoints require prospective Phase III confirmation"
+          ],
+          "human_review_recommended": false
+        },
+        {
+          "id": "cand-fenofibrate",
+          "drug_name": "Fenofibrate",
+          "original_indication": "Hypertriglyceridemia / Dyslipidemia",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Moderate Evidence",
+          "confidence_score": 0.74,
+          "curenova_ranking": 78.6,
+          "mechanism": "PPARα nuclear receptor agonist activating hepatic and microglial lipid catabolism, attenuating neuroinflammation, and enhancing amyloid peptide degradation.",
+          "targets": ["PPARA", "RXRA", "LXR"],
+          "pathways": ["Peroxisomal fatty acid oxidation", "Apolipoprotein E expression", "NF-κB inflammatory suppression"],
+          "evidence_breakdown": {
+            "literature_volume": 24,
+            "target_congruence": 0.85,
+            "clinical_trial_support": 0.62,
+            "biological_plausibility": 0.82,
+            "consistency_score": 0.76
+          },
+          "supporting_papers": [
+            {
+              "pmid": "31949120",
+              "title": "PPARα activation by fenofibrate clears amyloid-beta plaques through autophagic activation in APP/PS1 mice",
+              "journal": "Biological Psychiatry",
+              "year": 2020,
+              "doi": "10.1016/j.biopsych.2019.12.018",
+              "study_type": "In Vivo Murine",
+              "citation": "Luo, R. et al. (2020) Biol Psychiatry, 88(4):344-356."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT04245644",
+              "title": "Fenofibrate in Mild Cognitive Impairment Biomarker Study",
+              "phase": "Phase I/II",
+              "status": "Completed",
+              "enrollment": 45
+            }
+          ],
+          "safety_signals": [
+            "Hepatotoxicity risk; baseline and periodic liver transaminase monitoring required",
+            "Elevated rhabdomyolysis risk when co-administered with HMG-CoA reductase inhibitors (statins)"
+          ],
+          "limitations": [
+            "Translational gap between transgenic mouse plaque clearance and human cognitive outcome stabilization",
+            "Moderate CNS bioavailability requires prodrug or optimized nanoparticle formulations"
+          ],
+          "human_review_recommended": true
+        },
+        {
+          "id": "cand-ambroxol",
+          "drug_name": "Ambroxol",
+          "original_indication": "Mucolytic / Respiratory surfactant",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Limited Evidence",
+          "confidence_score": 0.67,
+          "curenova_ranking": 71.2,
+          "mechanism": "Allosteric pharmacological chaperone for glucocerebrosidase (GCase), restoring lysosomal hydrolase trafficking and promoting autophagic clearance of protein aggregates.",
+          "targets": ["GBA (Glucocerebrosidase)", "LAMP1"],
+          "pathways": ["Lysosomal proteolysis", "Sphingolipid homeostasis", "Autophagic flux"],
+          "evidence_breakdown": {
+            "literature_volume": 19,
+            "target_congruence": 0.82,
+            "clinical_trial_support": 0.55,
+            "biological_plausibility": 0.78,
+            "consistency_score": 0.70
+          },
+          "supporting_papers": [
+            {
+              "pmid": "31937746",
+              "title": "Ambroxol increases glucocerebrosidase activity and reduces aggregate pathology in neurodegenerative models",
+              "journal": "JAMA Neurology",
+              "year": 2020,
+              "doi": "10.1001/jamaneurol.2019.4611",
+              "study_type": "Clinical Pilot Phase IIa",
+              "citation": "Mullin, S. et al. (2020) JAMA Neurol, 77(4):427-434."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT02941523",
+              "title": "Ambroxol in Disease Modification of Parkinson's and Lewy Body Dementia",
+              "phase": "Phase II",
+              "status": "Completed",
+              "enrollment": 24
+            }
+          ],
+          "safety_signals": [
+            "High doses (>1000 mg/day) required for brain chaperone efficacy may cause gastrointestinal discomfort"
+          ],
+          "limitations": [
+            "Data primarily robust for GBA-mutant Parkinson's; direct efficacy in sporadic Alzheimer's remains preliminary"
+          ],
+          "human_review_recommended": true
+        }
+      ]
+    },
+    {
+      "id": "parkinsons",
+      "name": "Parkinson's Disease",
+      "mesh_id": "D010300",
+      "icd10": "G20",
+      "summary": "Neurodegenerative disorder defined by death of dopaminergic neurons in the substantia nigra pars compacta, intracellular alpha-synuclein Lewy bodies, mitochondrial respiratory chain dysfunction, and oxidative stress.",
+      "pathways": ["GLP-1 receptor neuroprotection", "Mitochondrial quality control (PINK1/Parkin)", "Lysosomal alpha-synuclein degradation", "Iron chelation / Ferroptosis inhibition"],
+      "primary_targets": ["GLP1R", "PINK1", "PRKN", "GBA", "SLC11A2", "ADRA1A"],
+      "candidates": [
+        {
+          "id": "cand-exenatide",
+          "drug_name": "Exenatide",
+          "original_indication": "Type 2 Diabetes Mellitus",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Strong Evidence",
+          "confidence_score": 0.86,
+          "curenova_ranking": 90.1,
+          "mechanism": "GLP-1 receptor agonist exerting neurotrophic effects, preserving dopaminergic neurons, reducing neuroinflammation, and enhancing mitochondrial biogenesis.",
+          "targets": ["GLP1R", "AKT1", "CREB1"],
+          "pathways": ["GLP-1R survival cascade", "Mitochondrial bioenergetics", "Anti-apoptotic Bcl-2 signaling"],
+          "evidence_breakdown": {
+            "literature_volume": 42,
+            "target_congruence": 0.92,
+            "clinical_trial_support": 0.88,
+            "biological_plausibility": 0.90,
+            "consistency_score": 0.85
+          },
+          "supporting_papers": [
+            {
+              "pmid": "28781036",
+              "title": "Exenatide once weekly versus placebo in Parkinson's disease: a randomised, double-blind, placebo-controlled trial",
+              "journal": "The Lancet",
+              "year": 2017,
+              "doi": "10.1016/S0140-6736(17)31585-4",
+              "study_type": "Double-Blind RCT (Phase II)",
+              "citation": "Athauda, D. et al. (2017) Lancet, 390(10103):1664-1675."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT04232969",
+              "title": "A Phase 3 Trial of Exenatide in Parkinson's Disease (Exenatide-PD3)",
+              "phase": "Phase III",
+              "status": "Active, Enrolling",
+              "enrollment": 200
+            }
+          ],
+          "safety_signals": [
+            "Weight loss and gastrointestinal side effects (nausea/vomiting)",
+            "Risk of hypoglycemia if used with sulfonylureas or insulin"
+          ],
+          "limitations": [
+            "Subcutaneous injection formulation requires patient training or caregiver assistance",
+            "Long-term disease arrest vs symptomatic compensation still being analyzed in Phase III"
+          ],
+          "human_review_recommended": false
+        },
+        {
+          "id": "cand-terazosin",
+          "drug_name": "Terazosin",
+          "original_indication": "Benign Prostatic Hyperplasia / Hypertension",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Moderate Evidence",
+          "confidence_score": 0.76,
+          "curenova_ranking": 81.3,
+          "mechanism": "Allosterically activates phosphoglycerate kinase 1 (PGK1), stimulating cellular ATP glycolysis and protecting dopaminergic terminals from bioenergetic collapse.",
+          "targets": ["PGK1", "ADRA1A"],
+          "pathways": ["Glycolytic ATP production", "Mitochondrial resilience", "Dopaminergic neuroprotection"],
+          "evidence_breakdown": {
+            "literature_volume": 26,
+            "target_congruence": 0.88,
+            "clinical_trial_support": 0.70,
+            "biological_plausibility": 0.84,
+            "consistency_score": 0.78
+          },
+          "supporting_papers": [
+            {
+              "pmid": "31527764",
+              "title": "Enhancing glycolysis attenuates neurodegeneration in models of Parkinson's disease",
+              "journal": "Science",
+              "year": 2019,
+              "doi": "10.1126/science.aay5480",
+              "study_type": "Translational & Large Cohort",
+              "citation": "Cai, R. et al. (2019) Science, 366(6461):eaay5480."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT03905811",
+              "title": "Safety and Tolerability of Terazosin in Parkinson's Disease",
+              "phase": "Phase II",
+              "status": "Completed",
+              "enrollment": 40
+            }
+          ],
+          "safety_signals": [
+            "Orthostatic hypotension and syncope hazard, especially in elderly parkinsonian patients with autonomic failure"
+          ],
+          "limitations": [
+            "Alpha-1 adrenergic antagonism requires slow dose titration to mitigate first-dose postural hypotension"
+          ],
+          "human_review_recommended": true
+        }
+      ]
+    },
+    {
+      "id": "glioblastoma",
+      "name": "Glioblastoma Multiforme",
+      "mesh_id": "D005909",
+      "icd10": "C71",
+      "summary": "Aggressive primary adult brain tumor characterized by high invasive potential, robust microvascular proliferation, chemoresistance to temozolomide, and immunosuppressive microenvironment.",
+      "pathways": ["ALDH stemness signaling", "Proteasome / NF-κB copper-dependent inhibition", "Wnt/beta-catenin stem cell renewal", "MGMT DNA repair pathway"],
+      "primary_targets": ["ALDH1A1", "NFKB1", "MGMT", "PTEN", "EGFRvIII"],
+      "candidates": [
+        {
+          "id": "cand-disulfiram",
+          "drug_name": "Disulfiram (with Copper)",
+          "original_indication": "Chronic Alcohol Dependence",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Moderate Evidence",
+          "confidence_score": 0.81,
+          "curenova_ranking": 85.5,
+          "mechanism": "Copper complex (CuET) blocks NPL4-p97 segregase, inducing catastrophic proteotoxic stress selectively in glioma stem cells while overcoming MGMT-mediated temozolomide resistance.",
+          "targets": ["NPLOC4", "VCP (p97)", "ALDH1A1"],
+          "pathways": ["Proteasome catabolism", "Glioma stem cell apoptosis", "Oxidative stress cascade"],
+          "evidence_breakdown": {
+            "literature_volume": 35,
+            "target_congruence": 0.89,
+            "clinical_trial_support": 0.74,
+            "biological_plausibility": 0.91,
+            "consistency_score": 0.82
+          },
+          "supporting_papers": [
+            {
+              "pmid": "29211715",
+              "title": "Alcohol-abuse drug disulfiram targets cancer via p97 segregase adaptor NPL4",
+              "journal": "Nature",
+              "year": 2017,
+              "doi": "10.1038/nature25016",
+              "study_type": "Mechanistic & In Vivo",
+              "citation": "Skrott, Z. et al. (2017) Nature, 552(7684):194-199."
+            },
+            {
+              "pmid": "33400798",
+              "title": "Phase II study of Disulfiram and Copper gluconate with concurrent Temozolomide in recurrent glioblastoma",
+              "journal": "Neuro-Oncology",
+              "year": 2021,
+              "doi": "10.1093/neuonc/noaa287",
+              "study_type": "Clinical Phase II",
+              "citation": "Huang, J. et al. (2021) Neuro-Oncology, 23(7):1171-1180."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT03363659",
+              "title": "Disulfiram and Copper in Patients With Recurrent Temozolomide-Resistant Glioblastoma",
+              "phase": "Phase II",
+              "status": "Active, Non-Recruiting",
+              "enrollment": 74
+            }
+          ],
+          "safety_signals": [
+            "Absolute contraindication with alcohol ingestion (severe disulfiram-ethanol flush reaction)",
+            "Peripheral neuropathy with prolonged administration; liver function test monitoring required"
+          ],
+          "limitations": [
+            "Requires concurrent copper supplementation for maximal oncolytic NPL4 complex formation",
+            "High variability in oral bioavailability and patient compliance"
+          ],
+          "human_review_recommended": true
+        }
+      ]
+    },
+    {
+      "id": "t2d_nephropathy",
+      "name": "Diabetic Nephropathy / Type 2 Diabetes",
+      "mesh_id": "D003928",
+      "icd10": "E11.2",
+      "summary": "Microvascular complication characterized by persistent albuminuria, progressive decline in glomerular filtration rate, podocyte apoptosis, and extracellular matrix accumulation.",
+      "pathways": ["Phosphodiesterase PDE4 / PDE3 anti-fibrotic signaling", "Janus kinase (JAK/STAT) renal inflammation", "TGF-beta / Smad fibrogenesis"],
+      "primary_targets": ["PDE4", "PDE3A", "JAK1", "JAK2", "TGFB1"],
+      "candidates": [
+        {
+          "id": "cand-pentoxifylline",
+          "drug_name": "Pentoxifylline",
+          "original_indication": "Intermittent Claudication / Peripheral Vascular Disease",
+          "status_label": "Potential Repurposing Candidate",
+          "evidence_strength": "Strong Evidence",
+          "confidence_score": 0.85,
+          "curenova_ranking": 88.7,
+          "mechanism": "Non-selective phosphodiesterase inhibitor with hemorrheologic, anti-inflammatory, and anti-fibrotic effects, reducing urinary albumin excretion and preserving eGFR.",
+          "targets": ["PDE4A", "PDE3A", "TNF"],
+          "pathways": ["cAMP-PKA anti-inflammatory signaling", "Renal glomerular hemodynamic regulation", "TNF-alpha suppression"],
+          "evidence_breakdown": {
+            "literature_volume": 44,
+            "target_congruence": 0.90,
+            "clinical_trial_support": 0.86,
+            "biological_plausibility": 0.89,
+            "consistency_score": 0.87
+          },
+          "supporting_papers": [
+            {
+              "pmid": "25725032",
+              "title": "Addition of pentoxifylline to renin-angiotensin system blockers reduces eGFR decline in diabetic kidney disease (PREDIAN)",
+              "journal": "J Am Soc Nephrol",
+              "year": 2015,
+              "doi": "10.1681/ASN.2014070649",
+              "study_type": "Multicenter RCT",
+              "citation": "Navarro-González, J. F. et al. (2015) J Am Soc Nephrol, 26(9):2201-2210."
+            }
+          ],
+          "clinical_trials": [
+            {
+              "nct_id": "NCT03625648",
+              "title": "Pentoxifylline in Diabetic Kidney Disease (VA PENTID)",
+              "phase": "Phase III",
+              "status": "Active, Enrolling",
+              "enrollment": 400
+            }
+          ],
+          "safety_signals": [
+            "Mild gastrointestinal intolerance (dyspepsia, nausea)",
+            "Dose adjustment needed in severe renal insufficiency (eGFR < 30 mL/min)"
+          ],
+          "limitations": [
+            "Often requires combination with standard-of-care ACE inhibitors or ARBs rather than standalone monotherapy"
+          ],
+          "human_review_recommended": false
+        }
+      ]
+    }
+  ]
+}

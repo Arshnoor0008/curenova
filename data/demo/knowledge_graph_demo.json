@@ -1,0 +1,77 @@
+{
+  "nodes": [
+    { "id": "drug-metformin", "label": "Metformin", "type": "Drug", "category": "Biguanide Antidiabetic", "properties": { "atc": "A10BA02", "rxcui": "6809", "approved_year": 1995, "solubility": "Water-soluble" } },
+    { "id": "drug-fasudil", "label": "Fasudil", "type": "Drug", "category": "Rho-Kinase Inhibitor", "properties": { "approved_year": 1995, "region": "Japan/China", "target_class": "Kinase" } },
+    { "id": "drug-exenatide", "label": "Exenatide", "type": "Drug", "category": "GLP-1 Receptor Agonist", "properties": { "approved_year": 2005, "peptide": true } },
+    { "id": "drug-aspirin", "label": "Aspirin", "type": "Drug", "category": "Antiplatelet / NSAID", "properties": { "atc": "B01AC06", "rxcui": "1191" } },
+    { "id": "drug-warfarin", "label": "Warfarin", "type": "Drug", "category": "Anticoagulant", "properties": { "atc": "B01AA03", "rxcui": "11289" } },
+    { "id": "drug-clopidogrel", "label": "Clopidogrel", "type": "Drug", "category": "P2Y12 Antiplatelet", "properties": { "atc": "B01AC04", "rxcui": "32968" } },
+    { "id": "drug-omeprazole", "label": "Omeprazole", "type": "Drug", "category": "Proton Pump Inhibitor", "properties": { "atc": "A02BC01", "rxcui": "7646" } },
+    { "id": "drug-disulfiram", "label": "Disulfiram", "type": "Drug", "category": "Aldehyde Dehydrogenase Inhibitor", "properties": { "approved_year": 1951 } },
+    
+    { "id": "disease-alzheimers", "label": "Alzheimer's Disease", "type": "Disease", "category": "Neurodegenerative", "properties": { "icd10": "G30", "mesh": "D000544" } },
+    { "id": "disease-parkinsons", "label": "Parkinson's Disease", "type": "Disease", "category": "Neurodegenerative", "properties": { "icd10": "G20", "mesh": "D010300" } },
+    { "id": "disease-glioblastoma", "label": "Glioblastoma Multiforme", "type": "Disease", "category": "Oncology", "properties": { "icd10": "C71", "mesh": "D005909" } },
+    { "id": "disease-t2d", "label": "Type 2 Diabetes", "type": "Disease", "category": "Metabolic", "properties": { "icd10": "E11", "mesh": "D003924" } },
+    
+    { "id": "protein-ampk", "label": "AMPK (PRKAA1)", "type": "Protein", "category": "Serine/threonine kinase", "properties": { "uniprot": "Q13131", "gene": "PRKAA1" } },
+    { "id": "protein-rock1", "label": "ROCK1", "type": "Protein", "category": "Rho-associated kinase", "properties": { "uniprot": "Q13464", "gene": "ROCK1" } },
+    { "id": "protein-glp1r", "label": "GLP1R", "type": "Protein", "category": "G-protein coupled receptor", "properties": { "uniprot": "P43220", "gene": "GLP1R" } },
+    { "id": "protein-vkorc1", "label": "VKORC1", "type": "Protein", "category": "Vitamin K epoxide reductase", "properties": { "uniprot": "Q9BQB6", "gene": "VKORC1" } },
+    { "id": "protein-ptgs1", "label": "COX-1 (PTGS1)", "type": "Protein", "category": "Cyclooxygenase", "properties": { "uniprot": "P23219", "gene": "PTGS1" } },
+    { "id": "protein-cyp2c19", "label": "CYP2C19", "type": "Protein", "category": "Cytochrome P450 Enzyme", "properties": { "uniprot": "P33261", "gene": "CYP2C19" } },
+    { "id": "protein-npl4", "label": "NPL4 (NPLOC4)", "type": "Protein", "category": "p97 Adaptor", "properties": { "uniprot": "Q8TAT6", "gene": "NPLOC4" } },
+    
+    { "id": "gene-app", "label": "APP", "type": "Gene", "category": "Amyloid Precursor", "properties": { "hgnc": "620", "chromosome": "21q21.3" } },
+    { "id": "gene-snca", "label": "SNCA", "type": "Gene", "category": "Alpha-synuclein", "properties": { "hgnc": "11138", "chromosome": "4q22.1" } },
+    { "id": "gene-pink1", "label": "PINK1", "type": "Gene", "category": "PTEN-induced kinase 1", "properties": { "hgnc": "14583", "chromosome": "1p36.12" } },
+    { "id": "gene-prkaa1", "label": "PRKAA1", "type": "Gene", "category": "AMPK Alpha 1 Subunit", "properties": { "hgnc": "9376", "chromosome": "5p12" } },
+    { "id": "gene-rock1", "label": "ROCK1 Gene", "type": "Gene", "category": "Rho Kinase 1", "properties": { "hgnc": "10251", "chromosome": "18q11.1" } },
+    
+    { "id": "pathway-glucose", "label": "Cerebral Glucose & Insulin Signaling", "type": "Pathway", "category": "Metabolic", "properties": { "reactome": "R-HSA-70326" } },
+    { "id": "pathway-autophagy", "label": "Macroautophagy & Protein Clearance", "type": "Pathway", "category": "Cellular Degradation", "properties": { "reactome": "R-HSA-9612973" } },
+    { "id": "pathway-rock", "label": "RhoA / ROCK Cytoskeleton Dynamics", "type": "Pathway", "category": "Signaling Transduction", "properties": { "reactome": "R-HSA-194840" } },
+    { "id": "pathway-hemostasis", "label": "Platelet Aggregation & Coagulation Cascade", "type": "Pathway", "category": "Hemostasis", "properties": { "reactome": "R-HSA-109582" } },
+    
+    { "id": "trial-map4ad", "label": "NCT04098666 (MAP4AD)", "type": "ClinicalTrial", "category": "Phase II/III Trial", "properties": { "status": "Active", "condition": "Mild Cognitive Impairment / Alzheimer's" } },
+    { "id": "trial-exenatide3", "label": "NCT04232969 (Exenatide-PD3)", "type": "ClinicalTrial", "category": "Phase III Trial", "properties": { "status": "Recruiting", "condition": "Parkinson's Disease" } },
+    
+    { "id": "paper-lancet-2021", "label": "Shi et al. Lancet 2021 (PMID 33188177)", "type": "Paper", "category": "Cohort Study", "properties": { "journal": "Lancet Healthy Longev", "year": 2021 } },
+    { "id": "paper-nature-2017", "label": "Skrott et al. Nature 2017 (PMID 29211715)", "type": "Paper", "category": "Mechanistic Cell Biology", "properties": { "journal": "Nature", "year": 2017 } },
+    
+    { "id": "warning-bleeding", "label": "Major Bleeding Risk Signal", "type": "SafetySignal", "category": "BlackBox / Severe Adverse Event", "properties": { "fda_alert": "Bleeding Synergism", "severity": "High" } },
+    { "id": "warning-cyp2c19", "label": "CYP2C19 Loss-of-Activation Signal", "type": "SafetySignal", "category": "BlackBox Pharmacogenomic Alert", "properties": { "fda_alert": "Clopidogrel Diminished Bioactivation", "severity": "High" } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "drug-metformin", "target": "protein-ampk", "relationship": "TARGETS", "evidence": "Direct allosteric activation of AMPK complex", "confidence": 0.95 },
+    { "id": "e2", "source": "protein-ampk", "target": "pathway-glucose", "relationship": "PART_OF", "evidence": "Key regulator of cellular energy homeostasis", "confidence": 0.98 },
+    { "id": "e3", "source": "pathway-glucose", "target": "disease-alzheimers", "relationship": "INVOLVED_IN", "evidence": "Type 3 diabetes / impaired neuronal glucose uptake", "confidence": 0.89 },
+    { "id": "e4", "source": "drug-metformin", "target": "disease-alzheimers", "relationship": "STUDIED_FOR", "evidence": "Preclinical models & cohort studies showing neuroprotection", "confidence": 0.88 },
+    { "id": "e5", "source": "drug-metformin", "target": "trial-map4ad", "relationship": "TESTED_IN", "evidence": "Phase II/III Metformin for Alzheimer's Prevention", "confidence": 1.0 },
+    { "id": "e6", "source": "drug-metformin", "target": "paper-lancet-2021", "relationship": "SUPPORTED_BY", "evidence": "Large EHR retrospective cohort of dementia incidence", "confidence": 0.92 },
+    
+    { "id": "e7", "source": "drug-fasudil", "target": "protein-rock1", "relationship": "TARGETS", "evidence": "Selective Rho-kinase inhibition", "confidence": 0.94 },
+    { "id": "e8", "source": "protein-rock1", "target": "pathway-rock", "relationship": "PART_OF", "evidence": "Phosphorylates myosin light chain and cofilin", "confidence": 0.96 },
+    { "id": "e9", "source": "pathway-rock", "target": "disease-alzheimers", "relationship": "INVOLVED_IN", "evidence": "Regulates microglial amyloid phagocytosis and tau stability", "confidence": 0.85 },
+    { "id": "e10", "source": "drug-fasudil", "target": "disease-alzheimers", "relationship": "STUDIED_FOR", "evidence": "Improves cognition and lowers tau pathology in vivo", "confidence": 0.82 },
+    
+    { "id": "e11", "source": "drug-exenatide", "target": "protein-glp1r", "relationship": "TARGETS", "evidence": "Agonist of GLP-1 receptor cross-talk", "confidence": 0.97 },
+    { "id": "e12", "source": "drug-exenatide", "target": "disease-parkinsons", "relationship": "STUDIED_FOR", "evidence": "Dopaminergic neuroprotection in Phase II RCT", "confidence": 0.89 },
+    { "id": "e13", "source": "drug-exenatide", "target": "trial-exenatide3", "relationship": "TESTED_IN", "evidence": "Phase 3 Exenatide-PD3 Trial", "confidence": 1.0 },
+    
+    { "id": "e14", "source": "drug-disulfiram", "target": "protein-npl4", "relationship": "TARGETS", "evidence": "CuET complex induces p97/NPL4 segregase immobilization", "confidence": 0.93 },
+    { "id": "e15", "source": "drug-disulfiram", "target": "paper-nature-2017", "relationship": "SUPPORTED_BY", "evidence": "Nature landmark mechanism paper", "confidence": 0.98 },
+    { "id": "e16", "source": "drug-disulfiram", "target": "disease-glioblastoma", "relationship": "STUDIED_FOR", "evidence": "Overcomes temozolomide chemoresistance in recurrent GBM", "confidence": 0.84 },
+    
+    { "id": "e17", "source": "drug-aspirin", "target": "protein-ptgs1", "relationship": "TARGETS", "evidence": "Irreversible Ser529 acetylation", "confidence": 0.99 },
+    { "id": "e18", "source": "drug-warfarin", "target": "protein-vkorc1", "relationship": "TARGETS", "evidence": "Inhibits vitamin K 2,3-epoxide reductase", "confidence": 0.99 },
+    { "id": "e19", "source": "drug-aspirin", "target": "drug-warfarin", "relationship": "INTERACTS_WITH", "evidence": "Synergistic hemostatic suppression", "confidence": 0.98 },
+    { "id": "e20", "source": "drug-aspirin", "target": "warning-bleeding", "relationship": "HAS_WARNING", "evidence": "Major bleeding risk elevation with anticoagulants", "confidence": 0.96 },
+    { "id": "e21", "source": "drug-warfarin", "target": "warning-bleeding", "relationship": "HAS_WARNING", "evidence": "Direct anticoagulant bleeding alert", "confidence": 0.99 },
+    
+    { "id": "e22", "source": "drug-clopidogrel", "target": "protein-cyp2c19", "relationship": "TARGETS", "evidence": "Requires CYP2C19 oxidative bioactivation", "confidence": 0.97 },
+    { "id": "e23", "source": "drug-omeprazole", "target": "protein-cyp2c19", "relationship": "TARGETS", "evidence": "Competitive inhibition of CYP2C19 catalytic pocket", "confidence": 0.95 },
+    { "id": "e24", "source": "drug-omeprazole", "target": "drug-clopidogrel", "relationship": "INTERACTS_WITH", "evidence": "Prevents conversion of clopidogrel to active thiol metabolite", "confidence": 0.94 },
+    { "id": "e25", "source": "drug-clopidogrel", "target": "warning-cyp2c19", "relationship": "HAS_WARNING", "evidence": "FDA Black Box: Diminished antiplatelet effect with PPIs", "confidence": 0.95 }
+  ]
+}

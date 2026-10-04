@@ -1,0 +1,27 @@
+# CureNova - AI-Powered Medication Intelligence Platform
+
+# Node & Frontend
+**/node_modules/
+**/dist/
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python & Backend
+venv/
+.venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+*.db
+*.sqlite3
+sqlite.db
+
+# OS & Logs
+.DS_Store
+Thumbs.db
+*.log

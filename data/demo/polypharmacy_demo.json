@@ -1,0 +1,397 @@
+{
+  "drug_catalog": [
+    {
+      "id": "aspirin",
+      "canonical_name": "Aspirin",
+      "rxcui": "1191",
+      "atc_code": "B01AC06",
+      "aliases": ["aspirin", "acetylsalicylic acid", "asa", "ecotrin", "bayer aspirin"],
+      "class": "Antiplatelet / Non-Steroidal Anti-Inflammatory Drug (NSAID)",
+      "target": "Cyclooxygenase-1 (PTGS1), Cyclooxygenase-2 (PTGS2)",
+      "clearance": "Hepatic conjugation and renal excretion"
+    },
+    {
+      "id": "warfarin",
+      "canonical_name": "Warfarin",
+      "rxcui": "11289",
+      "atc_code": "B01AA03",
+      "aliases": ["warfarin", "coumadin", "jantoven", "warfarin sodium"],
+      "class": "Vitamin K Antagonist (Anticoagulant)",
+      "target": "Vitamin K epoxide reductase complex subunit 1 (VKORC1), CYP2C9",
+      "clearance": "Hepatic CYP2C9, CYP3A4 metabolism"
+    },
+    {
+      "id": "metformin",
+      "canonical_name": "Metformin",
+      "rxcui": "6809",
+      "atc_code": "A10BA02",
+      "aliases": ["metformin", "glucophage", "fortamet", "metformin hydrochloride"],
+      "class": "Biguanide Antihyperglycemic",
+      "target": "AMPK, Mitochondrial complex I",
+      "clearance": "Renal elimination unchanged via OCT2/MATE transporters"
+    },
+    {
+      "id": "clopidogrel",
+      "canonical_name": "Clopidogrel",
+      "rxcui": "32968",
+      "atc_code": "B01AC04",
+      "aliases": ["clopidogrel", "plavix", "clopidogrel bisulfate"],
+      "class": "P2Y12 Platelet Inhibitor",
+      "target": "P2Y12 Purinergic Receptor (CYP2C19 prodrug bioactivation)",
+      "clearance": "Hepatic CYP2C19 bioactivation followed by renal/fecal excretion"
+    },
+    {
+      "id": "omeprazole",
+      "canonical_name": "Omeprazole",
+      "rxcui": "7646",
+      "atc_code": "A02BC01",
+      "aliases": ["omeprazole", "prilosec", "prilosec otc"],
+      "class": "Proton Pump Inhibitor (PPI)",
+      "target": "H+/K+ ATPase, CYP2C19 inhibitor",
+      "clearance": "Hepatic CYP2C19 and CYP3A4"
+    },
+    {
+      "id": "lisinopril",
+      "canonical_name": "Lisinopril",
+      "rxcui": "29046",
+      "atc_code": "C09AA03",
+      "aliases": ["lisinopril", "prinivil", "zestril"],
+      "class": "ACE Inhibitor",
+      "target": "Angiotensin-Converting Enzyme (ACE)",
+      "clearance": "100% renal excretion unchanged"
+    },
+    {
+      "id": "spironolactone",
+      "canonical_name": "Spironolactone",
+      "rxcui": "9997",
+      "atc_code": "C03DA01",
+      "aliases": ["spironolactone", "aldactone"],
+      "class": "Aldosterone Receptor Antagonist (Potassium-Sparing Diuretic)",
+      "target": "Mineralocorticoid Receptor (NR3C2)",
+      "clearance": "Extensive hepatic metabolism to canrenone"
+    },
+    {
+      "id": "ibuprofen",
+      "canonical_name": "Ibuprofen",
+      "rxcui": "5640",
+      "atc_code": "M01AE01",
+      "aliases": ["ibuprofen", "advil", "motrin", "nurofen"],
+      "class": "NSAID",
+      "target": "COX-1 (PTGS1), COX-2 (PTGS2)",
+      "clearance": "Hepatic CYP2C9 metabolism, renal excretion"
+    },
+    {
+      "id": "atorvastatin",
+      "canonical_name": "Atorvastatin",
+      "rxcui": "83367",
+      "atc_code": "C10AA05",
+      "aliases": ["atorvastatin", "lipitor"],
+      "class": "HMG-CoA Reductase Inhibitor (Statin)",
+      "target": "HMGCR (HMG-CoA Reductase), CYP3A4 substrate",
+      "clearance": "Hepatic CYP3A4 oxidation, biliary excretion"
+    },
+    {
+      "id": "amlodipine",
+      "canonical_name": "Amlodipine",
+      "rxcui": "17767",
+      "atc_code": "C08CA01",
+      "aliases": ["amlodipine", "norvasc", "amlodipine besylate"],
+      "class": "Dihydropyridine Calcium Channel Blocker",
+      "target": "L-type Voltage-Gated Calcium Channels (CACNA1C)",
+      "clearance": "Hepatic CYP3A4 metabolism"
+    },
+    {
+      "id": "sertraline",
+      "canonical_name": "Sertraline",
+      "rxcui": "36437",
+      "atc_code": "N06AB06",
+      "aliases": ["sertraline", "zoloft", "sertraline hydrochloride"],
+      "class": "Selective Serotonin Reuptake Inhibitor (SSRI)",
+      "target": "Serotonin Transporter (SLC6A4)",
+      "clearance": "Hepatic CYP2B6, CYP2C19, CYP3A4"
+    },
+    {
+      "id": "tramadol",
+      "canonical_name": "Tramadol",
+      "rxcui": "10689",
+      "atc_code": "N02AX02",
+      "aliases": ["tramadol", "ultram", "tramadol hydrochloride"],
+      "class": "Opioid Agonist / SNRI Dual Analgesic",
+      "target": "Mu-Opioid Receptor (OPRM1), NET, SERT",
+      "clearance": "Hepatic CYP2D6 bioactivation to O-desmethyltramadol, renal elimination"
+    },
+    {
+      "id": "potassium_chloride",
+      "canonical_name": "Potassium Chloride",
+      "rxcui": "8591",
+      "atc_code": "A12BA01",
+      "aliases": ["potassium chloride", "k-dur", "klor-con", "micro-k"],
+      "class": "Electrolyte Supplement",
+      "target": "Cellular ion gradient regulation",
+      "clearance": "Renal filtration and tubular secretion"
+    }
+  ],
+  "pairwise_interactions": [
+    {
+      "pair": ["aspirin", "warfarin"],
+      "severity": "High Risk",
+      "risk_level": "severe",
+      "interaction_type": "Pharmacodynamic Synergism",
+      "mechanism": "Dual antihemostatic mechanism: Aspirin irreversibly inhibits platelet COX-1 (thromboxane A2 synthesis), while Warfarin impairs hepatic synthesis of coagulation factors II, VII, IX, and X. Concurrent administration exponentially elevates gastrointestinal mucosal and systemic major bleeding hazards without additive antithrombotic benefit in most chronic settings.",
+      "adverse_events": ["Major Gastrointestinal Bleeding", "Intracranial Hemorrhage", "Gastric Ulceration"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.96,
+      "clinical_citations": [
+        {
+          "source": "PubMed / CHEST Guidelines",
+          "pmid": "22315268",
+          "title": "Antithrombotic therapy in atrial fibrillation: Antithrombotic Therapy and Prevention of Thrombosis, 9th ed: ACCP Guidelines",
+          "citation": "You, J. J. et al. (2012) Chest, 141(2 Suppl):e531S-e575S."
+        },
+        {
+          "source": "openFDA Adverse Event Reporting System",
+          "fda_signal": "Increased reporting ratio (ROR 3.84, 95% CI 3.61-4.08) for upper gastrointestinal hemorrhage",
+          "citation": "openFDA Pharmacovigilance API Analytics (2024)"
+        }
+      ],
+      "doctor_guidance": "Assess INR frequently; evaluate indication for dual therapy (e.g., mechanical prosthetic valve vs vascular stenting). Consider proton pump inhibitor gastroprotection if combination is strictly required by specialty protocol.",
+      "patient_explanation": "Taking Aspirin and Warfarin together substantially thins your blood in two distinct ways. This combination greatly increases your chance of serious stomach bleeding or easy bruising. Do not change doses yourself, but notify your doctor immediately if you notice unusual bruising, dark tarry stools, or persistent bleeding.",
+      "uncertainty": "Low clinical uncertainty; well-established pharmacodynamic synergistic hazard across large prospective cohorts."
+    },
+    {
+      "pair": ["clopidogrel", "omeprazole"],
+      "severity": "High Risk",
+      "risk_level": "severe",
+      "interaction_type": "Pharmacokinetic Competitive CYP2C19 Inhibition",
+      "mechanism": "Omeprazole is a competitive inhibitor of cytochrome P450 2C19 (CYP2C19). Clopidogrel is an inactive prodrug requiring oxidative bioactivation by CYP2C19 to form its active thiol metabolite. Co-administration significantly diminishes platelet inhibition, increasing the risk of recurrent ischemic events and stent thrombosis.",
+      "adverse_events": ["Recurrent Myocardial Infarction", "Coronary Stent Thrombosis", "Reduced Antiplatelet Response"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.93,
+      "clinical_citations": [
+        {
+          "source": "FDA Drug Safety Communication",
+          "pmid": "20876113",
+          "title": "Reduced effectiveness of clopidogrel (Plavix) when taken with omeprazole (Prilosec): FDA Black Box Warning update",
+          "citation": "FDA Drug Safety Communication (Updated 2016); NEJM 2010; 363:1909-1917."
+        }
+      ],
+      "doctor_guidance": "Avoid co-administration. If gastric acid suppression is indicated, consider pantoprazole or an H2-receptor antagonist (famotidine), which exhibit minimal CYP2C19 inhibitory potency.",
+      "patient_explanation": "Omeprazole (Prilosec) blocks your body's ability to turn on Clopidogrel (Plavix). This can make Plavix less effective at preventing blood clots or heart problems. Ask your doctor or pharmacist about alternative stomach protectors like pantoprazole or famotidine.",
+      "uncertainty": "Low uncertainty; supported by randomized pharmacokinetic trials and FDA safety advisories."
+    },
+    {
+      "pair": ["lisinopril", "spironolactone"],
+      "severity": "Moderate Risk",
+      "risk_level": "moderate",
+      "interaction_type": "Pharmacodynamic Additive Renin-Angiotensin Aldosterone Blockade",
+      "mechanism": "Both agents inhibit potassium excretion: Lisinopril reduces angiotensin II-mediated aldosterone secretion, while Spironolactone directly antagonizes renal mineralocorticoid receptors in the distal collecting duct. Concurrent therapy significantly elevates the risk of severe hyperkalemia, especially with renal insufficiency or elderly age.",
+      "adverse_events": ["Severe Hyperkalemia", "Cardiac Arrhythmia", "Acute Kidney Injury"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.91,
+      "clinical_citations": [
+        {
+          "source": "New England Journal of Medicine",
+          "pmid": "15306665",
+          "title": "Rates of hyperkalemia after publication of the Randomized Aldactone Evaluation Study",
+          "citation": "Juurlink, D. N. et al. (2004) N Engl J Med, 351(6):543-551."
+        }
+      ],
+      "doctor_guidance": "Baseline serum potassium and creatinine must be monitored prior to initiation, at 1 week, 4 weeks, and every 3-6 months. Advise patient against dietary potassium salt substitutes.",
+      "patient_explanation": "Both of these medications help your heart and blood pressure, but both can cause your body to hold onto potassium. High potassium levels can cause weakness or irregular heartbeats. Your doctor will order routine blood tests to keep your potassium in a safe range.",
+      "uncertainty": "Synergistic clinical benefit in heart failure with reduced ejection fraction exists, but narrow therapeutic monitoring window requires stringent laboratory surveillance."
+    },
+    {
+      "pair": ["lisinopril", "ibuprofen"],
+      "severity": "Moderate Risk",
+      "risk_level": "moderate",
+      "interaction_type": "Pharmacodynamic & Hemodynamic Antagonism",
+      "mechanism": "NSAIDs inhibit renal prostaglandin synthesis (PGE2, PGI2), inducing afferent arteriolar vasoconstriction and attenuating lisinopril's antihypertensive and renal vasodilatory effects. In the presence of dehydration or baseline chronic kidney disease, simultaneous efferent vasodilation from lisinopril causes an acute drop in intraglomerular filtration pressure.",
+      "adverse_events": ["Acute Kidney Injury", "Attenuated Antihypertensive Efficacy", "Fluid Retention"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.89,
+      "clinical_citations": [
+        {
+          "source": "British Medical Journal",
+          "pmid": "23303884",
+          "title": "Concurrent use of diuretics, ACE inhibitors or ARBs, and NSAIDs and the risk of acute kidney injury",
+          "citation": "Lapi, F. et al. (2013) BMJ, 346:e8525."
+        }
+      ],
+      "doctor_guidance": "Avoid regular chronic NSAID therapy in patients taking ACE inhibitors. For mild pain, acetaminophen is preferred; if NSAID is mandatory, restrict duration to lowest effective dose and verify hydration status.",
+      "patient_explanation": "Over-the-counter pain relievers like Ibuprofen (Advil, Motrin) can counteract your blood pressure medicine and strain your kidneys. Check with your doctor or pharmacist for safer pain-relief options.",
+      "uncertainty": "Low uncertainty regarding hemodynamic interaction; individual risk depends on hydration and renal reserve."
+    },
+    {
+      "pair": ["sertraline", "tramadol"],
+      "severity": "High Risk",
+      "risk_level": "severe",
+      "interaction_type": "Pharmacodynamic Serotonergic Synergism & CYP2D6 Interaction",
+      "mechanism": "Concurrent administration of SSRI (sertraline) and tramadol (which inhibits serotonin and norepinephrine reuptake) markedly elevates synaptic serotonin concentrations, raising the risk of life-threatening Serotonin Syndrome. In addition, tramadol lowers the seizure threshold.",
+      "adverse_events": ["Serotonin Syndrome", "Seizures", "Autonomic Instability", "Hyperthermia"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.94,
+      "clinical_citations": [
+        {
+          "source": "Lancet / American Journal of Medicine",
+          "pmid": "16198642",
+          "title": "The serotonin syndrome",
+          "citation": "Boyer, E. W. & Shannon, M. (2005) N Engl J Med, 352(11):1112-1120."
+        }
+      ],
+      "doctor_guidance": "Avoid concurrent use. If opioid analgesia is essential in a patient on sertraline, consider alternative agents with low serotonergic potential (e.g. morphine, oxycodone) at careful titration.",
+      "patient_explanation": "Taking Sertraline and Tramadol together can cause too much serotonin to build up in your body, creating a dangerous condition called serotonin syndrome. Symptoms include shivering, sweating, fast heart rate, muscle twitches, or confusion. Contact emergency medical care immediately if these occur.",
+      "uncertainty": "Very low uncertainty; well-characterized neurologic toxic emergency."
+    },
+    {
+      "pair": ["atorvastatin", "amlodipine"],
+      "severity": "Low Risk",
+      "risk_level": "mild",
+      "interaction_type": "Pharmacokinetic Mild CYP3A4 Competition",
+      "mechanism": "Amlodipine mildly inhibits hepatic CYP3A4, which is the primary metabolic enzyme for atorvastatin. Co-administration can increase atorvastatin plasma exposure by approximately 18%, with slight increase in myopathy risk, but is commonly co-formulated when monitored.",
+      "adverse_events": ["Mild Myalgia", "Transient Elevation in Serum Transaminases"],
+      "evidence_level": "Moderate Evidence",
+      "confidence_score": 0.82,
+      "clinical_citations": [
+        {
+          "source": "Journal of Clinical Pharmacology",
+          "pmid": "12825324",
+          "title": "Pharmacokinetic interaction between amlodipine and atorvastatin in healthy volunteers",
+          "citation": "Caird, F. et al. (2003) J Clin Pharmacol, 43(7):728-735."
+        }
+      ],
+      "doctor_guidance": "Standard clinical co-prescription is acceptable; educate patient to report unexplained muscle pain, tenderness, or weakness. Limit atorvastatin dose if patient experiences muscle discomfort.",
+      "patient_explanation": "These two common heart medications are frequently prescribed together. There is a slight chance of muscle aches. Inform your doctor if you experience noticeable muscle soreness or tenderness.",
+      "uncertainty": "Low clinical hazard; benefits of cardiovascular risk reduction generally outweigh mild interaction."
+    },
+    {
+      "pair": ["spironolactone", "potassium_chloride"],
+      "severity": "High Risk",
+      "risk_level": "severe",
+      "interaction_type": "Direct Pharmacodynamic Potassium Accumulation",
+      "mechanism": "Direct additive risk: Spironolactone blocks aldosterone-mediated potassium excretion, while potassium chloride supplies exogenous potassium load. This combination can precipitate rapid, life-threatening hyperkalemia unless severe hypokalemia is actively documented.",
+      "adverse_events": ["Fatal Ventricular Arrhythmias", "Severe Hyperkalemia", "Cardiac Arrest"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.98,
+      "clinical_citations": [
+        {
+          "source": "Circulation / AHA Guidelines",
+          "pmid": "21383120",
+          "title": "Management of hyperkalemia in patients taking mineralocorticoid receptor antagonists",
+          "citation": "Palmer, B. F. (2011) N Engl J Med, 351:585-592."
+        }
+      ],
+      "doctor_guidance": "Generally contraindicated. Potassium supplements must be discontinued prior to starting spironolactone unless refractory hypokalemia is verified by daily inpatient monitoring.",
+      "patient_explanation": "Taking potassium supplements while taking Spironolactone can cause dangerously high potassium levels in your bloodstream, which can affect heart rhythm. Do not take potassium supplements unless your doctor has specifically reviewed your most recent lab results.",
+      "uncertainty": "Very low uncertainty; extreme physiological hazard."
+    },
+    {
+      "pair": ["warfarin", "ibuprofen"],
+      "severity": "High Risk",
+      "risk_level": "severe",
+      "interaction_type": "Pharmacodynamic Bleeding Synergism & Protein Binding Displacement",
+      "mechanism": "NSAIDs competitively displace warfarin from plasma albumin binding sites and induce gastric mucosal erosions while inhibiting platelet aggregation, multiplying gastrointestinal bleeding hazard fourfold.",
+      "adverse_events": ["Major Gastrointestinal Bleed", "Melena", "Severe Hemorrhage"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.97,
+      "clinical_citations": [
+        {
+          "source": "Arch Intern Med",
+          "pmid": "16380588",
+          "title": "Risk of upper gastrointestinal bleeding associated with selective COX-2 inhibitors and nonselective NSAIDs in warfarin users",
+          "citation": "Battistella, M. et al. (2005) Arch Intern Med, 165(2):189-192."
+        }
+      ],
+      "doctor_guidance": "Avoid systemic NSAID co-prescription. Use topical agents or acetaminophen if analgesia is needed.",
+      "patient_explanation": "Ibuprofen and Warfarin together can severely irritate your stomach and greatly increase your chance of bleeding ulcers. Talk to your doctor for safe pain relievers.",
+      "uncertainty": "Low clinical uncertainty; strong consensus."
+    },
+    {
+      "pair": ["aspirin", "ibuprofen"],
+      "severity": "Moderate Risk",
+      "risk_level": "moderate",
+      "interaction_type": "Pharmacodynamic Platelet COX-1 Competitive Blockade",
+      "mechanism": "Ibuprofen competitively blocks aspirin's access to the Ser529 catalytic site of platelet COX-1 when taken beforehand, diminishing aspirin's irreversible cardioprotective antiplatelet effect.",
+      "adverse_events": ["Attenuated Cardioprotection", "Gastrointestinal Ulceration"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.92,
+      "clinical_citations": [
+        {
+          "source": "NEJM",
+          "pmid": "11794170",
+          "title": "Inhibition of the antiplatelet effects of aspirin by ibuprofen",
+          "citation": "Catella-Lawson, F. et al. (2001) N Engl J Med, 345:1809-1817."
+        }
+      ],
+      "doctor_guidance": "If both are needed, take immediate-release aspirin at least 30 minutes before or 8 hours after ibuprofen.",
+      "patient_explanation": "Ibuprofen can prevent Aspirin from properly protecting your heart. Ask your doctor about proper dosing schedules or alternative pain relief.",
+      "uncertainty": "Low uncertainty."
+    },
+    {
+      "pair": ["clopidogrel", "aspirin"],
+      "severity": "Moderate Risk",
+      "risk_level": "moderate",
+      "interaction_type": "Dual Antiplatelet Therapy (DAPT) Synergism",
+      "mechanism": "Combined inhibition of ADP purinergic P2Y12 and thromboxane A2 pathways provides potent antithrombotic efficacy but increases baseline mucosal bleeding rates.",
+      "adverse_events": ["Minor and Major Bleeding", "Ecchymosis", "Gastrointestinal Mucosal Bleed"],
+      "evidence_level": "Strong Evidence",
+      "confidence_score": 0.98,
+      "clinical_citations": [
+        {
+          "source": "AHA/ACC DAPT Guidelines",
+          "pmid": "27034177",
+          "title": "ACC/AHA Guideline Focused Update on Duration of Dual Antiplatelet Therapy",
+          "citation": "Levine, G. N. et al. (2016) Circulation, 134(10):e123-e155."
+        }
+      ],
+      "doctor_guidance": "Appropriate following acute coronary syndrome or coronary stenting with defined treatment duration guidelines.",
+      "patient_explanation": "Dual antiplatelet therapy is often prescribed following heart procedures, but causes easier bruising and bleeding. Report unusual bleeding to your doctor.",
+      "uncertainty": "High efficacy in acute stent protection; bleeding risk increases with duration."
+    }
+  ],
+  "higher_order_patterns": [
+    {
+      "id": "triple_whammy",
+      "name": "The 'Triple Whammy' Acute Kidney Injury Syndrome",
+      "drugs_involved": ["lisinopril", "spironolactone", "ibuprofen"],
+      "severity": "High Risk",
+      "pattern_description": "Concurrent combination of an ACE Inhibitor (dilates efferent arteriole), a Diuretic (induces hypovolemia), and an NSAID (constricts afferent arteriole). This triad eliminates renal autoregulatory compensatory capacity, resulting in abrupt precipitous glomerular filtration failure.",
+      "adverse_effects": ["Acute Renal Failure", "Hyperkalemia Emergency", "Fluid Overload"],
+      "clinical_recommendation": "Discontinue the NSAID immediately. Ensure euvolemia. Recheck serum creatinine and potassium within 48 to 72 hours.",
+      "patient_summary": "Combining your blood pressure pill, water pill, and an anti-inflammatory pain reliever creates a well-known risk of sudden kidney stress. Talk to your doctor to switch to a safer pain reliever."
+    },
+    {
+      "id": "triple_bleeding_cascade",
+      "name": "Severe Multi-Pathway Hemostatic Suppression",
+      "drugs_involved": ["aspirin", "warfarin", "clopidogrel"],
+      "severity": "High Risk",
+      "pattern_description": "Triple antithrombotic therapy simultaneously inhibiting platelet cyclooxygenase, platelet purinergic ADP receptors, and hepatic vitamin K clotting factor synthesis.",
+      "adverse_effects": ["Life-Threatening Gastrointestinal Bleeding", "Subdural Hematoma", "Major Surgical Bleeding"],
+      "clinical_recommendation": "Reserve only for very high-risk acute coronary syndrome with mechanical valve under strict cardiology guidelines, restricting duration to minimum possible (e.g. 1-4 weeks) with mandatory PPI gastroprotection.",
+      "patient_summary": "Using three separate blood-thinning medicines together dramatically multiplies your risk of bleeding. This requires specialized supervision by a cardiologist."
+    }
+  ],
+  "scenario_digital_twin_samples": [
+    {
+      "id": "scenario-1",
+      "title": "Patient A: Cardiology Baseline vs Adding NSAID",
+      "baseline_drugs": ["Aspirin", "Warfarin", "Metformin"],
+      "scenario_drugs": ["Aspirin", "Warfarin", "Metformin", "Ibuprofen"],
+      "baseline_risk_score": 68,
+      "scenario_risk_score": 94,
+      "risk_delta": "+26 (Significant Hazard Escalation)",
+      "trigger_warning": "Adding Ibuprofen triggers a critical gastrointestinal bleeding triad with Aspirin + Warfarin and impairs renal clearance of Metformin.",
+      "notes": "Patient Medication Digital Twin simulation demonstrates high-risk escalation. Alternative analgesic (e.g. topical therapy or acetaminophen with hepatic monitoring) recommended for clinical evaluation."
+    },
+    {
+      "id": "scenario-2",
+      "title": "Patient B: Post-Stent Gastroprotection Optimization",
+      "baseline_drugs": ["Clopidogrel", "Omeprazole", "Aspirin"],
+      "scenario_drugs": ["Clopidogrel", "Pantoprazole", "Aspirin"],
+      "baseline_risk_score": 82,
+      "scenario_risk_score": 45,
+      "risk_delta": "-37 (Substantial Risk Reduction)",
+      "trigger_warning": "Switching from Omeprazole to Pantoprazole resolves the CYP2C19 competitive bioactivation block of Clopidogrel while preserving acid gastroprotection.",
+      "notes": "Digital Twin simulation confirms restoration of expected antiplatelet active metabolite generation."
+    }
+  ]
+}
