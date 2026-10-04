@@ -13,12 +13,17 @@ import {
   Stethoscope,
   Activity,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Pill,
+  Share2
 } from 'lucide-react';
 import InteractionMatrix from '../../components/InteractionMatrix';
 import RiskBadge from '../../components/RiskBadge';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
 import ReportModal from '../../components/ReportModal';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 
 export const DoctorResults = () => {
   const location = useLocation();
@@ -92,6 +97,7 @@ export const DoctorResults = () => {
   };
 
   const drugNames = data.normalized_drugs?.map((d) => d.canonical_name) || [];
+  const isHighRisk = data.overall_risk_score >= 65;
 
   return (
     <div className="space-y-6">
@@ -100,225 +106,262 @@ export const DoctorResults = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/doctor/medication-safety"
-            className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-colors"
+            className="p-2 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] transition-colors cursor-pointer"
             title="Back to Input"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              Clinical Medication Safety Assessment
+            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
+              Clinical Medication Safety Dossier
             </h1>
-            <p className="text-xs text-slate-500 font-mono">
-              Analysis ID: {data.analysis_id} · Grounded in PubMed & openFDA Surveillance
+            <p className="text-xs text-[var(--color-text-muted)] font-mono">
+              Analysis ID: {data.analysis_id} · Grounded in PubMed & openFDA Pharmacovigilance
             </p>
           </div>
         </div>
 
-        <button
+        <Button
+          variant="secondary"
+          size="md"
+          icon={FileText}
           onClick={() => setReportModalOpen(true)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-xs cursor-pointer"
         >
-          <FileText className="w-4 h-4" />
-          <span>Generate Clinical Report (PDF)</span>
-        </button>
+          Generate Clinical Report (PDF)
+        </Button>
       </div>
 
       <SafetyDisclaimer variant="compact" />
 
-      {/* Overview Banner: Risk Score & Summary */}
-      <div
-        className={`p-6 rounded-2xl border shadow-sm ${
-          data.overall_risk_score >= 65
-            ? 'border-rose-200 bg-rose-50/50'
-            : data.overall_risk_score >= 35
-            ? 'border-amber-200 bg-amber-50/50'
-            : 'border-emerald-200 bg-emerald-50/50'
-        }`}
+      {/* Overview Dossier Banner: Critical Hazard treatment if high risk */}
+      <Card
+        elevation={isHighRisk ? 'critical' : 'raised'}
+        className={`p-6 ${isHighRisk ? 'border-l-4 border-l-[#dc2626]' : ''}`}
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
               <RiskBadge severity={data.overall_risk_category} size="lg" />
               {data.human_review_required && (
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                  Human Review Recommended
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[var(--color-status-critical-bg)] text-[var(--color-status-critical-text)] border border-[var(--color-status-critical-border)]">
+                  Human Clinical Review Recommended
                 </span>
               )}
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">{data.summary_headline}</h2>
-            <div className="text-xs text-slate-600 flex flex-wrap gap-2">
-              <span>Evaluated Drugs:</span>
-              <span className="font-semibold text-slate-800">{drugNames.join(', ')}</span>
+            <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text-primary)] tracking-tight">
+              {data.summary_headline}
+            </h2>
+
+            {/* Evaluated Drugs with RxCUI Mono Badges */}
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="text-xs text-[var(--color-text-muted)] font-medium">Evaluated Therapies:</span>
+              {data.normalized_drugs?.map((d, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-xs font-semibold text-[var(--color-text-primary)]"
+                >
+                  <Pill className="w-3.5 h-3.5 text-[var(--color-brand-primary)]" />
+                  <span>{d.canonical_name}</span>
+                  <span className="text-[10px] font-mono text-[var(--color-text-muted)] bg-[var(--color-surface-card)] px-1 py-0.2 rounded border border-[var(--color-border-subtle)]">
+                    RxCUI: {d.rxcui}
+                  </span>
+                </span>
+              ))}
             </div>
           </div>
 
-          <div className="sm:text-right shrink-0">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+          <div className="sm:text-right shrink-0 border-t sm:border-t-0 border-[var(--color-border-subtle)] pt-3 sm:pt-0">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--color-text-muted)] block">
               Quantified Risk Score
             </span>
-            <div className="text-3xl font-extrabold text-slate-900 font-mono">
+            <div className={`text-3xl font-extrabold tabular ${isHighRisk ? 'text-[#dc2626] dark:text-[#f87171]' : 'text-[var(--color-text-primary)]'}`}>
               {data.overall_risk_score}
-              <span className="text-sm font-normal text-slate-400"> / 100</span>
+              <span className="text-sm font-normal text-[var(--color-text-muted)]"> / 100</span>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Main Grid: Interaction Heatmap & Overlap Matrix */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Interaction Matrix Heatmap & Citations */}
         <div className="lg:col-span-8 space-y-6">
           {/* Pairwise Interaction Matrix */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+          <Card elevation="raised" className="p-6">
             <InteractionMatrix drugs={drugNames} matrixCells={data.interaction_matrix || []} />
-          </div>
+          </Card>
 
           {/* Detailed Pairwise Citations & Pharmacokinetic Mechanism Cards */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-900">
-                Detailed Pharmacokinetic Evidence & Citations
-              </h3>
-              <span className="text-xs font-mono text-slate-400">
+          <Card elevation="raised" className="p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[var(--color-border-subtle)] pb-3">
+              <div>
+                <CardTitle>Detailed Pharmacokinetic Evidence & Citations</CardTitle>
+                <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                  Peer-reviewed mechanism breakdown, receptor kinetics, and adverse signal levels
+                </p>
+              </div>
+              <span className="text-xs font-mono font-semibold text-[var(--color-text-muted)] tabular">
                 {data.pairwise_interactions?.length || 0} Flagged Pair(s)
               </span>
             </div>
 
             <div className="space-y-4">
               {data.pairwise_interactions?.map((item, idx) => (
-                <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-3"
+                >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-slate-900">
+                      <span className="text-sm font-bold text-[var(--color-text-primary)]">
                         {item.drug_a} ↔ {item.drug_b}
                       </span>
-                      <span className="text-xs text-slate-400 font-medium">({item.interaction_type})</span>
+                      <span className="text-xs text-[var(--color-text-muted)] font-mono">
+                        ({item.interaction_type})
+                      </span>
                     </div>
                     <RiskBadge severity={item.severity} size="sm" />
                   </div>
 
-                  <p className="text-xs text-slate-700 leading-relaxed">{item.mechanism}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                    {item.mechanism}
+                  </p>
 
-                  <div className="p-3 rounded-lg bg-sky-50/60 border border-sky-100 text-xs space-y-1">
-                    <span className="font-bold text-sky-900 text-[11px] uppercase tracking-wider block">
+                  <div className="p-3 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-brand-border)] text-xs space-y-1">
+                    <span className="font-bold text-[var(--color-brand-text)] text-[11px] uppercase tracking-wider block">
                       Clinician Decision Guidance:
                     </span>
-                    <p className="text-sky-950 font-medium">{item.doctor_guidance}</p>
+                    <p className="text-[var(--color-text-primary)] font-medium leading-relaxed">
+                      {item.doctor_guidance}
+                    </p>
                   </div>
 
                   {/* Supporting Literature / Regulatory Alerts */}
                   {item.citations?.length > 0 && (
-                    <div className="pt-2 border-t border-slate-200/80 space-y-2">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                    <div className="pt-2 border-t border-[var(--color-border-subtle)] space-y-2">
+                      <span className="text-[11px] font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">
                         Grounded Sources & Citations:
                       </span>
                       {item.citations.map((cite, cIdx) => (
-                        <div key={cIdx} className="text-xs p-2.5 rounded-lg bg-white border border-slate-200 space-y-0.5">
-                          <div className="flex items-center justify-between font-semibold text-slate-800 text-[11px]">
+                        <div
+                          key={cIdx}
+                          className="text-xs p-3 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] space-y-1"
+                        >
+                          <div className="flex items-center justify-between font-semibold text-[var(--color-text-primary)] text-[11px]">
                             <span>{cite.source}</span>
                             {cite.pmid && (
                               <a
                                 href={`https://pubmed.ncbi.nlm.nih.gov/${cite.pmid}/`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sky-600 hover:underline flex items-center gap-1 font-mono text-[10px]"
+                                className="text-[var(--color-brand-primary)] hover:underline flex items-center gap-1 font-mono text-[10px] bg-[var(--color-surface-sunken)] px-1.5 py-0.5 rounded border border-[var(--color-border-subtle)]"
                               >
                                 PMID: {cite.pmid} <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
                           </div>
-                          <p className="text-[11px] text-slate-600">{cite.title || cite.fda_signal}</p>
-                          <p className="text-[10px] text-slate-400 italic">{cite.citation}</p>
+                          <p className="text-[11px] text-[var(--color-text-secondary)] font-medium">{cite.title || cite.fda_signal}</p>
+                          <p className="text-[10px] text-[var(--color-text-muted)] italic font-mono">{cite.citation}</p>
                         </div>
                       ))}
                     </div>
                   )}
 
                   {item.uncertainty && (
-                    <div className="text-[11px] text-slate-500 flex items-center gap-1.5 pt-1">
-                      <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
+                    <div className="text-[11px] text-[var(--color-text-muted)] flex items-center gap-1.5 pt-1">
+                      <HelpCircle className="w-3.5 h-3.5" />
                       <span>Uncertainty: {item.uncertainty}</span>
                     </div>
                   )}
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
 
-        {/* Right Column: Discussion Points & Adverse Event Overlap */}
+        {/* Right Column: Discussion Points & Adverse Event Overlap Rail */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Clinician Discussion Points */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
-            <div className="flex items-center gap-2">
-              <Stethoscope className="w-4 h-4 text-sky-600" />
-              <h4 className="text-sm font-bold text-slate-900">Suggested Discussion Points</h4>
-            </div>
-            <p className="text-xs text-slate-500">
-              Evidence-based talking points for multidisciplinary clinical rounds and patient visits.
-            </p>
-            <div className="space-y-2 pt-1 text-xs">
-              {data.clinician_discussion_points?.map((pt, i) => (
-                <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="font-bold text-sky-600 shrink-0 mt-0.5">•</span>
-                  <span className="text-slate-700 leading-relaxed">{pt}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Adverse Event Overlap */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
-            <h4 className="text-sm font-bold text-slate-900">Adverse Event Hazard Overlap</h4>
-            <p className="text-xs text-slate-500">
+          {/* Adverse Event Overlap Rail */}
+          <Card elevation="raised" className="p-5 space-y-3">
+            <CardTitle>Adverse Event Hazard Overlap</CardTitle>
+            <p className="text-xs text-[var(--color-text-muted)]">
               Multi-drug synergism elevating specific toxicity clusters.
             </p>
             <div className="space-y-2 text-xs">
               {data.adverse_event_overlap?.map((ae, i) => (
-                <div key={i} className="p-3 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
-                  <div className="flex justify-between font-bold text-slate-800">
+                <div
+                  key={i}
+                  className="p-3 rounded-xl border border-[var(--color-status-critical-border)] bg-[var(--color-status-critical-bg)] text-[var(--color-status-critical-text)] space-y-1"
+                >
+                  <div className="flex justify-between font-bold">
                     <span>{ae.adverse_event}</span>
-                    <span className="text-rose-600 font-mono text-[11px]">{ae.hazard_level}</span>
+                    <span className="font-mono text-[11px] uppercase tracking-wider">{ae.hazard_level}</span>
                   </div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-[11px] opacity-90 font-mono">
                     Contributing: {ae.contributing_pairs?.join(', ')}
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
+
+          {/* Clinician Discussion Points */}
+          <Card elevation="raised" className="p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Stethoscope className="w-4 h-4 text-[#0284c7]" />
+              <CardTitle>Suggested Discussion Points</CardTitle>
+            </div>
+            <p className="text-xs text-[var(--color-text-muted)]">
+              Evidence-based talking points for multidisciplinary clinical rounds and patient visits.
+            </p>
+            <div className="space-y-2 pt-1 text-xs">
+              {data.clinician_discussion_points?.map((pt, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-2 p-2.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)]"
+                >
+                  <span className="font-bold text-[#0284c7] shrink-0 mt-0.5">•</span>
+                  <span className="leading-relaxed">{pt}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
 
           {/* Patient Context Considerations */}
           {data.patient_context_considerations?.length > 0 && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
-              <h4 className="text-sm font-bold text-slate-900">Patient Context Considerations</h4>
+            <Card elevation="raised" className="p-5 space-y-3">
+              <CardTitle>Patient Context Considerations</CardTitle>
               <div className="space-y-2 text-xs">
                 {data.patient_context_considerations.map((c, i) => (
-                  <div key={i} className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200 text-amber-950 text-xs">
+                  <div
+                    key={i}
+                    className="p-2.5 rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] text-xs leading-relaxed"
+                  >
                     {c}
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Link to Knowledge Graph */}
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-sky-50 to-teal-50 border border-sky-100 space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-sky-800">
+          <Card elevation="flat" className="p-5 space-y-3 border-l-4 border-l-[#0284c7]">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-brand-primary)]">
               Biomedical Knowledge Graph
             </h4>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Explore the graphical interaction network linking these molecules to their targets and adverse signals.
+            <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+              Explore the graphical interaction network linking these molecules to their biological targets and adverse signals.
             </p>
-            <Link
-              to="/knowledge-graph"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-sky-900 pt-1"
+            <Button
+              variant="subtle"
+              size="sm"
+              icon={ArrowRight}
+              iconPosition="right"
+              onClick={() => navigate('/knowledge-graph')}
             >
-              <span>Inspect Network Graph</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+              Inspect Network Graph
+            </Button>
+          </Card>
         </div>
       </div>
 

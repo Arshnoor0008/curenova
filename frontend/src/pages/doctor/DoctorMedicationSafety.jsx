@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ShieldAlert,
@@ -6,18 +6,40 @@ import {
   Trash2,
   Activity,
   Cpu,
-  Sparkles,
   ArrowRight,
   Sliders,
   CheckCircle2,
-  RefreshCw,
   AlertTriangle,
-  FileText
+  Pill,
+  X,
+  TrendingDown,
+  TrendingUp,
+  Minus
 } from 'lucide-react';
 import { safetyService } from '../../services/api';
 import AnalysisProgress from '../../components/AnalysisProgress';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
 import RiskBadge from '../../components/RiskBadge';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+
+const DRUG_SUGGESTIONS = [
+  'Aspirin',
+  'Warfarin',
+  'Metformin',
+  'Clopidogrel',
+  'Omeprazole',
+  'Pantoprazole',
+  'Lisinopril',
+  'Spironolactone',
+  'Ibuprofen',
+  'Atorvastatin',
+  'Amlodipine',
+  'Sertraline',
+  'Tramadol',
+  'Dexamethasone'
+];
 
 export const DoctorMedicationSafety = () => {
   const navigate = useNavigate();
@@ -27,7 +49,8 @@ export const DoctorMedicationSafety = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [medications, setMedications] = useState(['Aspirin', 'Warfarin', 'Metformin']);
   const [newMedInput, setNewMedInput] = useState('');
-  
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   // Patient context
   const [age, setAge] = useState(72);
   const [egfr, setEgfr] = useState(52);
@@ -37,7 +60,6 @@ export const DoctorMedicationSafety = () => {
   const [baselineMeds, setBaselineMeds] = useState(['Clopidogrel', 'Omeprazole', 'Aspirin']);
   const [addedMeds, setAddedMeds] = useState(['Pantoprazole']);
   const [removedMeds, setRemovedMeds] = useState(['Omeprazole']);
-  const [twinInput, setTwinInput] = useState('');
   const [twinSimResult, setTwinSimResult] = useState(null);
 
   // Execution states
@@ -67,13 +89,15 @@ export const DoctorMedicationSafety = () => {
     },
   ];
 
-  const handleAddMed = (e) => {
-    e.preventDefault();
-    if (!newMedInput.trim()) return;
-    if (!medications.some((m) => m.toLowerCase() === newMedInput.trim().toLowerCase())) {
-      setMedications([...medications, newMedInput.trim()]);
+  const handleAddMed = (drugName) => {
+    const target = drugName || newMedInput;
+    if (!target || !target.trim()) return;
+    const clean = target.trim();
+    if (!medications.some((m) => m.toLowerCase() === clean.toLowerCase())) {
+      setMedications([...medications, clean]);
     }
     setNewMedInput('');
+    setShowSuggestions(false);
   };
 
   const handleRemoveMed = (idx) => {
@@ -102,11 +126,10 @@ export const DoctorMedicationSafety = () => {
         { age: Number(age), egfr: Number(egfr), hepatic_status: hepatic },
         'doctor'
       );
-      // Wait for animation
       setTimeout(() => {
         setExecuting(false);
         navigate('/doctor/results', { state: { analysisData: response } });
-      }, 2600);
+      }, 2400);
     } catch (err) {
       setExecuting(false);
       setError(err.message || 'Analysis failed. Please check inputs.');
@@ -126,12 +149,18 @@ export const DoctorMedicationSafety = () => {
       setTimeout(() => {
         setExecuting(false);
         setTwinSimResult(sim);
-      }, 2200);
+      }, 2000);
     } catch (err) {
       setExecuting(false);
       setError(err.message || 'Simulation failed.');
     }
   };
+
+  const filteredSuggestions = DRUG_SUGGESTIONS.filter(
+    (s) =>
+      s.toLowerCase().includes(newMedInput.toLowerCase()) &&
+      !medications.some((m) => m.toLowerCase() === s.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -139,14 +168,14 @@ export const DoctorMedicationSafety = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1 rounded-md bg-sky-100 text-sky-700">
-              <ShieldAlert className="w-4 h-4" />
+            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7]">
+              <ShieldAlert className="w-5 h-5" />
             </span>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
               Medication Safety & Polypharmacy Engine
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-1">
             Pairwise interaction matrix, higher-order hazard syndromes, and Patient Medication Digital Twin simulation
           </p>
         </div>
@@ -154,24 +183,26 @@ export const DoctorMedicationSafety = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200">
+      <div className="flex items-center gap-2 border-b border-[var(--color-border-subtle)]">
         <button
+          type="button"
           onClick={() => setActiveTab('standard')}
-          className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
             activeTab === 'standard'
-              ? 'border-sky-600 text-sky-700'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-[#0284c7] text-[#0284c7]'
+              : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
           }`}
         >
           <Activity className="w-4 h-4" />
           <span>Regimen Interaction Analysis</span>
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('twin')}
-          className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
             activeTab === 'twin'
-              ? 'border-teal-600 text-teal-700'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-[#0d9488] text-[#0d9488]'
+              : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
           }`}
         >
           <Cpu className="w-4 h-4" />
@@ -179,7 +210,7 @@ export const DoctorMedicationSafety = () => {
         </button>
       </div>
 
-      {/* Execution Progress Animation Overlay */}
+      {/* Execution Progress Animation */}
       {executing && (
         <div className="py-8">
           <AnalysisProgress
@@ -194,120 +225,153 @@ export const DoctorMedicationSafety = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left: Medication List Input */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs space-y-4">
+            <Card elevation="raised" className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Current Medication Regimen</h3>
-                  <p className="text-xs text-slate-500">
+                  <h3 className="text-base font-bold text-[var(--color-text-primary)]">Current Medication Regimen</h3>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
                     Add prescription, OTC, or active supplements to evaluate multi-drug risks
                   </p>
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-400">
-                  {medications.length} drug{medications.length !== 1 ? 's' : ''} entered
-                </span>
+                <Badge variant="neutral" size="sm">
+                  <span className="font-mono tabular">{medications.length}</span> drugs entered
+                </Badge>
               </div>
 
-              {/* Add Drug Form */}
-              <form onSubmit={handleAddMed} className="flex gap-2">
-                <input
-                  type="text"
-                  value={newMedInput}
-                  onChange={(e) => setNewMedInput(e.target.value)}
-                  placeholder="Type medication name (e.g. Clopidogrel, Omeprazole, Lisinopril)..."
-                  className="flex-1 px-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-sky-500 focus:outline-hidden"
-                />
-                <button
-                  type="submit"
-                  className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl transition-colors cursor-pointer shadow-xs"
+              {/* Add Drug Input with Autocomplete */}
+              <div className="relative">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleAddMed();
+                  }}
+                  className="flex gap-2"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Add Drug</span>
-                </button>
-              </form>
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={newMedInput}
+                      onChange={(e) => {
+                        setNewMedInput(e.target.value);
+                        setShowSuggestions(true);
+                      }}
+                      onFocus={() => setShowSuggestions(true)}
+                      placeholder="Type medication name (e.g. Clopidogrel, Omeprazole, Lisinopril)..."
+                      className="w-full px-4 py-2.5 text-xs sm:text-sm rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284c7]"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="md"
+                    icon={Plus}
+                  >
+                    Add Drug
+                  </Button>
+                </form>
 
-              {/* Medication Pill Badges */}
-              <div className="flex flex-wrap gap-2 pt-2">
+                {/* Autocomplete Dropdown */}
+                {showSuggestions && newMedInput.trim() && filteredSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-24 mt-1 bg-[var(--color-surface-card)] border border-[var(--color-border-strong)] rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto divide-y divide-[var(--color-border-subtle)]">
+                    {filteredSuggestions.map((s) => (
+                      <div
+                        key={s}
+                        onClick={() => handleAddMed(s)}
+                        className="px-3.5 py-2 text-xs text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] cursor-pointer flex items-center gap-2"
+                      >
+                        <Pill className="w-3.5 h-3.5 text-[var(--color-brand-primary)]" />
+                        <span>{s}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Medication Pill Chips */}
+              <div className="flex flex-wrap gap-2 pt-1">
                 {medications.map((med, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-xs font-medium shadow-2xs animate-in fade-in"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] text-xs font-semibold shadow-2xs"
                   >
+                    <Pill className="w-3.5 h-3.5 text-[var(--color-brand-primary)]" />
                     <span>{med}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveMed(idx)}
-                      className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                      className="text-[var(--color-text-muted)] hover:text-[#dc2626] transition-colors cursor-pointer ml-1"
                       title={`Remove ${med}`}
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
               </div>
 
               {error && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                <div className="p-3 rounded-lg bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] text-[var(--color-status-critical-text)] text-xs flex items-center gap-2 font-medium">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#dc2626]" />
                   <span>{error}</span>
                 </div>
               )}
 
-              {/* Run Button */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-400">
+              {/* Run Analysis Button */}
+              <div className="pt-4 border-t border-[var(--color-border-subtle)] flex items-center justify-between">
+                <span className="text-xs text-[var(--color-text-muted)]">
                   Orchestrated with Retrieval, Reasoning & Safety Agents
                 </span>
-                <button
+                <Button
+                  variant="primary"
+                  size="md"
+                  icon={Activity}
                   onClick={handleStartAnalysis}
-                  className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer"
                 >
-                  <Activity className="w-4 h-4" />
-                  <span>Execute Medication Safety Analysis</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  Execute Medication Safety Analysis
+                </Button>
               </div>
-            </div>
+            </Card>
 
             {/* Presets Card */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+            <Card elevation="flat" className="p-5 space-y-3">
+              <span className="text-xs font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">
                 Standard Clinical Test Cases (1-Click Load)
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {samplePresets.map((preset, i) => (
                   <button
                     key={i}
+                    type="button"
                     onClick={() => handleApplyPreset(preset)}
-                    className="p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-sky-50/40 hover:border-sky-300 text-left transition-all cursor-pointer group"
+                    className="p-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] hover:border-[#0284c7] text-left transition-all cursor-pointer group shadow-2xs"
                   >
-                    <div className="text-xs font-bold text-slate-900 group-hover:text-sky-700">
+                    <div className="text-xs font-bold text-[var(--color-text-primary)] group-hover:text-[#0284c7]">
                       {preset.title}
                     </div>
-                    <div className="text-[11px] text-slate-500 mt-1">
+                    <div className="text-[11px] text-[var(--color-text-muted)] mt-1 font-mono">
                       {preset.meds.join(' + ')}
                     </div>
                   </button>
                 ))}
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Right: Patient Context Sidebar */}
           <div className="lg:col-span-4 space-y-4">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4">
+            <Card elevation="raised" className="p-5 space-y-4">
               <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-sky-600" />
-                <h4 className="text-sm font-bold text-slate-900">Patient Clinical Context</h4>
+                <Sliders className="w-4 h-4 text-[#0284c7]" />
+                <h4 className="text-sm font-bold text-[var(--color-text-primary)]">Patient Clinical Context</h4>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[var(--color-text-muted)]">
                 Contextual parameters adjust pharmacokinetics and organ clearance alert thresholds.
               </p>
 
-              <div className="space-y-3 text-xs">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <div className="flex justify-between font-semibold text-slate-700 mb-1">
+                  <div className="flex justify-between font-semibold text-[var(--color-text-primary)] mb-1">
                     <span>Patient Age:</span>
-                    <span className="font-mono text-sky-700">{age} yrs</span>
+                    <span className="font-mono tabular text-[#0284c7]">{age} yrs</span>
                   </div>
                   <input
                     type="range"
@@ -315,19 +379,19 @@ export const DoctorMedicationSafety = () => {
                     max="95"
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                    className="w-full accent-sky-600"
+                    className="w-full accent-[#0284c7]"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-400">
+                  <div className="flex justify-between text-[10px] text-[var(--color-text-muted)] font-mono">
                     <span>18</span>
-                    <span>65 (Geriatric threshold)</span>
+                    <span>65 (Geriatric)</span>
                     <span>95</span>
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between font-semibold text-slate-700 mb-1">
+                  <div className="flex justify-between font-semibold text-[var(--color-text-primary)] mb-1">
                     <span>Estimated GFR (eGFR):</span>
-                    <span className="font-mono text-sky-700">{egfr} mL/min</span>
+                    <span className="font-mono tabular text-[#0284c7]">{egfr} mL/min</span>
                   </div>
                   <input
                     type="range"
@@ -335,9 +399,9 @@ export const DoctorMedicationSafety = () => {
                     max="120"
                     value={egfr}
                     onChange={(e) => setEgfr(e.target.value)}
-                    className="w-full accent-sky-600"
+                    className="w-full accent-[#0284c7]"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-400">
+                  <div className="flex justify-between text-[10px] text-[var(--color-text-muted)] font-mono">
                     <span>15 (Severe CKD)</span>
                     <span>60 (Renal alert)</span>
                     <span>120 (Normal)</span>
@@ -345,11 +409,13 @@ export const DoctorMedicationSafety = () => {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Hepatic Function</label>
+                  <label className="block font-semibold text-[var(--color-text-primary)] mb-1">
+                    Hepatic Function Status
+                  </label>
                   <select
                     value={hepatic}
                     onChange={(e) => setHepatic(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-hidden"
+                    className="w-full p-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284c7]"
                   >
                     <option value="Normal">Normal Hepatic Function</option>
                     <option value="Child-Pugh A">Child-Pugh A (Mild)</option>
@@ -359,11 +425,11 @@ export const DoctorMedicationSafety = () => {
               </div>
 
               {egfr < 60 && (
-                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
-                  <strong>Renal Impairment Flagged:</strong> Renally cleared agents will receive heightened surveillance.
+                <div className="p-3 rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] text-xs">
+                  <strong>Renal Impairment Flagged:</strong> Renally cleared agents will receive heightened clearance surveillance.
                 </div>
               )}
-            </div>
+            </Card>
           </div>
         </div>
       )}
@@ -371,16 +437,16 @@ export const DoctorMedicationSafety = () => {
       {/* Tab 2: Digital Twin "What-If" Simulation */}
       {!executing && activeTab === 'twin' && (
         <div className="space-y-6">
-          <div className="rounded-2xl border border-teal-200 bg-gradient-to-r from-teal-50/50 to-sky-50/50 p-6 space-y-4">
+          <Card elevation="raised" className="p-6 space-y-5 border-l-4 border-l-[#0d9488]">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-teal-600 text-white shadow-xs">
+              <div className="p-2.5 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0d9488]">
                 <Cpu className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-[var(--color-text-primary)]">
                   Patient Medication Digital Twin Simulator
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[var(--color-text-muted)]">
                   Simulate proposed pharmacological adjustments before modifying actual patient regimens
                 </p>
               </div>
@@ -389,47 +455,47 @@ export const DoctorMedicationSafety = () => {
             {/* Baseline vs Proposed Regimens Inputs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
               {/* Baseline */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-3">
-                <div className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center justify-between">
-                  <span>1. Baseline Patient Regimen</span>
-                  <span className="text-[10px] text-slate-400 font-mono">{baselineMeds.length} drugs</span>
+              <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-3">
+                <div className="text-xs font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider flex items-center justify-between">
+                  <span>1. Baseline Regimen</span>
+                  <span className="tabular">{baselineMeds.length} drugs</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {baselineMeds.map((m, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-xs font-medium border border-slate-200"
+                      className="px-2.5 py-1 rounded-md bg-[var(--color-surface-card)] text-[var(--color-text-primary)] text-xs font-semibold border border-[var(--color-border-subtle)]"
                     >
                       {m}
                     </span>
                   ))}
                 </div>
-                <div className="text-[11px] text-slate-500 italic">
-                  E.g., Current post-stent regimen: Clopidogrel + Omeprazole + Aspirin
+                <div className="text-[11px] text-[var(--color-text-muted)]">
+                  Current post-PCI regimen: Clopidogrel + Omeprazole + Aspirin
                 </div>
               </div>
 
               {/* Proposed Changes */}
-              <div className="p-4 rounded-xl border border-teal-200 bg-teal-50/30 space-y-3">
-                <div className="text-xs font-bold text-teal-900 uppercase tracking-wider">
+              <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] space-y-3">
+                <div className="text-xs font-mono font-bold text-[#0d9488] uppercase tracking-wider">
                   2. Simulated Scenario Adjustments
                 </div>
                 <div className="space-y-2 text-xs">
                   <div>
-                    <span className="text-slate-500 font-semibold block mb-1">Add Candidate Drug(s):</span>
+                    <span className="text-[var(--color-text-muted)] font-semibold block mb-1">Add Candidate Therapy:</span>
                     <div className="flex gap-1.5">
                       {addedMeds.map((m, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                        <span key={idx} className="px-2 py-0.5 rounded bg-[var(--color-status-safe-bg)] text-[var(--color-status-safe-text)] border border-[var(--color-status-safe-border)] font-bold">
                           + {m}
                         </span>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <span className="text-slate-500 font-semibold block mb-1">Discontinue Drug(s):</span>
+                    <span className="text-[var(--color-text-muted)] font-semibold block mb-1">Discontinue Therapy:</span>
                     <div className="flex gap-1.5">
                       {removedMeds.map((m, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">
+                        <span key={idx} className="px-2 py-0.5 rounded bg-[var(--color-status-critical-bg)] text-[var(--color-status-critical-text)] border border-[var(--color-status-critical-border)] font-bold">
                           - {m}
                         </span>
                       ))}
@@ -440,84 +506,89 @@ export const DoctorMedicationSafety = () => {
             </div>
 
             <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-[var(--color-text-muted)]">
                 Decision Support Only: Compares Pharmacodynamic & Pharmacokinetic Delta
               </span>
-              <button
+              <Button
+                variant="primary"
+                size="md"
+                icon={Cpu}
                 onClick={handleSimulateTwin}
-                className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 rounded-xl transition-all shadow-md cursor-pointer"
               >
-                <Cpu className="w-4 h-4" />
-                <span>Simulate "What-If" Scenario</span>
-              </button>
+                Simulate "What-If" Scenario
+              </Button>
             </div>
-          </div>
+          </Card>
 
           {/* Simulation Result Presentation */}
           {twinSimResult && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6 animate-in fade-in">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
+            <Card elevation="raised" className="p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[var(--color-border-subtle)] pb-4">
                 <div>
-                  <h4 className="text-base font-bold text-slate-900">Digital Twin Scenario Results</h4>
-                  <p className="text-xs text-slate-500 font-mono">Simulation ID: {twinSimResult.simulation_id}</p>
+                  <h4 className="text-base font-bold text-[var(--color-text-primary)]">Digital Twin Scenario Results</h4>
+                  <p className="text-xs text-[var(--color-text-muted)] font-mono">Simulation ID: {twinSimResult.simulation_id}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Risk Score Delta</span>
-                    <span
-                      className={`text-lg font-extrabold ${
-                        twinSimResult.risk_delta < 0
-                          ? 'text-emerald-600'
-                          : twinSimResult.risk_delta > 0
-                          ? 'text-rose-600'
-                          : 'text-slate-600'
-                      }`}
-                    >
-                      {twinSimResult.risk_change_label}
-                    </span>
-                  </div>
+                <div className="text-right">
+                  <span className="text-[10px] uppercase font-mono font-bold text-[var(--color-text-muted)] block">
+                    Risk Score Delta
+                  </span>
+                  <span
+                    className={`text-lg font-bold tabular ${
+                      twinSimResult.risk_delta < 0
+                        ? 'text-[#059669]'
+                        : twinSimResult.risk_delta > 0
+                        ? 'text-[#dc2626]'
+                        : 'text-[var(--color-text-primary)]'
+                    }`}
+                  >
+                    {twinSimResult.risk_change_label}
+                  </span>
                 </div>
               </div>
 
               {/* Comparison Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1">
-                  <span className="text-xs font-semibold text-slate-400">Baseline Regimen Score</span>
-                  <div className="text-2xl font-bold text-slate-900">{twinSimResult.baseline_risk_score} / 100</div>
-                  <p className="text-xs text-slate-500">
+                <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-1">
+                  <span className="text-xs font-semibold text-[var(--color-text-muted)]">Baseline Regimen Score</span>
+                  <div className="text-2xl font-bold tabular text-[var(--color-text-primary)]">
+                    {twinSimResult.baseline_risk_score} / 100
+                  </div>
+                  <p className="text-xs text-[var(--color-text-muted)]">
                     Meds: {twinSimResult.baseline_medications.join(', ')}
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl border border-teal-200 bg-teal-50/30 space-y-1">
-                  <span className="text-xs font-semibold text-teal-700">Simulated Scenario Score</span>
-                  <div className="text-2xl font-bold text-teal-900">{twinSimResult.scenario_risk_score} / 100</div>
-                  <p className="text-xs text-slate-500">
+                <div className="p-4 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] space-y-1">
+                  <span className="text-xs font-semibold text-[#0d9488]">Simulated Scenario Score</span>
+                  <div className="text-2xl font-bold tabular text-[var(--color-text-primary)]">
+                    {twinSimResult.scenario_risk_score} / 100
+                  </div>
+                  <p className="text-xs text-[var(--color-text-muted)]">
                     Meds: {twinSimResult.scenario_medications.join(', ')}
                   </p>
                 </div>
               </div>
 
               {/* Assessment Message */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-700 leading-relaxed">
+              <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] text-xs text-[var(--color-text-primary)] leading-relaxed">
                 <strong>Simulation Assessment:</strong> {twinSimResult.simulation_assessment}
               </div>
 
               {/* Resolved Interactions */}
               {twinSimResult.resolved_interactions?.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-[#059669] uppercase tracking-wider block">
                     Resolved Hazard Signals:
                   </span>
                   {twinSimResult.resolved_interactions.map((p, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-lg border border-emerald-200 bg-emerald-50/50 text-xs text-emerald-950 flex items-center justify-between"
+                      className="p-3 rounded-lg border border-[var(--color-status-safe-border)] bg-[var(--color-status-safe-bg)] text-xs text-[var(--color-status-safe-text)] flex items-center justify-between"
                     >
                       <span>
                         Eliminated interaction between <strong>{p.drug_a}</strong> and <strong>{p.drug_b}</strong>.
                       </span>
-                      <span className="font-semibold text-emerald-700">Conflict Mitigated</span>
+                      <span className="font-semibold text-[#059669]">Conflict Mitigated</span>
                     </div>
                   ))}
                 </div>
@@ -526,13 +597,13 @@ export const DoctorMedicationSafety = () => {
               {/* Triggered New Interactions */}
               {twinSimResult.triggered_new_interactions?.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-bold text-rose-700 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-[#dc2626] uppercase tracking-wider block">
                     Triggered New Interaction Alerts:
                   </span>
                   {twinSimResult.triggered_new_interactions.map((p, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-lg border border-rose-200 bg-rose-50/50 text-xs text-rose-950 space-y-1"
+                      className="p-3 rounded-lg border border-[var(--color-status-critical-border)] bg-[var(--color-status-critical-bg)] text-xs text-[var(--color-status-critical-text)] space-y-1"
                     >
                       <div className="flex justify-between font-bold">
                         <span>
@@ -540,16 +611,16 @@ export const DoctorMedicationSafety = () => {
                         </span>
                         <RiskBadge severity={p.severity} size="sm" />
                       </div>
-                      <p className="text-[11px] text-rose-800">{p.mechanism}</p>
+                      <p className="text-[11px] leading-relaxed">{p.mechanism}</p>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="pt-2 text-[11px] text-slate-400">
+              <div className="pt-2 text-[11px] text-[var(--color-text-muted)]">
                 Notice: {twinSimResult.disclaimer}
               </div>
-            </div>
+            </Card>
           )}
         </div>
       )}

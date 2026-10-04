@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { ShieldAlert, AlertTriangle, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, AlertCircle, ShieldCheck, Info } from 'lucide-react';
+import Tooltip from './ui/Tooltip';
 
 export const InteractionMatrix = ({ drugs = [], matrixCells = [], onSelectPair }) => {
   const [selectedCell, setSelectedCell] = useState(null);
 
   if (!drugs || drugs.length === 0) {
     return (
-      <div className="p-8 text-center text-sm text-slate-400 bg-slate-50 rounded-xl border border-slate-200">
-        Enter at least two medications to generate the pairwise interaction matrix.
+      <div className="p-8 text-center text-xs text-[var(--color-text-muted)] bg-[var(--color-surface-sunken)] rounded-xl border border-[var(--color-border-subtle)]">
+        Enter at least two medications to generate the pairwise pharmacokinetic interaction matrix.
       </div>
     );
   }
@@ -22,13 +23,46 @@ export const InteractionMatrix = ({ drugs = [], matrixCells = [], onSelectPair }
     );
   };
 
-  const getCellColor = (row, col) => {
-    if (row === col) return 'bg-slate-100 text-slate-400 cursor-default';
+  const getCellStyling = (row, col) => {
+    if (row === col) {
+      return {
+        bg: 'bg-[var(--color-surface-sunken)] text-[var(--color-text-muted)] cursor-default',
+        icon: null,
+        code: '—',
+        label: 'Self'
+      };
+    }
     const cell = getCell(row, col);
-    if (!cell.has_interaction) return 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700';
-    if (cell.severity === 'High Risk') return 'bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold';
-    if (cell.severity === 'Moderate Risk') return 'bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold';
-    return 'bg-sky-100 hover:bg-sky-200 text-sky-800';
+    if (!cell.has_interaction || cell.severity === 'None') {
+      return {
+        bg: 'bg-[var(--color-status-safe-bg)] text-[var(--color-status-safe-text)] hover:bg-[var(--color-status-safe-border)] focus-visible:ring-2 focus-visible:ring-[var(--color-status-safe)]',
+        icon: ShieldCheck,
+        code: 'SAFE',
+        label: 'No Conflict'
+      };
+    }
+    if (cell.severity === 'High Risk' || cell.severity === 'Critical') {
+      return {
+        bg: 'bg-[var(--color-status-critical-bg)] text-[var(--color-status-critical-text)] font-bold hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[#dc2626]',
+        icon: AlertTriangle,
+        code: 'CRIT',
+        label: 'High Risk'
+      };
+    }
+    if (cell.severity === 'Moderate Risk') {
+      return {
+        bg: 'bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text)] font-semibold hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[#d97706]',
+        icon: AlertCircle,
+        code: 'MOD',
+        label: 'Moderate'
+      };
+    }
+    return {
+      bg: 'bg-[var(--color-status-info-bg)] text-[var(--color-status-info-text)]',
+      icon: Info,
+      code: 'INFO',
+      label: 'Informational'
+    };
   };
 
   const handleCellClick = (row, col) => {
@@ -40,35 +74,56 @@ export const InteractionMatrix = ({ drugs = [], matrixCells = [], onSelectPair }
     }
   };
 
+  const handleKeyDown = (e, row, col) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleCellClick(row, col);
+    }
+  };
+
   return (
     <div className="space-y-4">
+      {/* Matrix Controls & Accessible Legend (Icon + Letter + Color) */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-        <span className="font-semibold text-slate-700">Pairwise Interaction Heatmap</span>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-rose-200 border border-rose-300"></span>
-            <span className="text-slate-600">High Risk</span>
+        <span className="font-semibold text-[var(--color-text-primary)]">
+          Pairwise Interaction Heatmap
+        </span>
+
+        <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-1.5 font-medium">
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[var(--color-status-critical-bg)] text-[var(--color-status-critical-text)] border border-[var(--color-status-critical-border)] text-[10px] font-bold">
+              <AlertTriangle className="w-3 h-3 text-[var(--color-status-critical)]" />
+              <span>[CRIT] High Risk</span>
+            </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-amber-200 border border-amber-300"></span>
-            <span className="text-slate-600">Moderate</span>
+          <div className="flex items-center gap-1.5 font-medium">
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text)] border border-[var(--color-status-warning-border)] text-[10px] font-semibold">
+              <AlertCircle className="w-3 h-3 text-[var(--color-status-warning)]" />
+              <span>[MOD] Moderate</span>
+            </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-emerald-200 border border-emerald-300"></span>
-            <span className="text-slate-600">No Conflict</span>
+          <div className="flex items-center gap-1.5 font-medium">
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[var(--color-status-safe-bg)] text-[var(--color-status-safe-text)] border border-[var(--color-status-safe-border)] text-[10px] font-medium">
+              <ShieldCheck className="w-3 h-3 text-[var(--color-status-safe)]" />
+              <span>[SAFE] Monitored</span>
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-2xs">
-        <table className="w-full border-collapse text-xs">
+      {/* Sticky Table Matrix Container */}
+      <div className="overflow-x-auto max-h-[460px] rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] shadow-2xs">
+        <table className="w-full border-collapse text-xs select-none">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="p-3 text-left font-semibold text-slate-500 w-32">Medication</th>
+            <tr className="border-b border-[var(--color-border-subtle)]">
+              {/* Sticky Top-Left Corner */}
+              <th className="sticky top-0 left-0 z-30 p-3 text-left font-bold text-[var(--color-text-muted)] bg-[var(--color-surface-sunken)] border-r border-b border-[var(--color-border-subtle)] w-36">
+                Active Regimen
+              </th>
               {drugs.map((drug) => (
                 <th
                   key={drug}
-                  className="p-3 text-center font-semibold text-slate-700 border-l border-slate-200 min-w-24 truncate"
+                  className="sticky top-0 z-20 p-3 text-center font-bold text-[var(--color-text-primary)] bg-[var(--color-surface-sunken)] border-r last:border-0 border-b border-[var(--color-border-subtle)] min-w-28 truncate"
                   title={drug}
                 >
                   {drug}
@@ -78,37 +133,36 @@ export const InteractionMatrix = ({ drugs = [], matrixCells = [], onSelectPair }
           </thead>
           <tbody>
             {drugs.map((rowDrug) => (
-              <tr key={rowDrug} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
-                <td className="p-3 font-semibold text-slate-800 bg-slate-50/70 border-r border-slate-200 truncate">
+              <tr key={rowDrug} className="border-b border-[var(--color-border-subtle)] last:border-0">
+                {/* Sticky Left Row Header */}
+                <td className="sticky left-0 z-10 p-3 font-semibold text-[var(--color-text-primary)] bg-[var(--color-surface-sunken)] border-r border-[var(--color-border-subtle)] truncate">
                   {rowDrug}
                 </td>
+
                 {drugs.map((colDrug) => {
                   const cell = getCell(rowDrug, colDrug);
                   const isSelf = rowDrug === colDrug;
+                  const style = getCellStyling(rowDrug, colDrug);
+                  const CellIcon = style.icon;
+
                   return (
                     <td
                       key={colDrug}
+                      tabIndex={isSelf ? -1 : 0}
                       onClick={() => handleCellClick(rowDrug, colDrug)}
-                      className={`p-3 text-center border-r border-slate-200 last:border-0 transition-colors ${getCellColor(
-                        rowDrug,
-                        colDrug
-                      )} ${!isSelf ? 'cursor-pointer' : ''}`}
-                      title={isSelf ? 'Self' : `${rowDrug} + ${colDrug}: ${cell.severity}`}
+                      onKeyDown={(e) => handleKeyDown(e, rowDrug, colDrug)}
+                      className={`p-3 text-center border-r border-[var(--color-border-subtle)] last:border-0 transition-all outline-none ${
+                        style.bg
+                      } ${!isSelf ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
+                      title={isSelf ? 'Self' : `${rowDrug} + ${colDrug}: ${cell.severity} - ${cell.summary}`}
                     >
                       {isSelf ? (
-                        <span className="text-slate-300">—</span>
-                      ) : cell.severity === 'High Risk' ? (
-                        <div className="flex items-center justify-center gap-1">
-                          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-                          <span className="text-[11px] font-bold">HIGH</span>
-                        </div>
-                      ) : cell.severity === 'Moderate Risk' ? (
-                        <div className="flex items-center justify-center gap-1">
-                          <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                          <span className="text-[11px] font-semibold">MOD</span>
-                        </div>
+                        <span className="text-[var(--color-text-muted)]">—</span>
                       ) : (
-                        <CheckCircle2 className="w-3.5 h-3.5 mx-auto text-emerald-500" />
+                        <div className="flex items-center justify-center gap-1">
+                          {CellIcon && <CellIcon className="w-3.5 h-3.5 shrink-0" />}
+                          <span className="font-mono text-[11px]">{style.code}</span>
+                        </div>
                       )}
                     </td>
                   );
@@ -119,25 +173,37 @@ export const InteractionMatrix = ({ drugs = [], matrixCells = [], onSelectPair }
         </table>
       </div>
 
+      {/* Selected Cell Detail Drawer / Callout */}
       {selectedCell && (
-        <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between mb-2">
-            <h5 className="font-bold text-slate-800 text-sm">
-              Interaction Detail: {selectedCell.row} ↔ {selectedCell.col}
-            </h5>
-            <span
-              className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
-                selectedCell.severity === 'High Risk'
-                  ? 'bg-rose-100 text-rose-800'
-                  : selectedCell.severity === 'Moderate Risk'
-                  ? 'bg-amber-100 text-amber-800'
-                  : 'bg-emerald-100 text-emerald-800'
-              }`}
+        <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] shadow-xs space-y-2 animate-in fade-in">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xs text-[var(--color-text-primary)]">
+                Selected Pair: {selectedCell.row} ↔ {selectedCell.col}
+              </span>
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                  selectedCell.severity === 'High Risk'
+                    ? 'bg-[var(--color-status-critical-bg)] text-[var(--color-status-critical-text)]'
+                    : selectedCell.severity === 'Moderate Risk'
+                    ? 'bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text)]'
+                    : 'bg-[var(--color-status-safe-bg)] text-[var(--color-status-safe-text)]'
+                }`}
+              >
+                {selectedCell.severity}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedCell(null)}
+              className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] cursor-pointer"
             >
-              {selectedCell.severity}
-            </span>
+              Dismiss
+            </button>
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">{selectedCell.summary}</p>
+          <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+            {selectedCell.summary || 'No direct pharmacokinetic interaction observed.'}
+          </p>
         </div>
       )}
     </div>
