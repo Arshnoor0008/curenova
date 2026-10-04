@@ -8,9 +8,9 @@ export const DashboardLayout = ({ role }) => {
   const currentRole = role || user?.role || 'doctor';
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] bg-slate-50">
+    <div className="flex min-h-[calc(100vh-4.25rem)] bg-[var(--color-surface-ground)] text-[var(--color-text-primary)] transition-colors duration-200">
       <Sidebar role={currentRole} />
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
+      <main className="flex-1 min-w-0 w-full px-4 sm:px-6 lg:px-8 py-6 max-w-[1600px] mx-auto overflow-y-auto">
         <Outlet />
       </main>
     </div>
