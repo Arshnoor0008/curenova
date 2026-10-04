@@ -5,22 +5,45 @@ import {
   FileText,
   ExternalLink,
   BookOpen,
-  Calendar,
-  Layers,
-  ChevronRight,
-  ShieldCheck,
-  Sparkles,
-  Info,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Database,
+  FlaskConical,
+  Activity,
+  Layers,
+  X,
+  ChevronRight,
+  Tag,
+  Calendar
 } from 'lucide-react';
 import { evidenceService } from '../services/api';
 import RiskBadge from '../components/RiskBadge';
-import SafetyDisclaimer from '../components/SafetyDisclaimer';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
-import Card, { CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import Skeleton, { SkeletonCard } from '../components/ui/Skeleton';
+import { SkeletonCard } from '../components/ui/Skeleton';
+
+const SOURCES = [
+  { key: 'all', label: 'All Sources', color: '#0271b0', icon: Database },
+  { key: 'PubMed', label: 'PubMed', color: '#38bdf8', icon: BookOpen },
+  { key: 'openFDA', label: 'openFDA', color: '#fbbf24', icon: Activity },
+  { key: 'ClinicalTrials.gov', label: 'ClinicalTrials', color: '#818cf8', icon: FlaskConical },
+  { key: 'ChEMBL', label: 'ChEMBL', color: '#2dd4bf', icon: Layers },
+];
+
+const TYPES = [
+  { key: 'all', label: 'All Types' },
+  { key: 'Literature', label: 'Literature' },
+  { key: 'SafetySignal', label: 'Safety Signal' },
+  { key: 'ClinicalTrial', label: 'Clinical Trial' },
+  { key: 'Pathway', label: 'Pathway' },
+];
+
+const SOURCE_BADGE_VARIANT = {
+  PubMed: 'info',
+  openFDA: 'warning',
+  'ClinicalTrials.gov': 'critical',
+  ChEMBL: 'safe',
+};
 
 export const EvidenceExplorer = () => {
   const [query, setQuery] = useState('');
@@ -30,8 +53,6 @@ export const EvidenceExplorer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedRecord, setSelectedRecord] = useState(null);
-  const [availableSources, setAvailableSources] = useState([]);
-  const [availableTypes, setAvailableTypes] = useState([]);
 
   const fetchEvidence = async () => {
     setLoading(true);
@@ -43,10 +64,7 @@ export const EvidenceExplorer = () => {
         evidence_type: evidenceType !== 'all' ? evidenceType : undefined,
       });
       setRecords(res.results || []);
-      setAvailableSources(res.available_sources || []);
-      setAvailableTypes(res.available_evidence_types || []);
     } catch (err) {
-      console.error('Failed to load evidence', err);
       setError('Unable to reach evidence repository. Please retry.');
     } finally {
       setLoading(false);
@@ -62,176 +80,350 @@ export const EvidenceExplorer = () => {
     fetchEvidence();
   };
 
-  const handleClearFilters = () => {
+  const clearFilters = () => {
     setQuery('');
     setSource('all');
     setEvidenceType('all');
   };
 
+  const hasActiveFilters = source !== 'all' || evidenceType !== 'all' || query;
+  const activeSource = SOURCES.find((s) => s.key === source);
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7]">
-              <Search className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
-              Biomedical Evidence Explorer
-            </h1>
+    <div className="min-h-screen bg-[var(--color-surface-ground)]">
+
+      {/* ── PAGE HEADER ── */}
+      <div className="bg-gradient-to-r from-[#0b1e3d] to-[#0a2d3a] border-b border-white/10 px-6 py-6">
+        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-[#0271b0] flex items-center justify-center">
+                <Search className="w-4 h-4 text-white" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+                Biomedical Evidence Explorer
+              </h1>
+            </div>
+            <p className="text-sm text-white/60 ml-10">
+              Curated peer-reviewed literature, regulatory signals, and pathway data — PubMed · openFDA · ChEMBL · ClinicalTrials.gov
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-1">
-            Curated, peer-reviewed literature and regulatory safety datasets (PubMed, ClinicalTrials.gov, openFDA, ChEMBL)
-          </p>
+          <div className="flex items-center gap-2 ml-10 sm:ml-0">
+            {SOURCES.slice(1).map((s) => (
+              <span
+                key={s.key}
+                className="flex items-center gap-1 text-[11px] font-semibold text-white/50 px-2 py-1 rounded-lg border border-white/10 bg-white/5"
+              >
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: s.color }} />
+                {s.label}
+              </span>
+            ))}
+          </div>
         </div>
-        <SafetyDisclaimer variant="compact" />
       </div>
 
-      {/* Search & Filter Bar */}
-      <Card elevation="raised" className="p-5 space-y-4">
-        <form onSubmit={handleSearchSubmit} className="flex gap-2.5">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)] pointer-events-none" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by drug (e.g. Metformin), disease (e.g. Alzheimer's), or PMID..."
-              className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284c7]"
-            />
-          </div>
-          <Button
-            type="submit"
-            variant="primary"
-            size="md"
-            icon={Search}
-          >
-            Search Evidence
-          </Button>
-        </form>
+      <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row min-h-[calc(100vh-160px)]">
 
-        {/* Quick Select Filter Chips */}
-        <div className="flex flex-wrap items-center gap-3 pt-2 text-xs border-t border-[var(--color-border-subtle)]">
-          <div className="flex items-center gap-1.5 text-[var(--color-text-muted)] font-medium">
-            <Filter className="w-3.5 h-3.5" /> Sources:
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {['all', 'PubMed', 'openFDA', 'ClinicalTrials.gov', 'ChEMBL'].map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setSource(s)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                  source === s
-                    ? 'bg-[#0284c7] text-white shadow-2xs'
-                    : 'bg-[var(--color-surface-sunken)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)]'
-                }`}
-              >
-                {s === 'all' ? 'All Sources' : s}
-              </button>
-            ))}
-          </div>
+        {/* ── LEFT SIDEBAR: Filters ── */}
+        <aside className="w-full lg:w-64 xl:w-72 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] p-5 space-y-6">
 
-          <span className="text-[var(--color-border-strong)] hidden sm:inline">|</span>
-
-          <div className="flex items-center gap-1.5 text-[var(--color-text-muted)] font-medium">
-            Type:
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {['all', 'Literature', 'SafetySignal', 'ClinicalTrial', 'Pathway'].map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setEvidenceType(t)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                  evidenceType === t
-                    ? 'bg-[#0d9488] text-white shadow-2xs'
-                    : 'bg-[var(--color-surface-sunken)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)]'
-                }`}
-              >
-                {t === 'all' ? 'All Types' : t}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Card>
-
-      {/* Evidence Results Grid + Shimmer Skeletons + Empty & Error States */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      ) : error ? (
-        <Card elevation="flat" className="p-8 text-center space-y-3 border-dashed">
-          <AlertTriangle className="w-8 h-8 text-[#dc2626] mx-auto" />
-          <h3 className="text-sm font-bold text-[var(--color-text-primary)]">Evidence Retrieval Error</h3>
-          <p className="text-xs text-[var(--color-text-muted)] max-w-md mx-auto">{error}</p>
-          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={fetchEvidence}>
-            Retry Search
-          </Button>
-        </Card>
-      ) : records.length === 0 ? (
-        <Card elevation="flat" className="p-12 text-center space-y-3 border-dashed">
-          <BookOpen className="w-8 h-8 text-[var(--color-border-strong)] mx-auto" />
-          <h3 className="text-sm font-bold text-[var(--color-text-primary)]">No Evidence Records Found</h3>
-          <p className="text-xs text-[var(--color-text-muted)] max-w-md mx-auto">
-            No peer-reviewed papers or regulatory signals matched your search criteria. Try broadening your query or resetting filters.
-          </p>
-          <Button variant="subtle" size="sm" onClick={handleClearFilters}>
-            Clear All Filters
-          </Button>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {records.map((rec) => (
-            <Card
-              key={rec.id}
-              elevation="raised"
-              className="p-5 flex flex-col justify-between space-y-3 hover:border-[var(--color-border-focus)] transition-all"
+          {/* Search */}
+          <form onSubmit={handleSearchSubmit} className="space-y-2">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+              Search Evidence
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)] pointer-events-none" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Drug, disease, PMID…"
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[#0271b0] focus:border-transparent transition-all"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-2 rounded-xl bg-[#0271b0] text-white text-sm font-bold hover:bg-[#025f93] transition-colors"
             >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Badge variant="info" size="sm">
-                    {rec.source}
-                  </Badge>
-                  {rec.evidence_level && (
-                    <RiskBadge severity={rec.evidence_level} size="sm" />
+              Search
+            </button>
+          </form>
+
+          {/* Source filter */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+                Data Source
+              </span>
+              <Filter className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
+            </div>
+            <div className="space-y-1">
+              {SOURCES.map((s) => {
+                const Icon = s.icon;
+                const isActive = source === s.key;
+                return (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => setSource(s.key)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                      isActive
+                        ? 'text-white shadow-sm'
+                        : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+                    }`}
+                    style={isActive ? { backgroundColor: s.color } : {}}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span>{s.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Evidence Type filter */}
+          <div className="space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+              Evidence Type
+            </span>
+            <div className="space-y-1">
+              {TYPES.map((t) => {
+                const isActive = evidenceType === t.key;
+                return (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setEvidenceType(t.key)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                      isActive
+                        ? 'bg-[var(--color-brand-surface)] text-[var(--color-brand-primary)] border border-[var(--color-brand-border)]'
+                        : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+                    }`}
+                  >
+                    <Tag className="w-3.5 h-3.5 flex-shrink-0" />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Clear filters */}
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-[var(--color-border-subtle)] text-xs font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-all"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear All Filters
+            </button>
+          )}
+        </aside>
+
+        {/* ── MAIN CONTENT AREA ── */}
+        <main className="flex-1 p-5 sm:p-6 space-y-4 min-w-0">
+
+          {/* Results header bar */}
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-3">
+              {!loading && !error && (
+                <span className="text-sm font-bold text-[var(--color-text-primary)]">
+                  {records.length} record{records.length !== 1 ? 's' : ''} found
+                </span>
+              )}
+              {hasActiveFilters && (
+                <div className="flex flex-wrap gap-1.5">
+                  {source !== 'all' && (
+                    <span
+                      className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full text-white"
+                      style={{ backgroundColor: activeSource?.color }}
+                    >
+                      {source}
+                      <button onClick={() => setSource('all')} className="ml-0.5 hover:opacity-80"><X className="w-3 h-3" /></button>
+                    </span>
+                  )}
+                  {evidenceType !== 'all' && (
+                    <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-brand-surface)] text-[var(--color-brand-primary)] border border-[var(--color-brand-border)]">
+                      {evidenceType}
+                      <button onClick={() => setEvidenceType('all')} className="ml-0.5 hover:opacity-80"><X className="w-3 h-3" /></button>
+                    </span>
+                  )}
+                  {query && (
+                    <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-surface-sunken)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)]">
+                      "{query}"
+                      <button onClick={() => setQuery('')} className="ml-0.5 hover:opacity-80"><X className="w-3 h-3" /></button>
+                    </span>
                   )}
                 </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={fetchEvidence}
+              className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Refresh
+            </button>
+          </div>
 
-                <h3 className="text-sm font-bold text-[var(--color-text-primary)] leading-snug line-clamp-2">
-                  {rec.title}
+          {/* Results grid */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-24 space-y-4 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] flex items-center justify-center">
+                <AlertTriangle className="w-7 h-7 text-[#dc2626]" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)]">Evidence Retrieval Error</h3>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1 max-w-xs">{error}</p>
+              </div>
+              <Button variant="secondary" size="sm" icon={RefreshCw} onClick={fetchEvidence}>Retry</Button>
+            </div>
+          ) : records.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 space-y-4 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] flex items-center justify-center">
+                <BookOpen className="w-7 h-7 text-[var(--color-text-muted)]" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)]">No Records Found</h3>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1 max-w-xs">
+                  Try broadening your query or clearing the active filters.
+                </p>
+              </div>
+              <Button variant="subtle" size="sm" onClick={clearFilters}>Clear Filters</Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {records.map((rec) => {
+                const srcColor = SOURCES.find((s) => s.key === rec.source)?.color || '#64748b';
+                return (
+                  <div
+                    key={rec.id}
+                    onClick={() => setSelectedRecord(selectedRecord?.id === rec.id ? null : rec)}
+                    className={`group bg-[var(--color-surface-card)] border rounded-2xl p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all hover:shadow-md ${
+                      selectedRecord?.id === rec.id
+                        ? 'border-[#0271b0] ring-2 ring-[#0271b0]/20 shadow-md'
+                        : 'border-[var(--color-border-subtle)] hover:border-[var(--color-border-strong)]'
+                    }`}
+                  >
+                    <div className="space-y-2.5">
+                      {/* Source dot + type */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className="flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full text-white"
+                          style={{ backgroundColor: srcColor }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+                          {rec.source}
+                        </span>
+                        {rec.evidence_level && <RiskBadge severity={rec.evidence_level} size="sm" />}
+                      </div>
+
+                      <h3 className="text-sm font-bold text-[var(--color-text-primary)] leading-snug line-clamp-2 group-hover:text-[#0271b0] transition-colors">
+                        {rec.title}
+                      </h3>
+
+                      <p className="text-xs text-[var(--color-text-secondary)] line-clamp-3 leading-relaxed">
+                        {rec.summary || rec.findings}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-[var(--color-border-subtle)] flex items-center justify-between">
+                      <span className="text-[10px] font-mono text-[var(--color-text-muted)] tabular">
+                        {rec.pmid ? `PMID ${rec.pmid}` : rec.nct_id ? rec.nct_id : 'openFDA FAERS'}
+                      </span>
+                      {rec.url ? (
+                        <a
+                          href={rec.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1 text-[11px] font-semibold text-[#0271b0] hover:underline"
+                        >
+                          View <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <span className="flex items-center gap-1 text-[11px] font-semibold text-[var(--color-text-muted)]">
+                          Details <ChevronRight className="w-3 h-3" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </main>
+
+        {/* ── DETAIL PANEL (slides in on click) ── */}
+        {selectedRecord && (
+          <aside className="hidden xl:flex w-80 flex-shrink-0 border-l border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] p-5 flex-col space-y-4 overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Record Detail</span>
+              <button
+                type="button"
+                onClick={() => setSelectedRecord(null)}
+                className="p-1 rounded-lg hover:bg-[var(--color-surface-hover)] text-[var(--color-text-muted)] transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                {selectedRecord.source && (
+                  <span
+                    className="text-[11px] font-bold px-2 py-0.5 rounded-full text-white inline-block mb-2"
+                    style={{ backgroundColor: SOURCES.find((s) => s.key === selectedRecord.source)?.color || '#64748b' }}
+                  >
+                    {selectedRecord.source}
+                  </span>
+                )}
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)] leading-snug">
+                  {selectedRecord.title}
                 </h3>
+              </div>
 
-                <p className="text-xs text-[var(--color-text-secondary)] line-clamp-3 leading-relaxed">
-                  {rec.summary || rec.findings}
+              {selectedRecord.evidence_level && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[var(--color-text-muted)]">Risk Level:</span>
+                  <RiskBadge severity={selectedRecord.evidence_level} size="sm" />
+                </div>
+              )}
+
+              {(selectedRecord.pmid || selectedRecord.nct_id) && (
+                <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--color-text-muted)]">
+                  <FileText className="w-3.5 h-3.5" />
+                  {selectedRecord.pmid ? `PMID: ${selectedRecord.pmid}` : selectedRecord.nct_id}
+                </div>
+              )}
+
+              <div className="p-3 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)]">
+                <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                  {selectedRecord.summary || selectedRecord.findings || 'No summary available.'}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-[var(--color-border-subtle)] flex items-center justify-between text-xs">
-                <span className="text-[11px] font-mono text-[var(--color-text-muted)]">
-                  {rec.pmid ? `PMID: ${rec.pmid}` : rec.nct_id ? rec.nct_id : 'openFDA FAERS'}
-                </span>
-
-                {rec.url && (
-                  <a
-                    href={rec.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--color-brand-primary)] hover:underline flex items-center gap-1 text-[11px] font-semibold"
-                  >
-                    <span>View Record</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+              {selectedRecord.url && (
+                <a
+                  href={selectedRecord.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#0271b0] text-white text-sm font-bold hover:bg-[#025f93] transition-colors"
+                >
+                  View Full Record <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
+            </div>
+          </aside>
+        )}
+      </div>
     </div>
   );
 };

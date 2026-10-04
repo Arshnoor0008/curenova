@@ -113,79 +113,102 @@ export const KnowledgeGraph = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7]">
-              <Share2 className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
-              Biomedical Knowledge Graph
-            </h1>
+    <div className="min-h-screen bg-[var(--color-surface-ground)]">
+
+      {/* ── PAGE HEADER ── */}
+      <div className="bg-gradient-to-r from-[#0b1e3d] via-[#1a1060] to-[#0b2235] border-b border-white/10 px-6 py-6">
+        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-[#8b5cf6] flex items-center justify-center">
+                <Share2 className="w-4 h-4 text-white" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+                Biomedical Knowledge Graph
+              </h1>
+            </div>
+            <p className="text-sm text-white/60 ml-10">
+              Interactive multi-relational network — Drug · Disease · Target · Gene · Pathway · Safety Signal
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-1">
-            Interactive multi-relational network connecting Drugs, Diseases, Targets, Genes, Pathways, and Safety Alerts
-          </p>
+
+          {/* Entity type color legend in header */}
+          <div className="flex flex-wrap gap-2 ml-10 sm:ml-0">
+            {Object.entries(TYPE_COLORS).slice(0, 5).map(([type, c]) => (
+              <span key={type} className="flex items-center gap-1.5 text-[11px] font-semibold text-white/50 px-2 py-1 rounded-lg border border-white/10 bg-white/5">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c.bg }} />
+                {type}
+              </span>
+            ))}
+          </div>
         </div>
-        <SafetyDisclaimer variant="compact" />
       </div>
 
-      {/* Toolbar & Filter Bar */}
-      <Card elevation="flat" className="p-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="font-semibold text-[var(--color-text-muted)] flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5" /> Entity Filter:
-          </span>
-          {['all', 'Drug', 'Disease', 'Protein', 'Pathway', 'SafetySignal'].map((type) => (
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-4 space-y-4">
+
+        {/* ── TOOLBAR ── */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-sm">
+          {/* Entity filters */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-[var(--color-text-muted)] flex items-center gap-1.5 mr-1">
+              <Filter className="w-3.5 h-3.5" /> Filter:
+            </span>
+            {['all', 'Drug', 'Disease', 'Protein', 'Pathway', 'SafetySignal'].map((type) => {
+              const isActive = filterType === type;
+              const color = type === 'all' ? '#0271b0' : (TYPE_COLORS[type]?.bg || '#64748b');
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setFilterType(type)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border"
+                  style={isActive
+                    ? { backgroundColor: color, color: '#fff', borderColor: color }
+                    : { backgroundColor: 'var(--color-surface-sunken)', color: 'var(--color-text-secondary)', borderColor: 'var(--color-border-subtle)' }
+                  }
+                >
+                  {type === 'all' ? 'All Entities' : type}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Zoom controls */}
+          <div className="flex items-center gap-1.5">
             <button
-              key={type}
               type="button"
-              onClick={() => setFilterType(type)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                filterType === type
-                  ? 'bg-[#0284c7] text-white shadow-2xs'
-                  : 'bg-[var(--color-surface-sunken)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)]'
-              }`}
+              onClick={() => setZoomLevel((z) => Math.min(z + 0.15, 2.2))}
+              className="p-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] transition-colors text-[var(--color-text-secondary)]"
+              title="Zoom In"
             >
-              {type === 'all' ? 'All Entities' : type}
+              <ZoomIn className="w-4 h-4" />
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => setZoomLevel((z) => Math.max(z - 0.15, 0.6))}
+              className="p-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] transition-colors text-[var(--color-text-secondary)]"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => { setZoomLevel(1); setPanOffset({ x: 0, y: 0 }); }}
+              className="p-2 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] transition-colors text-[var(--color-text-secondary)]"
+              title="Reset"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+            <span className="text-[11px] font-mono text-[var(--color-text-muted)] px-2">
+              {Math.round(zoomLevel * 100)}%
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={ZoomIn}
-            onClick={() => setZoomLevel((z) => Math.min(z + 0.15, 2.2))}
-            title="Zoom In"
-          />
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={ZoomOut}
-            onClick={() => setZoomLevel((z) => Math.max(z - 0.15, 0.6))}
-            title="Zoom Out"
-          />
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={RotateCcw}
-            onClick={() => {
-              setZoomLevel(1);
-              setPanOffset({ x: 0, y: 0 });
-            }}
-            title="Reset Pan & Zoom"
-          />
-        </div>
-      </Card>
-
-      {/* Graph Canvas Container + Inspector Drawer */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* SVG Canvas with Minimap */}
-        <div className="lg:col-span-3 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden shadow-xs relative h-[600px] select-none">
+        {/* ── MAIN CANVAS + INSPECTOR ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* SVG Canvas with Minimap */}
+          <div className="lg:col-span-3 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] overflow-hidden shadow-sm relative h-[600px] select-none">
           {loading ? (
             <div className="flex h-full items-center justify-center text-xs text-[var(--color-text-muted)]">
               Loading connected biological graph...
@@ -347,9 +370,9 @@ export const KnowledgeGraph = () => {
           </div>
         </div>
 
-        {/* Node Inspector Drawer */}
-        <div className="lg:col-span-1">
-          <Card elevation="raised" className="p-5 h-[600px] flex flex-col justify-between overflow-y-auto">
+          {/* Node Inspector Drawer */}
+          <div className="lg:col-span-1">
+            <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] p-5 h-[600px] flex flex-col justify-between overflow-y-auto shadow-sm">
             {selectedNode ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-[var(--color-border-subtle)] pb-3">
@@ -422,10 +445,8 @@ export const KnowledgeGraph = () => {
               </div>
             )}
 
-            <div className="mt-4 pt-3 border-t border-[var(--color-border-subtle)] text-[10px] text-[var(--color-text-muted)] font-mono">
-              Graph Engine: Neo4j Cypher compatible model with in-memory graph fallback.
             </div>
-          </Card>
+          </div>
         </div>
       </div>
     </div>
