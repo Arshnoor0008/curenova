@@ -170,7 +170,7 @@ export const PatientMedicationSafety = () => {
                     {medications.map((med, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[var(--color-text-primary)] text-sm font-semibold shadow-2xs"
+                        className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] dark:border-[#0284C7]/30 text-[var(--color-text-primary)] text-sm font-semibold shadow-2xs"
                       >
                         <Pill className="w-4 h-4 text-[#0284C7]" />
                         <span>{med}</span>

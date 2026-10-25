@@ -192,7 +192,7 @@ export const PatientResults = () => {
             {data.patient_questions_for_doctor?.map((question, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-[#0284C7]/40 transition-colors shadow-2xs"
+                className="flex items-start gap-3 p-3.5 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] hover:border-[#0284C7]/50 transition-colors shadow-2xs"
               >
                 <div className="w-5 h-5 rounded-md border-2 border-[#0284C7]/40 bg-[var(--color-surface-card)] flex items-center justify-center shrink-0 mt-0.5" />
                 <p className="text-xs sm:text-sm font-medium text-[var(--color-text-primary)] leading-relaxed">
