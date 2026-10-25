@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: 'Inter Tight', 'Inter', -apple-system, sans-serif;
@@ -199,78 +201,78 @@
   .dark {
     color-scheme: dark;
 
-    /* Semantic Surfaces (Dark - Restrained Navy Slate) */
-    --color-surface-ground: #0A1624;
-    --color-surface-card: #10263A;
-    --color-surface-overlay: #15324C;
-    --color-surface-hover: #1A3C5B;
-    --color-surface-sunken: #07101B;
+    /* Semantic Surfaces (Dark - Designer Obsidian Slate) */
+    --color-surface-ground: #070B14;
+    --color-surface-card: #0F172A;
+    --color-surface-overlay: #1E293B;
+    --color-surface-hover: #1E293B;
+    --color-surface-sunken: #0B1120;
 
-    /* Semantic Borders (Dark) */
-    --color-border-subtle: #1E3A54;
-    --color-border-strong: #2B4E70;
-    --color-border-focus: #0284C7;
+    /* Semantic Borders (Dark - Precision Outlines) */
+    --color-border-subtle: rgba(148, 163, 184, 0.16);
+    --color-border-strong: rgba(148, 163, 184, 0.3);
+    --color-border-focus: #38BDF8;
 
-    /* Semantic Text (Dark) */
-    --color-text-primary: #F1F5F9;
-    --color-text-secondary: #94A3B8;
-    --color-text-muted: #64748B;
-    --color-text-inverse: #0A1624;
+    /* Semantic Text (Dark - Crisp WCAG AAA/AA Anti-Fatigue) */
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #CBD5E1;
+    --color-text-muted: #94A3B8;
+    --color-text-inverse: #070B14;
 
     /* Master Palette Tokens */
-    --color-primary: #0A2540;
-    --color-primary-hover: #17324D;
-    --color-primary-dark: #0A1624;
-    --color-accent: #0284C7;
+    --color-primary: #0F172A;
+    --color-primary-hover: #1E293B;
+    --color-primary-dark: #070B14;
+    --color-accent: #0EA5E9;
     --color-accent-hover: #38BDF8;
-    --color-accent-light: rgba(2, 132, 199, 0.15);
-    --color-background: #0A1624;
-    --color-surface: #10263A;
+    --color-accent-light: rgba(14, 165, 233, 0.18);
+    --color-background: #070B14;
+    --color-surface: #0F172A;
 
-    /* Brand Primary (Dark) */
+    /* Brand Primary (Dark - Luminous Medical Cyan & Sky) */
     --color-brand-primary: #38BDF8;
     --color-brand-primary-hover: #7DD3FC;
-    --color-brand-secondary: #0284C7;
-    --color-brand-surface: rgba(2, 132, 199, 0.18);
-    --color-brand-border: rgba(56, 189, 248, 0.35);
+    --color-brand-secondary: #0EA5E9;
+    --color-brand-surface: rgba(14, 165, 233, 0.16);
+    --color-brand-border: rgba(56, 189, 248, 0.38);
     --color-brand-text: #38BDF8;
 
-    /* Status: Critical Hazard (Dark) */
+    /* Status: Critical Hazard (Dark - High-Luminance Coral) */
     --color-status-critical: #F87171;
-    --color-status-critical-bg: rgba(185, 28, 28, 0.18);
-    --color-status-critical-border: rgba(248, 113, 113, 0.3);
+    --color-status-critical-bg: rgba(239, 68, 68, 0.18);
+    --color-status-critical-border: rgba(248, 113, 113, 0.4);
     --color-status-critical-text: #FCA5A5;
     --color-status-critical-rail: #EF4444;
     --color-danger: #F87171;
 
-    /* Status: Warning (Dark) */
+    /* Status: Warning (Dark - Luminous Amber Gold) */
     --color-status-warning: #FBBF24;
-    --color-status-warning-bg: rgba(180, 83, 9, 0.18);
-    --color-status-warning-border: rgba(251, 191, 36, 0.3);
-    --color-status-warning-text: #FDE68A;
+    --color-status-warning-bg: rgba(245, 158, 11, 0.18);
+    --color-status-warning-border: rgba(251, 191, 36, 0.4);
+    --color-status-warning-text: #FDE047;
     --color-status-warning-rail: #F59E0B;
     --color-warning: #FBBF24;
 
-    /* Status: Safe (Dark) */
+    /* Status: Safe (Dark - Luminous Mint Emerald) */
     --color-status-safe: #34D399;
-    --color-status-safe-bg: rgba(21, 128, 61, 0.18);
-    --color-status-safe-border: rgba(52, 211, 153, 0.3);
-    --color-status-safe-text: #A7F3D0;
+    --color-status-safe-bg: rgba(16, 185, 129, 0.18);
+    --color-status-safe-border: rgba(52, 211, 153, 0.4);
+    --color-status-safe-text: #6EE7B7;
     --color-status-safe-rail: #10B981;
     --color-success: #34D399;
 
-    /* Status: Info (Dark) */
+    /* Status: Info (Dark - High-Clarity Ice Blue) */
     --color-status-info: #60A5FA;
-    --color-status-info-bg: rgba(37, 99, 235, 0.18);
-    --color-status-info-border: rgba(96, 165, 250, 0.3);
-    --color-status-info-text: #BFDBFE;
-    --color-status-info-rail: #3B82F6;
-    --color-info: #60A5FA;
+    --color-status-info-bg: rgba(14, 165, 233, 0.18);
+    --color-status-info-border: rgba(56, 189, 248, 0.4);
+    --color-status-info-text: #BAE6FD;
+    --color-status-info-rail: #0EA5E9;
+    --color-info: #38BDF8;
 
-    /* Elevation & Shadows (Dark) */
-    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
-    --shadow-raised: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
-    --shadow-overlay: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    /* Elevation & Shadows (Dark - Specular Inner Edge + Deep Ambient) */
+    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    --shadow-raised: 0 4px 18px -2px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(148, 163, 184, 0.14), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    --shadow-overlay: 0 24px 48px -8px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(148, 163, 184, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
   }
 
   body {

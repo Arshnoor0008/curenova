@@ -71,8 +71,14 @@ class InMemoryDatabase:
         self.is_loaded = True
 
     def seed_demo_users(self):
-        # No pre-seeded demo accounts. Users register and log into their own accounts.
-        pass
+        demo_accounts = [
+            ("doctor@curenova.ai", "Dr. Sarah Lin, MD", "doctor123", "doctor", "Mount Sinai Hospital"),
+            ("researcher@curenova.ai", "Dr. Marcus Vance, PhD", "researcher123", "researcher", "Broad Institute of MIT & Harvard"),
+            ("patient@curenova.ai", "Elena Rostova", "patient123", "patient", "Patient / Family Caregiver")
+        ]
+        for email, name, pwd, role, org in demo_accounts:
+            if email not in self.users:
+                self.create_user(email, name, pwd, role, org)
 
     def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         return self.users.get(email.lower().strip())

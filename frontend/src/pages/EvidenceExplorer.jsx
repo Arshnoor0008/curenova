@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search,
   Filter,
@@ -13,13 +13,11 @@ import {
   Layers,
   X,
   ChevronRight,
-  Tag,
-  Calendar
+  Tag
 } from 'lucide-react';
 import { evidenceService } from '../services/api';
 import RiskBadge from '../components/RiskBadge';
 import Button from '../components/ui/Button';
-import Badge from '../components/ui/Badge';
 import { SkeletonCard } from '../components/ui/Skeleton';
 
 const SOURCES = [
@@ -38,13 +36,6 @@ const TYPES = [
   { key: 'Pathway', label: 'Pathway' },
 ];
 
-const SOURCE_BADGE_VARIANT = {
-  PubMed: 'info',
-  openFDA: 'warning',
-  'ClinicalTrials.gov': 'critical',
-  ChEMBL: 'safe',
-};
-
 export const EvidenceExplorer = () => {
   const [query, setQuery] = useState('');
   const [source, setSource] = useState('all');
@@ -54,26 +45,26 @@ export const EvidenceExplorer = () => {
   const [error, setError] = useState('');
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  const fetchEvidence = async () => {
+  const fetchEvidence = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
       const res = await evidenceService.search({
-        q: query,
+        q: query || undefined,
         source: source !== 'all' ? source : undefined,
         evidence_type: evidenceType !== 'all' ? evidenceType : undefined,
       });
       setRecords(res.results || []);
-    } catch (err) {
+    } catch {
       setError('Unable to reach evidence repository. Please retry.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, source, evidenceType]);
 
   useEffect(() => {
     fetchEvidence();
-  }, [source, evidenceType]);
+  }, [fetchEvidence]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

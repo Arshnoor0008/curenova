@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './components/ui/Toast';
@@ -31,80 +31,90 @@ import PatientDashboard from './pages/patient/PatientDashboard';
 import PatientMedicationSafety from './pages/patient/PatientMedicationSafety';
 import PatientResults from './pages/patient/PatientResults';
 
+function AppContent() {
+  const location = useLocation();
+  // Hide global navbar on landing and auth pages for a clean, minimal look
+  const hideNavbar = ['/', '/login', '/register', '/forgot-password'].includes(location.pathname);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[var(--color-surface-ground)] text-[var(--color-text-primary)] font-sans antialiased">
+      {!hideNavbar && <Navbar />}
+      <div className="flex-1 flex flex-col">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/evidence" element={<EvidenceExplorer />} />
+          <Route path="/knowledge-graph" element={<KnowledgeGraph />} />
+          <Route path="/about" element={<About />} />
+
+          {/* Doctor Protected Routes */}
+          <Route
+            path="/doctor"
+            element={
+              <ProtectedRoute allowedRoles={['doctor']}>
+                <DashboardLayout role="doctor" />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/doctor/dashboard" replace />} />
+            <Route path="dashboard" element={<DoctorDashboard />} />
+            <Route path="medication-safety" element={<DoctorMedicationSafety />} />
+            <Route path="results" element={<DoctorResults />} />
+          </Route>
+
+          {/* Researcher Protected Routes */}
+          <Route
+            path="/researcher"
+            element={
+              <ProtectedRoute allowedRoles={['researcher']}>
+                <DashboardLayout role="researcher" />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/researcher/dashboard" replace />} />
+            <Route path="dashboard" element={<ResearcherDashboard />} />
+            <Route path="drug-repurposing" element={<ResearcherDrugRepurposing />} />
+            <Route path="results" element={<ResearcherResults />} />
+          </Route>
+
+          {/* Patient Protected Routes */}
+          <Route
+            path="/patient"
+            element={
+              <ProtectedRoute allowedRoles={['patient']}>
+                <DashboardLayout role="patient" />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/patient/dashboard" replace />} />
+            <Route path="dashboard" element={<PatientDashboard />} />
+            <Route path="medication-safety" element={<PatientMedicationSafety />} />
+            <Route path="results" element={<PatientResults />} />
+          </Route>
+
+          {/* Catch-all redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
           <Router>
-            <div className="min-h-screen flex flex-col bg-[var(--color-surface-ground)] text-[var(--color-text-primary)] font-sans antialiased">
-              <Navbar />
-              <div className="flex-1 flex flex-col">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/evidence" element={<EvidenceExplorer />} />
-              <Route path="/knowledge-graph" element={<KnowledgeGraph />} />
-              <Route path="/about" element={<About />} />
-
-              {/* Doctor Protected Routes */}
-              <Route
-                path="/doctor"
-                element={
-                  <ProtectedRoute allowedRoles={['doctor']}>
-                    <DashboardLayout role="doctor" />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Navigate to="/doctor/dashboard" replace />} />
-                <Route path="dashboard" element={<DoctorDashboard />} />
-                <Route path="medication-safety" element={<DoctorMedicationSafety />} />
-                <Route path="results" element={<DoctorResults />} />
-              </Route>
-
-              {/* Researcher Protected Routes */}
-              <Route
-                path="/researcher"
-                element={
-                  <ProtectedRoute allowedRoles={['researcher']}>
-                    <DashboardLayout role="researcher" />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Navigate to="/researcher/dashboard" replace />} />
-                <Route path="dashboard" element={<ResearcherDashboard />} />
-                <Route path="drug-repurposing" element={<ResearcherDrugRepurposing />} />
-                <Route path="results" element={<ResearcherResults />} />
-              </Route>
-
-              {/* Patient Protected Routes */}
-              <Route
-                path="/patient"
-                element={
-                  <ProtectedRoute allowedRoles={['patient']}>
-                    <DashboardLayout role="patient" />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Navigate to="/patient/dashboard" replace />} />
-                <Route path="dashboard" element={<PatientDashboard />} />
-                <Route path="medication-safety" element={<PatientMedicationSafety />} />
-                <Route path="results" element={<PatientResults />} />
-              </Route>
-
-              {/* Catch-all redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-            </div>
-          </div>
-        </Router>
-      </AuthProvider>
-    </ToastProvider>
-  </ThemeProvider>
-);
+            <AppContent />
+          </Router>
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
+  );
 }
 
 export default App;

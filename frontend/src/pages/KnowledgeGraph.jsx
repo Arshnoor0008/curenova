@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Share2,
   Filter,
@@ -6,19 +6,14 @@ import {
   ZoomOut,
   RotateCcw,
   Info,
+  Search,
   ExternalLink,
   Layers,
-  Search,
-  CheckCircle,
-  AlertTriangle,
-  Compass,
-  ArrowRight
+  X
 } from 'lucide-react';
 import { graphService } from '../services/api';
-import SafetyDisclaimer from '../components/SafetyDisclaimer';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
-import Card, { CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 
 const TYPE_COLORS = {
   Drug: { bg: '#0284c7', text: '#ffffff', border: '#0369a1' },
@@ -36,6 +31,7 @@ export const KnowledgeGraph = () => {
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState(null);
   const [filterType, setFilterType] = useState('all');
+  const [nodeSearch, setNodeSearch] = useState('');
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -171,6 +167,35 @@ export const KnowledgeGraph = () => {
                 </button>
               );
             })}
+          </div>
+
+          {/* Quick Node Search */}
+          <div className="relative flex items-center min-w-[200px] flex-1 sm:flex-initial">
+            <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)] absolute left-3 pointer-events-none" />
+            <input
+              type="text"
+              value={nodeSearch}
+              onChange={(e) => {
+                setNodeSearch(e.target.value);
+                if (e.target.value.trim()) {
+                  const match = positionedNodes.find((n) =>
+                    n.label.toLowerCase().includes(e.target.value.toLowerCase())
+                  );
+                  if (match) setSelectedNode(match);
+                }
+              }}
+              placeholder="Find entity by name..."
+              className="w-full text-xs bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] pl-8 pr-7 py-1.5 rounded-xl border border-[var(--color-border-subtle)] focus:outline-none focus:ring-1 focus:ring-[#0284c7]"
+            />
+            {nodeSearch && (
+              <button
+                type="button"
+                onClick={() => setNodeSearch('')}
+                className="absolute right-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
           {/* Zoom controls */}

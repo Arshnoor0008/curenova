@@ -313,7 +313,7 @@ export const DoctorResults = () => {
                   key={i}
                   className="flex items-start gap-2 p-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)]"
                 >
-                  <span className="font-bold text-[#0284C7] shrink-0 mt-0.5">•</span>
+                  <span className="font-bold text-[#0284C7] dark:text-[#38BDF8] shrink-0 mt-0.5">•</span>
                   <span className="leading-relaxed">{pt}</span>
                 </div>
               ))}
@@ -342,8 +342,8 @@ export const DoctorResults = () => {
           )}
 
           {/* Link to Knowledge Graph */}
-          <Card elevation="flat" className="p-5 space-y-3 border-l-4 border-l-[#0284C7]">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7]">
+          <Card elevation="flat" className="p-5 space-y-3 border-l-4 border-l-[#0284C7] dark:border-l-[#38BDF8]">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7] dark:text-[#38BDF8]">
               Biomedical Knowledge Graph
             </h4>
             <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">

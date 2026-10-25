@@ -24,7 +24,7 @@ export default function CommandPalette({ isOpen, onClose }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
   const navigate = useNavigate();
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const actions = [
@@ -110,40 +110,7 @@ export default function CommandPalette({ isOpen, onClose }) {
       icon: Pill,
       action: () => navigate('/doctor/medication-safety?drug=Lisinopril')
     },
-    // Switch Role
-    {
-      category: 'Switch Role',
-      id: 'role-doctor',
-      title: 'Switch to Clinician (Doctor)',
-      subtitle: 'Access clinical triage, polypharmacy matrix & digital twin',
-      icon: Stethoscope,
-      action: () => {
-        login({ email: 'doctor@curenova.ai', role: 'doctor', name: 'Dr. Sarah Lin, MD' });
-        navigate('/doctor/dashboard');
-      }
-    },
-    {
-      category: 'Switch Role',
-      id: 'role-researcher',
-      title: 'Switch to Biomedical Researcher',
-      subtitle: 'Access drug repurposing engine & target congruence',
-      icon: Microscope,
-      action: () => {
-        login({ email: 'researcher@curenova.ai', role: 'researcher', name: 'Dr. Marcus Vance, PhD' });
-        navigate('/researcher/dashboard');
-      }
-    },
-    {
-      category: 'Switch Role',
-      id: 'role-patient',
-      title: 'Switch to Patient / Caregiver',
-      subtitle: 'Access simplified schedule & doctor discussion sheet',
-      icon: HeartHandshake,
-      action: () => {
-        login({ email: 'patient@curenova.ai', role: 'patient', name: 'Elena Rostova' });
-        navigate('/patient/dashboard');
-      }
-    },
+
     // Theme toggle
     {
       category: 'Preferences',
@@ -155,7 +122,21 @@ export default function CommandPalette({ isOpen, onClose }) {
     }
   ];
 
-  const filtered = actions.filter(item => {
+  const roleSpecificActions = actions.filter((item) => {
+    if (!user) return true;
+    if (user.role === 'doctor') {
+      return !item.id.startsWith('nav-res') && !item.id.startsWith('nav-pat');
+    }
+    if (user.role === 'researcher') {
+      return !item.id.startsWith('nav-doc') && !item.id.startsWith('nav-pat');
+    }
+    if (user.role === 'patient') {
+      return !item.id.startsWith('nav-doc') && !item.id.startsWith('nav-res') && !item.id.startsWith('drug-');
+    }
+    return true;
+  });
+
+  const filtered = roleSpecificActions.filter(item => {
     if (!query.trim()) return true;
     const q = query.toLowerCase();
     return (

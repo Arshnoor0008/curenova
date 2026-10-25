@@ -392,7 +392,7 @@ export const DoctorDashboard = () => {
                     key={c.id}
                     type="button"
                     onClick={() => handleAddDrug(c.canonical_name)}
-                    className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)] hover:border-[#0284C7]/40 text-[var(--color-text-secondary)] hover:text-[#0284C7] transition-colors cursor-pointer"
+                    className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)] hover:border-[#0284C7] dark:hover:border-[#38BDF8] text-[var(--color-text-secondary)] dark:text-[#E2E8F0] hover:text-[#0284C7] dark:hover:text-[#38BDF8] transition-colors cursor-pointer"
                   >
                     + {c.canonical_name}
                   </button>
@@ -421,12 +421,12 @@ export const DoctorDashboard = () => {
                       onClick={() => toggleDrug(drug.name)}
                       className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all border ${
                         drug.enabled
-                          ? 'bg-[var(--color-surface-card)] text-[#0A2540] dark:text-[#E0F2FE] border-[#0284C7] shadow-xs'
-                          : 'bg-transparent text-[var(--color-text-muted)] border-dashed border-[var(--color-border-strong)] opacity-50 line-through'
+                          ? 'bg-[var(--color-surface-card)] dark:bg-[#1E293B] text-[#0A2540] dark:text-[#F8FAFC] border-[#0284C7] dark:border-[#38BDF8] shadow-xs dark:shadow-[0_0_12px_rgba(56,189,248,0.2)]'
+                          : 'bg-transparent text-[var(--color-text-muted)] dark:text-slate-400 border-dashed border-[var(--color-border-strong)] opacity-60 line-through'
                       }`}
                       title="Click to toggle drug ON/OFF in safety check"
                     >
-                      <Pill className={`w-3.5 h-3.5 ${drug.enabled ? 'text-[#0284C7]' : 'text-slate-400'}`} />
+                      <Pill className={`w-3.5 h-3.5 ${drug.enabled ? 'text-[#0284C7] dark:text-[#38BDF8]' : 'text-slate-400'}`} />
                       <span>{drug.name}</span>
                       <span className={`w-2 h-2 rounded-full ${drug.enabled ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                       <button
@@ -435,7 +435,7 @@ export const DoctorDashboard = () => {
                           e.stopPropagation();
                           handleRemoveDrug(drug.name);
                         }}
-                        className="text-[var(--color-text-muted)] hover:text-rose-600 ml-1 p-0.5"
+                        className="text-[var(--color-text-muted)] dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 ml-1 p-0.5 cursor-pointer"
                         title="Remove"
                       >
                         <X className="w-3 h-3" />
@@ -519,9 +519,9 @@ export const DoctorDashboard = () => {
                                   onClick={() => setActiveCell({ row: rowMed, col: colMed, ...interaction })}
                                   className={`w-7 h-7 rounded-lg font-bold text-[10px] font-mono transition-transform hover:scale-110 cursor-pointer ${
                                     interaction.severity === 'Severe'
-                                      ? 'bg-rose-500 text-white shadow-xs'
-                                      : 'bg-amber-400 text-black shadow-xs'
-                                  } ${isSelected ? 'ring-2 ring-sky-500 scale-110' : ''}`}
+                                      ? 'bg-rose-500 dark:bg-rose-600 text-white shadow-xs dark:shadow-[0_0_8px_rgba(244,63,94,0.4)]'
+                                      : 'bg-amber-400 dark:bg-amber-500 text-black dark:text-slate-950 shadow-xs'
+                                  } ${isSelected ? 'ring-2 ring-[#0284C7] dark:ring-[#38BDF8] scale-110' : ''}`}
                                   title={`${rowMed} + ${colMed}: ${interaction.alert}`}
                                 >
                                   !
@@ -530,7 +530,7 @@ export const DoctorDashboard = () => {
                                 <button
                                   type="button"
                                   onClick={() => setActiveCell({ row: rowMed, col: colMed, severity: 'Safe', alert: 'No documented clinical interaction' })}
-                                  className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 border border-emerald-200 dark:border-emerald-800 font-mono text-[10px] hover:scale-105 cursor-pointer"
+                                  className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60 font-mono text-[10px] hover:scale-105 cursor-pointer"
                                   title={`${rowMed} + ${colMed}: Safe`}
                                 >
                                   ✓
@@ -665,7 +665,7 @@ export const DoctorDashboard = () => {
                   onClick={() => setSelectedOrgan(org.id)}
                   className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                     selectedOrgan === org.id
-                      ? 'bg-[var(--color-surface-card)] text-[#0284C7] shadow-xs'
+                      ? 'bg-[var(--color-surface-card)] text-[#0284C7] dark:text-[#38BDF8] border border-[var(--color-border-subtle)] shadow-xs'
                       : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >

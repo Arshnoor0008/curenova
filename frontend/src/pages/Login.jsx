@@ -15,6 +15,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const ROLES = [
   {
@@ -22,6 +23,7 @@ const ROLES = [
     label: 'Researcher',
     icon: Microscope,
     color: '#0284C7',
+    darkColor: '#38BDF8',
     demoEmail: 'researcher@curenova.ai',
     demoPass: 'researcher123',
     demoName: 'Dr. Marcus Vance',
@@ -30,7 +32,8 @@ const ROLES = [
     role: 'doctor',
     label: 'Doctor',
     icon: Stethoscope,
-    color: '#17324D',
+    color: '#0284C7',
+    darkColor: '#60A5FA',
     demoEmail: 'doctor@curenova.ai',
     demoPass: 'doctor123',
     demoName: 'Dr. Sarah Lin',
@@ -40,6 +43,7 @@ const ROLES = [
     label: 'Patient',
     icon: HeartHandshake,
     color: '#15803D',
+    darkColor: '#34D399',
     demoEmail: 'patient@curenova.ai',
     demoPass: 'patient123',
     demoName: 'Elena Rostova',
@@ -48,6 +52,8 @@ const ROLES = [
 
 export const Login = () => {
   const { login } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialRoleParam = searchParams.get('role');
@@ -62,6 +68,7 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const activeRoleMeta = ROLES.find((r) => r.role === selectedRole) || ROLES[0];
+  const activeColor = isDark ? (activeRoleMeta.darkColor || activeRoleMeta.color) : activeRoleMeta.color;
 
   const handleRoleSelect = (roleKey) => {
     setSelectedRole(roleKey);
@@ -139,6 +146,7 @@ export const Login = () => {
             {ROLES.map((r) => {
               const Icon = r.icon;
               const isSelected = selectedRole === r.role;
+              const rColor = isDark ? (r.darkColor || r.color) : r.color;
               return (
                 <button
                   key={r.role}
@@ -152,7 +160,7 @@ export const Login = () => {
                 >
                   <Icon
                     className="w-4 h-4"
-                    style={{ color: isSelected ? r.color : undefined }}
+                    style={{ color: isSelected ? rColor : undefined }}
                   />
                   <span className="text-[11px]">{r.label}</span>
                 </button>
@@ -161,31 +169,31 @@ export const Login = () => {
           </div>
         </div>
 
-        {/* Demo Account Indicator Pill */}
-        <div
-          className="p-2.5 rounded-xl border flex items-center justify-between text-xs"
-          style={{
-            backgroundColor: `${activeRoleMeta.color}10`,
-            borderColor: `${activeRoleMeta.color}30`
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5" style={{ color: activeRoleMeta.color }} />
-            <span className="font-semibold text-[var(--color-text-primary)] text-[11px]">
-              Demo: <strong style={{ color: activeRoleMeta.color }}>{activeRoleMeta.demoName}</strong>
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setEmail(activeRoleMeta.demoEmail);
-              setPassword(activeRoleMeta.demoPass);
-            }}
-            className="text-[10px] font-bold underline hover:opacity-80 cursor-pointer"
-            style={{ color: activeRoleMeta.color }}
-          >
-            Auto-fill
-          </button>
+            {/* Demo Account Indicator Pill */}
+            <div
+              className="p-2.5 rounded-xl border flex items-center justify-between text-xs transition-colors"
+              style={{
+                backgroundColor: isDark ? `${activeColor}1A` : `${activeColor}10`,
+                borderColor: isDark ? `${activeColor}40` : `${activeColor}30`
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5" style={{ color: activeColor }} />
+                <span className="font-semibold text-[var(--color-text-primary)] text-[11px]">
+                  Demo: <strong style={{ color: activeColor }}>{activeRoleMeta.demoName}</strong>
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail(activeRoleMeta.demoEmail);
+                  setPassword(activeRoleMeta.demoPass);
+                }}
+                className="text-[10px] font-bold underline hover:opacity-80 cursor-pointer"
+                style={{ color: activeColor }}
+              >
+                Auto-fill
+              </button>
         </div>
 
         {/* Error Alert */}

@@ -12,6 +12,7 @@ import {
   Building
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Input from '../components/ui/Input';
 
 const ROLES = [
@@ -20,23 +21,28 @@ const ROLES = [
     label: 'Researcher',
     icon: Microscope,
     accentColor: '#0284C7',
+    darkAccentColor: '#38BDF8',
   },
   {
     role: 'doctor',
     label: 'Clinician',
     icon: Stethoscope,
-    accentColor: '#17324D',
+    accentColor: '#0284C7',
+    darkAccentColor: '#60A5FA',
   },
   {
     role: 'patient',
     label: 'Patient',
     icon: HeartHandshake,
     accentColor: '#15803D',
+    darkAccentColor: '#34D399',
   },
 ];
 
 export const Register = () => {
   const { register } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const navigate = useNavigate();
 
   const [role, setRole] = useState('doctor');
@@ -99,6 +105,7 @@ export const Register = () => {
             {ROLES.map((r) => {
               const Icon = r.icon;
               const isSelected = role === r.role;
+              const roleColor = isDark ? (r.darkAccentColor || r.accentColor) : r.accentColor;
               return (
                 <button
                   key={r.role}
@@ -115,7 +122,7 @@ export const Register = () => {
                 >
                   <Icon
                     className="w-3.5 h-3.5 shrink-0"
-                    style={{ color: isSelected ? r.accentColor : 'inherit' }}
+                    style={{ color: isSelected ? roleColor : 'inherit' }}
                   />
                   <span>{r.label}</span>
                 </button>

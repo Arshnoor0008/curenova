@@ -311,7 +311,7 @@ export const DoctorMedicationSafety = () => {
                   key={sug}
                   type="button"
                   onClick={() => handleAddMed(sug)}
-                  className="px-2.5 py-1 text-[11px] rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] hover:border-[#0284C7]/40 hover:text-[#0284C7] transition-colors cursor-pointer"
+                  className="px-2.5 py-1 text-[11px] rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] dark:text-[#E2E8F0] border border-[var(--color-border-subtle)] hover:border-[#0284C7] dark:hover:border-[#38BDF8] hover:text-[#0284C7] dark:hover:text-[#38BDF8] transition-colors cursor-pointer"
                 >
                   + {sug}
                 </button>
@@ -329,7 +329,7 @@ export const DoctorMedicationSafety = () => {
                 <button
                   type="button"
                   onClick={() => setMedications([])}
-                  className="text-[11px] font-mono text-[var(--color-text-muted)] hover:text-rose-600 cursor-pointer"
+                  className="text-[11px] font-mono text-[var(--color-text-muted)] dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 cursor-pointer"
                 >
                   Clear All
                 </button>
@@ -344,14 +344,14 @@ export const DoctorMedicationSafety = () => {
                   medications.map((med, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--color-surface-card)] border border-[#0284C7]/30 text-xs font-bold text-[#0A2540] dark:text-[#E0F2FE] shadow-2xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--color-surface-card)] dark:bg-[#1E293B] border border-[#0284C7]/30 dark:border-[#38BDF8]/40 text-xs font-bold text-[#0A2540] dark:text-[#F8FAFC] shadow-2xs dark:shadow-[0_0_12px_rgba(56,189,248,0.15)]"
                     >
-                      <Pill className="w-3.5 h-3.5 text-[#0284C7]" />
+                      <Pill className="w-3.5 h-3.5 text-[#0284C7] dark:text-[#38BDF8]" />
                       <span>{med}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveMed(idx)}
-                        className="text-[var(--color-text-muted)] hover:text-rose-600 cursor-pointer ml-1 p-0.5"
+                        className="text-[var(--color-text-muted)] dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 cursor-pointer ml-1 p-0.5"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -367,7 +367,7 @@ export const DoctorMedicationSafety = () => {
               <div className="p-3.5 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-1">
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="text-[var(--color-text-secondary)]">Patient Age</span>
-                  <span className="font-mono text-[#0284C7] font-semibold">{age} years</span>
+                  <span className="font-mono text-[#0284C7] dark:text-[#38BDF8] font-semibold">{age} years</span>
                 </div>
                 <input
                   type="range"
@@ -375,7 +375,7 @@ export const DoctorMedicationSafety = () => {
                   max="95"
                   value={age}
                   onChange={(e) => setAge(Number(e.target.value))}
-                  className="w-full accent-[#0284C7] cursor-pointer"
+                  className="w-full accent-[#0284C7] dark:accent-[#38BDF8] cursor-pointer"
                 />
                 <div className="flex justify-between text-[9px] font-mono text-[var(--color-text-muted)]">
                   <span>18y</span>
@@ -388,7 +388,7 @@ export const DoctorMedicationSafety = () => {
               <div className="p-3.5 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-1">
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="text-[var(--color-text-secondary)]">Renal Function (eGFR)</span>
-                  <span className="font-mono text-[#0284C7] font-semibold">{egfr} mL/min</span>
+                  <span className="font-mono text-[#0284C7] dark:text-[#38BDF8] font-semibold">{egfr} mL/min</span>
                 </div>
                 <input
                   type="range"
@@ -396,7 +396,7 @@ export const DoctorMedicationSafety = () => {
                   max="120"
                   value={egfr}
                   onChange={(e) => setEgfr(Number(e.target.value))}
-                  className="w-full accent-[#0284C7] cursor-pointer"
+                  className="w-full accent-[#0284C7] dark:accent-[#38BDF8] cursor-pointer"
                 />
                 <div className="flex justify-between text-[9px] font-mono text-[var(--color-text-muted)]">
                   <span>Renal Failure (&lt;30)</span>

@@ -162,7 +162,7 @@ export const PatientDashboard = () => {
                   Add medicines to build your daily schedule and check for interactions.
                 </p>
               </div>
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800">
+              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800">
                 {savedMeds.length} in List
               </span>
             </div>
@@ -196,7 +196,7 @@ export const PatientDashboard = () => {
                     key={c.id}
                     type="button"
                     onClick={() => handleAddMed(c.canonical_name)}
-                    className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-emerald-700 transition-colors cursor-pointer"
+                    className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer"
                   >
                     + {c.canonical_name}
                   </button>
@@ -224,7 +224,7 @@ export const PatientDashboard = () => {
                       key={idx}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--color-surface-card)] border border-[#0284C7]/30 text-xs font-bold text-[#0A2540] dark:text-[#E0F2FE] shadow-2xs"
                     >
-                      <Pill className="w-3.5 h-3.5 text-[#0284C7]" />
+                      <Pill className="w-3.5 h-3.5 text-[#0284C7] dark:text-[#38BDF8]" />
                       <span>{med}</span>
                       <button
                         type="button"

@@ -25,3 +25,12 @@ sqlite.db
 .DS_Store
 Thumbs.db
 *.log
+*.tmp
+*.bak
+
+# AI Agent & Planning Metadata (Never push to remote)
+.agents/
+.planning/
+.claude/
+.gemini/
+

@@ -15,16 +15,8 @@ export const AuthProvider = ({ children }) => {
     if (savedUser && savedToken) {
       try {
         const parsed = JSON.parse(savedUser);
-        // Clear any previous legacy demo user IDs
-        if (parsed?.id?.startsWith('usr-doctor') || parsed?.id?.startsWith('usr-researcher') || parsed?.id?.startsWith('usr-patient')) {
-          localStorage.removeItem('curenova_user');
-          localStorage.removeItem('curenova_token');
-          setUser(null);
-          setToken(null);
-        } else {
-          setUser(parsed);
-          setToken(savedToken);
-        }
+        setUser(parsed);
+        setToken(savedToken);
       } catch (e) {
         localStorage.removeItem('curenova_user');
         localStorage.removeItem('curenova_token');
@@ -55,6 +47,34 @@ export const AuthProvider = ({ children }) => {
     return res.user;
   };
 
+  const demoAccounts = {
+    doctor: { email: 'doctor@curenova.ai', password: 'doctor123', role: 'doctor', name: 'Dr. Sarah Lin, MD' },
+    researcher: { email: 'researcher@curenova.ai', password: 'researcher123', role: 'researcher', name: 'Dr. Marcus Vance, PhD' },
+    patient: { email: 'patient@curenova.ai', password: 'patient123', role: 'patient', name: 'Elena Rostova' },
+  };
+
+  const switchRole = async (targetRole) => {
+    const target = demoAccounts[targetRole] || demoAccounts.doctor;
+    try {
+      return await login(target.email, target.password, target.role);
+    } catch {
+      // Offline fallback: if backend is unreachable, still set verified mock session
+      const mockUser = {
+        id: `usr-${targetRole}-001`,
+        name: target.name,
+        email: target.email,
+        role: target.role,
+        organization: targetRole === 'doctor' ? 'Mount Sinai Hospital' : targetRole === 'researcher' ? 'Broad Institute of MIT & Harvard' : 'Patient / Caregiver',
+      };
+      const mockToken = `mock-jwt-token-${targetRole}`;
+      localStorage.setItem('curenova_token', mockToken);
+      localStorage.setItem('curenova_user', JSON.stringify(mockUser));
+      setToken(mockToken);
+      setUser(mockUser);
+      return mockUser;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('curenova_token');
     localStorage.removeItem('curenova_user');
@@ -70,6 +90,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
+        switchRole,
+        demoLogin: switchRole,
         logout,
         isAuthenticated: !!user,
       }}

@@ -130,7 +130,7 @@ export const ResearcherDashboard = () => {
                 key={ex}
                 type="button"
                 onClick={() => navigate('/researcher/drug-repurposing', { state: { prefilledQuery: ex } })}
-                className="px-2.5 py-1 text-xs rounded-lg bg-[var(--color-surface-card)] hover:bg-[#E0F2FE] hover:text-[#0369A1] hover:border-[#BAE6FD] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-colors cursor-pointer"
+                className="px-2.5 py-1 text-xs rounded-lg bg-[var(--color-surface-card)] hover:bg-[#E0F2FE] dark:hover:bg-[#0284C7]/20 hover:text-[#0369A1] dark:hover:text-[#38BDF8] hover:border-[#BAE6FD] dark:hover:border-[#0284C7]/40 text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-colors cursor-pointer"
               >
                 + {ex}
               </button>
@@ -157,7 +157,7 @@ export const ResearcherDashboard = () => {
           <span className="text-[11px] font-bold uppercase text-[var(--color-text-muted)] block">
             Completed Analyses
           </span>
-          <div className="text-2xl font-extrabold text-[#0284C7]">
+          <div className="text-2xl font-extrabold text-[#0284C7] dark:text-[#38BDF8]">
             {completedCount}
           </div>
           <span className="text-[11px] text-[var(--color-text-muted)]">
@@ -239,7 +239,7 @@ export const ResearcherDashboard = () => {
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="text-xs font-bold text-[#0284C7] block">
+                        <span className="text-xs font-bold text-[#0284C7] dark:text-[#38BDF8] block">
                           {dm.candidate_count || 3} Candidates
                         </span>
                         <span className="text-[10px] text-[var(--color-text-muted)]">
@@ -257,7 +257,7 @@ export const ResearcherDashboard = () => {
               <div className="p-4 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-3 pt-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#0284C7] block">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#0284C7] dark:text-[#38BDF8] block">
                       Selected Target
                     </span>
                     <h3 className="text-sm font-bold text-[var(--color-text-primary)]">
@@ -299,7 +299,7 @@ export const ResearcherDashboard = () => {
           <div className="p-5 sm:p-6 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#0284C7]" />
+                <Clock className="w-4 h-4 text-[#0284C7] dark:text-[#38BDF8]" />
                 <h3 className="text-base font-bold text-[#0A2540] dark:text-[#F1F5F9]">
                   Recent Research
                 </h3>
@@ -332,7 +332,7 @@ export const ResearcherDashboard = () => {
                     <button
                       type="button"
                       onClick={() => navigate('/researcher/drug-repurposing', { state: { prefilledQuery: item.query } })}
-                      className="text-xs font-bold text-[#0284C7] hover:underline shrink-0 cursor-pointer"
+                      className="text-xs font-bold text-[#0284C7] dark:text-[#38BDF8] hover:underline shrink-0 cursor-pointer"
                     >
                       Re-open
                     </button>
@@ -376,16 +376,16 @@ export const ResearcherDashboard = () => {
             <div className="grid grid-cols-2 gap-2 pt-1">
               <Link
                 to="/evidence"
-                className="p-3 rounded-xl bg-[var(--color-surface-sunken)] hover:bg-[#EFF6FF] hover:text-[#0369A1] border border-[var(--color-border-subtle)] transition-all text-xs font-semibold text-[var(--color-text-secondary)] flex items-center gap-2"
+                className="p-3 rounded-xl bg-[var(--color-surface-sunken)] hover:bg-[#EFF6FF] dark:hover:bg-[#0284C7]/20 hover:text-[#0369A1] dark:hover:text-[#38BDF8] border border-[var(--color-border-subtle)] transition-all text-xs font-semibold text-[var(--color-text-secondary)] flex items-center gap-2"
               >
-                <BookOpen className="w-4 h-4 text-[#0284C7]" />
+                <BookOpen className="w-4 h-4 text-[#0284C7] dark:text-[#38BDF8]" />
                 <span>Evidence</span>
               </Link>
               <Link
                 to="/knowledge-graph"
-                className="p-3 rounded-xl bg-[var(--color-surface-sunken)] hover:bg-[#EFF6FF] hover:text-[#0369A1] border border-[var(--color-border-subtle)] transition-all text-xs font-semibold text-[var(--color-text-secondary)] flex items-center gap-2"
+                className="p-3 rounded-xl bg-[var(--color-surface-sunken)] hover:bg-[#EFF6FF] dark:hover:bg-[#0284C7]/20 hover:text-[#0369A1] dark:hover:text-[#38BDF8] border border-[var(--color-border-subtle)] transition-all text-xs font-semibold text-[var(--color-text-secondary)] flex items-center gap-2"
               >
-                <Share2 className="w-4 h-4 text-[#0284C7]" />
+                <Share2 className="w-4 h-4 text-[#0284C7] dark:text-[#38BDF8]" />
                 <span>Graph Network</span>
               </Link>
             </div>

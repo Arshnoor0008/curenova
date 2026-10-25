@@ -163,7 +163,7 @@ export const ResearcherDrugRepurposing = () => {
               onClick={() => setActiveTab('workspace')}
               className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                 activeTab === 'workspace'
-                  ? 'bg-[var(--color-surface-card)] text-[#0284C7] shadow-xs font-bold'
+                  ? 'bg-[var(--color-surface-card)] text-[#0284C7] dark:text-[#38BDF8] shadow-xs font-bold'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
               }`}
             >
@@ -174,7 +174,7 @@ export const ResearcherDrugRepurposing = () => {
               onClick={() => setActiveTab('history')}
               className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'history'
-                  ? 'bg-[var(--color-surface-card)] text-[#0284C7] shadow-xs font-bold'
+                  ? 'bg-[var(--color-surface-card)] text-[#0284C7] dark:text-[#38BDF8] shadow-xs font-bold'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
               }`}
             >
@@ -216,7 +216,7 @@ export const ResearcherDrugRepurposing = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-sm text-[var(--color-text-primary)]">{item.query}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#E6F5F2] text-[#0E6D67] border border-[#B2DFD9]">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#0284C7]/10 text-[#0284C7] border border-[#0284C7]/20 dark:bg-[#0284C7]/20 dark:text-[#38BDF8] dark:border-[#0284C7]/40">
                         {item.candidate_count} Candidates
                       </span>
                     </div>
@@ -267,7 +267,7 @@ export const ResearcherDrugRepurposing = () => {
                     onClick={() => setSearchMode('disease-to-drug')}
                     className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                       searchMode === 'disease-to-drug'
-                        ? 'bg-[var(--color-surface-card)] text-[#0284C7] font-bold shadow-xs'
+                        ? 'bg-[var(--color-surface-card)] text-[#0284C7] dark:text-[#38BDF8] font-bold shadow-xs'
                         : 'text-[var(--color-text-muted)]'
                     }`}
                   >
@@ -278,7 +278,7 @@ export const ResearcherDrugRepurposing = () => {
                     onClick={() => setSearchMode('drug-to-disease')}
                     className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                       searchMode === 'drug-to-disease'
-                        ? 'bg-[var(--color-surface-card)] text-[#0284C7] font-bold shadow-xs'
+                        ? 'bg-[var(--color-surface-card)] text-[#0284C7] dark:text-[#38BDF8] font-bold shadow-xs'
                         : 'text-[var(--color-text-muted)]'
                     }`}
                   >
@@ -430,7 +430,7 @@ export const ResearcherDrugRepurposing = () => {
                       type="button"
                       onClick={() => setViewMode('table')}
                       className={`px-2.5 py-1 rounded text-xs font-semibold cursor-pointer ${
-                        viewMode === 'table' ? 'bg-[var(--color-surface-card)] text-[#0284C7] shadow-xs' : 'text-[var(--color-text-muted)]'
+                        viewMode === 'table' ? 'bg-[var(--color-surface-card)] text-[#0284C7] dark:text-[#38BDF8] shadow-xs' : 'text-[var(--color-text-muted)]'
                       }`}
                     >
                       Table View
@@ -439,7 +439,7 @@ export const ResearcherDrugRepurposing = () => {
                       type="button"
                       onClick={() => setViewMode('cards')}
                       className={`px-2.5 py-1 rounded text-xs font-semibold cursor-pointer ${
-                        viewMode === 'cards' ? 'bg-[var(--color-surface-card)] text-[#0284C7] shadow-xs' : 'text-[var(--color-text-muted)]'
+                        viewMode === 'cards' ? 'bg-[var(--color-surface-card)] text-[#0284C7] dark:text-[#38BDF8] shadow-xs' : 'text-[var(--color-text-muted)]'
                       }`}
                     >
                       Card Grid
@@ -486,7 +486,7 @@ export const ResearcherDrugRepurposing = () => {
                                     <div className="font-bold text-[var(--color-text-primary)]">{cand.drug_name}</div>
                                     <div className="text-[10px] text-[var(--color-text-muted)] font-mono">{cand.original_indication}</div>
                                   </td>
-                                  <td className="py-3 px-4 font-mono font-bold text-[#0284C7]">
+                                  <td className="py-3 px-4 font-mono font-bold text-[#0284C7] dark:text-[#38BDF8]">
                                     {cand.curenova_ranking || 85}
                                     <span className="text-[10px] text-[var(--color-text-muted)] font-normal"> / 100</span>
                                   </td>
@@ -496,7 +496,7 @@ export const ResearcherDrugRepurposing = () => {
                                   <td className="py-3 px-4 text-right">
                                     <button
                                       type="button"
-                                      className="text-xs font-bold text-[#0284C7] hover:underline"
+                                      className="text-xs font-bold text-[#0284C7] dark:text-[#38BDF8] hover:underline cursor-pointer"
                                     >
                                       Inspect &rarr;
                                     </button>
@@ -533,7 +533,7 @@ export const ResearcherDrugRepurposing = () => {
                                 <span className="text-xs text-[var(--color-text-muted)] font-mono">({cand.original_indication})</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="font-mono font-bold text-sm text-[#0284C7]">
+                                <span className="font-mono font-bold text-sm text-[#0284C7] dark:text-[#38BDF8]">
                                   {cand.curenova_ranking || 85} / 100
                                 </span>
                                 <RiskBadge severity={cand.evidence_strength} size="sm" />
@@ -584,7 +584,7 @@ export const ResearcherDrugRepurposing = () => {
                               <span className="text-[10px] font-mono text-[var(--color-text-muted)] block uppercase font-bold">
                                 Congruence
                               </span>
-                              <span className="text-xl font-black font-mono text-[#0284C7]">
+                              <span className="text-xl font-black font-mono text-[#0284C7] dark:text-[#38BDF8]">
                                 {selectedCandidate.curenova_ranking}
                               </span>
                             </div>
@@ -621,7 +621,7 @@ export const ResearcherDrugRepurposing = () => {
                                   key={idx}
                                   className="p-2 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[11px] text-[var(--color-text-primary)] flex items-center gap-2"
                                 >
-                                  <GitFork className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
+                                  <GitFork className="w-3.5 h-3.5 text-[#0284C7] dark:text-[#38BDF8] shrink-0" />
                                   <span className="truncate">{pw}</span>
                                 </div>
                               ))}
@@ -647,7 +647,7 @@ export const ResearcherDrugRepurposing = () => {
                                           href={`https://pubmed.ncbi.nlm.nih.gov/${p.pmid}/`}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-[#0284C7] hover:underline flex items-center gap-1 font-mono text-[10px]"
+                                          className="text-[#0284C7] dark:text-[#38BDF8] hover:underline flex items-center gap-1 font-mono text-[10px]"
                                         >
                                           PMID: {p.pmid} <ExternalLink className="w-3 h-3" />
                                         </a>
@@ -683,7 +683,7 @@ export const ResearcherDrugRepurposing = () => {
                                         href={`https://clinicaltrials.gov/study/${trial.nct_id}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="font-mono font-bold text-[#0284C7] hover:underline flex items-center gap-1"
+                                        className="font-mono font-bold text-[#0284C7] dark:text-[#38BDF8] hover:underline flex items-center gap-1"
                                       >
                                         {trial.nct_id} <ExternalLink className="w-3 h-3" />
                                       </a>
@@ -703,14 +703,14 @@ export const ResearcherDrugRepurposing = () => {
 
                           {/* Limitations & Missing Evidence */}
                           <div className="space-y-1.5 pt-2 border-t border-[var(--color-border-subtle)] text-xs">
-                            <span className="font-mono font-bold text-[#B45309] uppercase tracking-wider text-[10px] flex items-center gap-1">
+                            <span className="font-mono font-bold text-[#B45309] dark:text-[#FBBF24] uppercase tracking-wider text-[10px] flex items-center gap-1">
                               <AlertTriangle className="w-3.5 h-3.5" />
                               Limitations & Evidence Gaps
                             </span>
                             <ul className="space-y-1 text-[11px] text-[var(--color-text-secondary)]">
                               {selectedCandidate.limitations?.map((lim, idx) => (
                                 <li key={idx} className="flex items-start gap-1.5">
-                                  <span className="text-[#B45309] font-bold">•</span>
+                                  <span className="text-[#B45309] dark:text-[#FBBF24] font-bold">•</span>
                                   <span>{lim}</span>
                                 </li>
                               )) || (
