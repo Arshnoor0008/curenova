@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Activity,
   Stethoscope,
@@ -7,85 +7,135 @@ import {
   HeartHandshake,
   Lock,
   Mail,
-  AlertCircle
+  AlertCircle,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Input from '../components/ui/Input';
 
 const ROLES = [
-  {
-    role: 'doctor',
-    label: 'Clinician',
-    icon: Stethoscope,
-    accentColor: '#0284c7',
-  },
   {
     role: 'researcher',
     label: 'Researcher',
     icon: Microscope,
-    accentColor: '#0d9488',
+    color: '#0284C7',
+    demoEmail: 'researcher@curenova.ai',
+    demoPass: 'researcher123',
+    demoName: 'Dr. Marcus Vance',
+  },
+  {
+    role: 'doctor',
+    label: 'Doctor',
+    icon: Stethoscope,
+    color: '#17324D',
+    demoEmail: 'doctor@curenova.ai',
+    demoPass: 'doctor123',
+    demoName: 'Dr. Sarah Lin',
   },
   {
     role: 'patient',
     label: 'Patient',
     icon: HeartHandshake,
-    accentColor: '#10b981',
+    color: '#15803D',
+    demoEmail: 'patient@curenova.ai',
+    demoPass: 'patient123',
+    demoName: 'Elena Rostova',
   },
 ];
 
 export const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialRoleParam = searchParams.get('role');
+  const validInitialRole = ROLES.some((r) => r.role === initialRoleParam) ? initialRoleParam : 'doctor';
+  const initialMeta = ROLES.find((r) => r.role === validInitialRole) || ROLES[0];
 
-  const [selectedRole, setSelectedRole] = useState('doctor');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState(validInitialRole);
+  const [email, setEmail] = useState(initialMeta.demoEmail);
+  const [password, setPassword] = useState(initialMeta.demoPass);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const activeRoleMeta = ROLES.find((r) => r.role === selectedRole) || ROLES[0];
 
+  const handleRoleSelect = (roleKey) => {
+    setSelectedRole(roleKey);
+    const meta = ROLES.find((r) => r.role === roleKey);
+    if (meta) {
+      setEmail(meta.demoEmail);
+      setPassword(meta.demoPass);
+    }
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
-      setError('Please provide both your email and password.');
+      setError('Please enter your email and password.');
       return;
     }
+
     setError('');
     setLoading(true);
     try {
-      const user = await login(email.trim(), password, selectedRole);
+      const user = await login(email.trim(), password);
       navigate(`/${user.role}/dashboard`);
     } catch (err) {
-      setError(err.message || 'Invalid email or password. Please verify your credentials or register an account.');
+      setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 bg-[var(--color-surface-ground)]">
-      <div className="w-full max-w-md bg-[var(--color-surface-card)] rounded-2xl border border-[var(--color-border-subtle)] p-6 sm:p-8 shadow-[var(--shadow-card)] transition-colors">
-        
-        {/* Brand Icon & Heading */}
-        <div className="text-center mb-6">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-brand-primary)] text-white shadow-md shadow-[var(--color-brand-primary)]/20 mb-3">
-            <Activity className="h-6 w-6" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
-            Sign in to Cure<span className="text-[var(--color-brand-primary)]">Nova</span>
+    <div className="min-h-screen flex flex-col justify-center items-center px-4 py-8 bg-[var(--color-surface-ground)] transition-colors">
+      {/* Back to Home Link */}
+      <div className="w-full max-w-md mb-4 flex items-center justify-between">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Home</span>
+        </Link>
+        <span className="text-[11px] font-mono text-[var(--color-text-muted)]">
+          CureNova Med-AI
+        </span>
+      </div>
+
+      {/* Main Single Centered Login Card */}
+      <div className="w-full max-w-md bg-[var(--color-surface-card)] rounded-2xl border border-[var(--color-border-subtle)] p-6 sm:p-8 shadow-[var(--shadow-raised)] space-y-6">
+        {/* Brand Header */}
+        <div className="text-center space-y-2">
+          <Link to="/" className="inline-flex items-center justify-center gap-2 group">
+            <div className="w-10 h-10 rounded-xl bg-[#0284C7] text-white flex items-center justify-center shadow-md shadow-[#0284C7]/20 group-hover:scale-105 transition-transform">
+              <Activity className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <span className="text-xl font-extrabold tracking-tight text-[#0A2540] dark:text-[#F1F5F9]">
+                Cure<span className="text-[#0284C7] dark:text-[#38BDF8]">Nova</span>
+              </span>
+            </div>
+          </Link>
+          <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-primary)]">
+            Sign In
           </h1>
-          <p className="text-xs text-[var(--color-text-secondary)] mt-1">
-            Access your personalized medical intelligence workspace
+          <p className="text-xs text-[var(--color-text-muted)]">
+            Choose your role and enter your workspace
           </p>
         </div>
 
-        {/* Role Selector Segmented Tabs */}
-        <div className="mb-5">
-          <label className="block text-[11px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2 text-center">
-            Select Your Role
+        {/* Role Selector Tabs (Doctor, Researcher, Patient) */}
+        <div>
+          <label className="block text-[11px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">
+            Select Persona
           </label>
-          <div className="grid grid-cols-3 gap-1.5 p-1 bg-[var(--color-surface-sunken)] rounded-xl border border-[var(--color-border-subtle)]">
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)]">
             {ROLES.map((r) => {
               const Icon = r.icon;
               const isSelected = selectedRole === r.role;
@@ -93,96 +143,138 @@ export const Login = () => {
                 <button
                   key={r.role}
                   type="button"
-                  onClick={() => {
-                    setSelectedRole(r.role);
-                    setError('');
-                  }}
-                  className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  onClick={() => handleRoleSelect(r.role)}
+                  className={`flex flex-col items-center justify-center gap-1 py-2 px-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[var(--color-surface-card)] text-[var(--color-text-primary)] font-semibold shadow-sm border border-[var(--color-border-subtle)]'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                      ? 'bg-[var(--color-surface-card)] text-[var(--color-text-primary)] shadow-sm border border-[var(--color-border-subtle)]'
+                      : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
                   <Icon
-                    className="w-3.5 h-3.5 shrink-0"
-                    style={{ color: isSelected ? r.accentColor : 'inherit' }}
+                    className="w-4 h-4"
+                    style={{ color: isSelected ? r.color : undefined }}
                   />
-                  <span>{r.label}</span>
+                  <span className="text-[11px]">{r.label}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
+        {/* Demo Account Indicator Pill */}
+        <div
+          className="p-2.5 rounded-xl border flex items-center justify-between text-xs"
+          style={{
+            backgroundColor: `${activeRoleMeta.color}10`,
+            borderColor: `${activeRoleMeta.color}30`
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5" style={{ color: activeRoleMeta.color }} />
+            <span className="font-semibold text-[var(--color-text-primary)] text-[11px]">
+              Demo: <strong style={{ color: activeRoleMeta.color }}>{activeRoleMeta.demoName}</strong>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setEmail(activeRoleMeta.demoEmail);
+              setPassword(activeRoleMeta.demoPass);
+            }}
+            className="text-[10px] font-bold underline hover:opacity-80 cursor-pointer"
+            style={{ color: activeRoleMeta.color }}
+          >
+            Auto-fill
+          </button>
+        </div>
+
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] text-[var(--color-status-critical-text)] text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-[#dc2626]" />
-            <span>{error}</span>
+          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span className="leading-snug">{error}</span>
           </div>
         )}
 
-        {/* Standard Email / Password Form */}
+        {/* Form Inputs */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Email Address"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@institution.org"
-            icon={Mail}
-            required
-            autoFocus
-          />
-
-          <Input
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            icon={Lock}
-            required
-          />
-
-          <div className="flex items-center justify-between text-xs pt-1">
-            <label className="flex items-center gap-1.5 cursor-pointer text-[var(--color-text-secondary)] select-none">
-              <input
-                type="checkbox"
-                className="rounded accent-[var(--color-brand-primary)] cursor-pointer"
-                defaultChecked
-              />
-              <span>Remember me</span>
+          {/* Email */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-[var(--color-text-secondary)]">
+              Email Address
             </label>
-            <Link
-              to="/forgot-password"
-              className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:underline"
-            >
-              Forgot password?
-            </Link>
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="name@example.com"
+                className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[#0284C7] transition-all"
+              />
+            </div>
           </div>
 
+          {/* Password */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-[var(--color-text-secondary)]">
+                Password
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-[11px] font-semibold text-[#0284C7] dark:text-[#38BDF8] hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[#0284C7] transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] p-0.5 cursor-pointer"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs text-white bg-[var(--color-brand-primary)] hover:bg-[var(--color-brand-secondary)] transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+            className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm text-white transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 hover:shadow-lg active:scale-[0.98] mt-2"
+            style={{ backgroundColor: activeRoleMeta.color }}
           >
-            {loading ? 'Authenticating…' : `Sign In as ${activeRoleMeta.label}`}
+            {loading ? (
+              <span>Signing in...</span>
+            ) : (
+              <>
+                <span>Sign In as {activeRoleMeta.label}</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </form>
 
-        {/* Register Footer */}
-        <div className="text-center mt-6 pt-4 border-t border-[var(--color-border-subtle)]">
-          <p className="text-xs text-[var(--color-text-muted)]">
-            Don't have an account yet?{' '}
-            <Link
-              to="/register"
-              className="font-semibold text-[var(--color-brand-primary)] hover:underline"
-            >
-              Register here
-            </Link>
-          </p>
-        </div>
+        {/* Footer Link */}
+        <p className="text-center text-xs text-[var(--color-text-muted)] pt-2 border-t border-[var(--color-border-subtle)]">
+          Don't have an account?{' '}
+          <Link to="/register" className="font-bold text-[#0284C7] dark:text-[#38BDF8] hover:underline">
+            Register here
+          </Link>
+        </p>
       </div>
     </div>
   );

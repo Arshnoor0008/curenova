@@ -16,22 +16,22 @@ import Input from '../components/ui/Input';
 
 const ROLES = [
   {
-    role: 'doctor',
-    label: 'Clinician',
-    icon: Stethoscope,
-    accentColor: '#0284c7',
-  },
-  {
     role: 'researcher',
     label: 'Researcher',
     icon: Microscope,
-    accentColor: '#0d9488',
+    accentColor: '#0284C7',
+  },
+  {
+    role: 'doctor',
+    label: 'Clinician',
+    icon: Stethoscope,
+    accentColor: '#17324D',
   },
   {
     role: 'patient',
     label: 'Patient',
     icon: HeartHandshake,
-    accentColor: '#10b981',
+    accentColor: '#15803D',
   },
 ];
 

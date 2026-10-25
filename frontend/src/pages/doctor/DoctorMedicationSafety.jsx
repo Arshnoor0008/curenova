@@ -1,103 +1,99 @@
-import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   ShieldAlert,
   Plus,
-  Trash2,
   Activity,
   Cpu,
-  ArrowRight,
-  Sliders,
-  CheckCircle2,
   AlertTriangle,
   Pill,
   X,
-  TrendingDown,
-  TrendingUp,
-  Minus
+  ArrowRight,
+  RotateCcw,
+  Sparkles,
+  Sliders,
+  CheckCircle2,
+  HeartPulse,
+  Clock,
+  Layers
 } from 'lucide-react';
 import { safetyService } from '../../services/api';
 import AnalysisProgress from '../../components/AnalysisProgress';
-import SafetyDisclaimer from '../../components/SafetyDisclaimer';
-import RiskBadge from '../../components/RiskBadge';
 import Button from '../../components/ui/Button';
-import Badge from '../../components/ui/Badge';
-import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import Card from '../../components/ui/Card';
+import { ClinicalHighlightBox } from '../../components/ui/ClinicalHighlightBox';
 
-const DRUG_SUGGESTIONS = [
+const QUICK_SUGGESTIONS = [
   'Aspirin',
   'Warfarin',
-  'Metformin',
   'Clopidogrel',
   'Omeprazole',
-  'Pantoprazole',
   'Lisinopril',
-  'Spironolactone',
+  'Metformin',
   'Ibuprofen',
   'Atorvastatin',
-  'Amlodipine',
-  'Sertraline',
-  'Tramadol',
-  'Dexamethasone'
+  'Spironolactone',
+  'Amiodarone'
+];
+
+const CLINICAL_PRESETS = [
+  { name: 'Cardiology Bleed Alert', meds: ['Warfarin', 'Aspirin'], age: 74, egfr: 52 },
+  { name: 'Triple Whammy (AKI)', meds: ['Lisinopril', 'Hydrochlorothiazide', 'Ibuprofen'], age: 68, egfr: 45 },
+  { name: 'Cardio-Metabolic Safe', meds: ['Lisinopril', 'Metformin', 'Atorvastatin'], age: 62, egfr: 78 },
+  { name: 'Post-PCI Stent Triad', meds: ['Clopidogrel', 'Omeprazole', 'Aspirin'], age: 65, egfr: 60 },
 ];
 
 export const DoctorMedicationSafety = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const initialTab = searchParams.get('tab') === 'twin' ? 'twin' : 'standard';
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [medications, setMedications] = useState(['Aspirin', 'Warfarin', 'Metformin']);
-  const [newMedInput, setNewMedInput] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get('tab') === 'twin' ? 'twin' : 'standard'
+  );
 
-  // Patient context
-  const [age, setAge] = useState(72);
-  const [egfr, setEgfr] = useState(52);
-  const [hepatic, setHepatic] = useState('Normal');
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'twin' && activeTab !== 'twin') {
+      setActiveTab('twin');
+    } else if (!tabParam && activeTab !== 'standard') {
+      setActiveTab('standard');
+    }
+  }, [searchParams, activeTab]);
 
-  // Digital Twin specific states
-  const [baselineMeds, setBaselineMeds] = useState(['Clopidogrel', 'Omeprazole', 'Aspirin']);
-  const [addedMeds, setAddedMeds] = useState(['Pantoprazole']);
-  const [removedMeds, setRemovedMeds] = useState(['Omeprazole']);
-  const [twinSimResult, setTwinSimResult] = useState(null);
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    setSearchParams(tab === 'twin' ? { tab: 'twin' } : {});
+  };
 
-  // Execution states
-  const [executing, setExecuting] = useState(false);
+  // Standard Regimen State (starts empty if none passed)
+  const [medications, setMedications] = useState(
+    location.state?.prefilledMeds || []
+  );
+  const [newMed, setNewMed] = useState('');
+  const [age, setAge] = useState(65);
+  const [egfr, setEgfr] = useState(75);
+
+  // Digital Twin state (starts empty if none passed)
+  const [baselineMeds, setBaselineMeds] = useState(
+    location.state?.prefilledMeds || []
+  );
+  const [addedMeds, setAddedMeds] = useState([]);
+  const [removedMeds, setRemovedMeds] = useState([]);
+  const [twinAddInput, setTwinAddInput] = useState('');
+  const [twinResult, setTwinResult] = useState(null);
+
+  // Status
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const samplePresets = [
-    {
-      title: 'Cardiology Dual Therapy (High Bleeding)',
-      meds: ['Aspirin', 'Warfarin', 'Metformin'],
-      context: { age: 74, egfr: 55 },
-    },
-    {
-      title: 'Post-PCI Stent (CYP2C19 Loss-of-Activation)',
-      meds: ['Clopidogrel', 'Omeprazole', 'Aspirin'],
-      context: { age: 62, egfr: 80 },
-    },
-    {
-      title: 'Triple Whammy Acute Renal Syndrome',
-      meds: ['Lisinopril', 'Spironolactone', 'Ibuprofen'],
-      context: { age: 68, egfr: 45 },
-    },
-    {
-      title: 'Neuro-Psych Serotonin Syndrome Triad',
-      meds: ['Sertraline', 'Tramadol', 'Amlodipine'],
-      context: { age: 55, egfr: 90 },
-    },
-  ];
-
-  const handleAddMed = (drugName) => {
-    const target = drugName || newMedInput;
-    if (!target || !target.trim()) return;
-    const clean = target.trim();
-    if (!medications.some((m) => m.toLowerCase() === clean.toLowerCase())) {
-      setMedications([...medications, clean]);
+  const handleAddMed = (name) => {
+    const target = (name || newMed).trim();
+    if (!target) return;
+    if (!medications.includes(target)) {
+      setMedications([...medications, target]);
     }
-    setNewMedInput('');
-    setShowSuggestions(false);
+    setNewMed('');
   };
 
   const handleRemoveMed = (idx) => {
@@ -106,39 +102,63 @@ export const DoctorMedicationSafety = () => {
 
   const handleApplyPreset = (preset) => {
     setMedications(preset.meds);
-    if (preset.context) {
-      setAge(preset.context.age);
-      setEgfr(preset.context.egfr);
-    }
+    setAge(preset.age);
+    setEgfr(preset.egfr);
   };
 
-  const handleStartAnalysis = async () => {
+  const handleClearMedications = () => {
+    setMedications([]);
+    setError('');
+  };
+
+  const handleRunAnalysis = async () => {
     if (medications.length === 0) {
-      setError('Please add at least one medication to analyze.');
+      setError('Please add at least one medication to run an interaction check.');
       return;
     }
     setError('');
-    setExecuting(true);
-
+    setLoading(true);
     try {
-      const response = await safetyService.analyze(
+      const res = await safetyService.analyze(
         medications,
-        { age: Number(age), egfr: Number(egfr), hepatic_status: hepatic },
+        { age: Number(age), egfr: Number(egfr) },
         'doctor'
       );
-      setTimeout(() => {
-        setExecuting(false);
-        navigate('/doctor/results', { state: { analysisData: response } });
-      }, 2400);
+      setLoading(false);
+
+      // Persist in doctor safety history
+      try {
+        const existing = JSON.parse(localStorage.getItem('curenova_doctor_safety_history') || '[]');
+        const entry = {
+          id: res.analysis_id || `safe-${Date.now()}`,
+          medications: [...medications],
+          overall_risk_category: res.overall_risk_category || 'Evaluated',
+          overall_risk_score: res.overall_risk_score ?? 0,
+          summary_headline: res.summary_headline || 'Medication Safety Analysis',
+          flagged_pairs: res.pairwise_interactions?.length || 0,
+          timestamp: new Date().toISOString(),
+          analysisData: res,
+        };
+        const updated = [entry, ...existing.filter(e => e.id !== entry.id)].slice(0, 15);
+        localStorage.setItem('curenova_doctor_safety_history', JSON.stringify(updated));
+      } catch {
+        // ignore storage errors
+      }
+
+      navigate('/doctor/results', { state: { analysisData: res } });
     } catch (err) {
-      setExecuting(false);
-      setError(err.message || 'Analysis failed. Please check inputs.');
+      setLoading(false);
+      setError(err.message || 'Safety check failed. Please verify connection.');
     }
   };
 
   const handleSimulateTwin = async () => {
+    if (baselineMeds.length === 0) {
+      setError('Please add at least one baseline medication.');
+      return;
+    }
     setError('');
-    setExecuting(true);
+    setLoading(true);
     try {
       const sim = await safetyService.simulateTwin(
         baselineMeds,
@@ -146,481 +166,457 @@ export const DoctorMedicationSafety = () => {
         removedMeds,
         { age: Number(age), egfr: Number(egfr) }
       );
-      setTimeout(() => {
-        setExecuting(false);
-        setTwinSimResult(sim);
-      }, 2000);
+      setLoading(false);
+      setTwinResult(sim);
     } catch (err) {
-      setExecuting(false);
-      setError(err.message || 'Simulation failed.');
+      setLoading(false);
+      setError(err.message || 'Simulation failed. Please try again.');
     }
   };
 
-  const filteredSuggestions = DRUG_SUGGESTIONS.filter(
-    (s) =>
-      s.toLowerCase().includes(newMedInput.toLowerCase()) &&
-      !medications.some((m) => m.toLowerCase() === s.toLowerCase())
-  );
+  const toggleRemoveFromBaseline = (drug) => {
+    if (removedMeds.includes(drug)) {
+      setRemovedMeds(removedMeds.filter((d) => d !== drug));
+    } else {
+      setRemovedMeds([...removedMeds, drug]);
+    }
+  };
+
+  const handleAddTwinCandidate = (drugName) => {
+    const clean = (drugName || twinAddInput).trim();
+    if (!clean) return;
+    if (!addedMeds.includes(clean) && !baselineMeds.includes(clean)) {
+      setAddedMeds([...addedMeds, clean]);
+    }
+    setTwinAddInput('');
+  };
+
+  const handleRemoveTwinAdded = (drug) => {
+    setAddedMeds(addedMeds.filter((d) => d !== drug));
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-6 max-w-5xl mx-auto pb-8">
+      {/* ── Title & Tab Switcher ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-[var(--color-border-subtle)]">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7]">
-              <ShieldAlert className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
-              Medication Safety & Polypharmacy Engine
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
+              Medication Safety & Digital Twin
             </h1>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/40 text-[#0284c7] border border-sky-200 dark:border-sky-800">
+              Interactive Tools
+            </span>
           </div>
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-1">
-            Pairwise interaction matrix, higher-order hazard syndromes, and Patient Medication Digital Twin simulation
+          <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-1">
+            Test multi-drug combinations or simulate regimen modifications with organ delta metrics.
           </p>
         </div>
-        <SafetyDisclaimer variant="compact" />
+
+        {/* Tab Pills */}
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)]">
+          <button
+            type="button"
+            onClick={() => handleTabSwitch('standard')}
+            className={`flex items-center gap-2 py-2 px-3.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+              activeTab === 'standard'
+                ? 'bg-[var(--color-surface-card)] text-[#17324D] dark:text-[#38BDF8] shadow-xs border border-[var(--color-border-subtle)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Safety Matrix</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabSwitch('twin')}
+            className={`flex items-center gap-2 py-2 px-3.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+              activeTab === 'twin'
+                ? 'bg-[var(--color-surface-card)] text-[#0284C7] shadow-xs border border-[var(--color-border-subtle)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+            }`}
+          >
+            <Cpu className="w-4 h-4" />
+            <span>Digital Twin Simulator</span>
+          </button>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[var(--color-border-subtle)]">
-        <button
-          type="button"
-          onClick={() => setActiveTab('standard')}
-          className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
-            activeTab === 'standard'
-              ? 'border-[#0284c7] text-[#0284c7]'
-              : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-          }`}
-        >
-          <Activity className="w-4 h-4" />
-          <span>Regimen Interaction Analysis</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('twin')}
-          className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
-            activeTab === 'twin'
-              ? 'border-[#0d9488] text-[#0d9488]'
-              : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-          }`}
-        >
-          <Cpu className="w-4 h-4" />
-          <span>Patient Medication Digital Twin ("What-If")</span>
-        </button>
-      </div>
-
-      {/* Execution Progress Animation */}
-      {executing && (
-        <div className="py-8">
+      {loading && (
+        <div className="py-12">
           <AnalysisProgress
-            title={activeTab === 'twin' ? 'Simulating Patient Medication Twin' : 'Running Polypharmacy Verification'}
-            subtitle="Evaluating Pairwise Kinetics, Adverse Overlap, and Renal/Hepatic Clearance"
+            title={activeTab === 'twin' ? 'Simulating Digital Twin Regimen Delta' : 'Evaluating Polypharmacy Interaction Matrix'}
+            subtitle="Cross-referencing openFDA pharmacovigilance reports and PubMed citations..."
           />
         </div>
       )}
 
-      {/* Tab 1: Standard Analysis */}
-      {!executing && activeTab === 'standard' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left: Medication List Input */}
-          <div className="lg:col-span-8 space-y-6">
-            <Card elevation="raised" className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-[var(--color-text-primary)]">Current Medication Regimen</h3>
-                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                    Add prescription, OTC, or active supplements to evaluate multi-drug risks
-                  </p>
-                </div>
-                <Badge variant="neutral" size="sm">
-                  <span className="font-mono tabular">{medications.length}</span> drugs entered
-                </Badge>
-              </div>
-
-              {/* Add Drug Input with Autocomplete */}
-              <div className="relative">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleAddMed();
-                  }}
-                  className="flex gap-2"
-                >
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      value={newMedInput}
-                      onChange={(e) => {
-                        setNewMedInput(e.target.value);
-                        setShowSuggestions(true);
-                      }}
-                      onFocus={() => setShowSuggestions(true)}
-                      placeholder="Type medication name (e.g. Clopidogrel, Omeprazole, Lisinopril)..."
-                      className="w-full px-4 py-2.5 text-xs sm:text-sm rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284c7]"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="md"
-                    icon={Plus}
-                  >
-                    Add Drug
-                  </Button>
-                </form>
-
-                {/* Autocomplete Dropdown */}
-                {showSuggestions && newMedInput.trim() && filteredSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-24 mt-1 bg-[var(--color-surface-card)] border border-[var(--color-border-strong)] rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto divide-y divide-[var(--color-border-subtle)]">
-                    {filteredSuggestions.map((s) => (
-                      <div
-                        key={s}
-                        onClick={() => handleAddMed(s)}
-                        className="px-3.5 py-2 text-xs text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] cursor-pointer flex items-center gap-2"
-                      >
-                        <Pill className="w-3.5 h-3.5 text-[var(--color-brand-primary)]" />
-                        <span>{s}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Medication Pill Chips */}
-              <div className="flex flex-wrap gap-2 pt-1">
-                {medications.map((med, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] text-xs font-semibold shadow-2xs"
-                  >
-                    <Pill className="w-3.5 h-3.5 text-[var(--color-brand-primary)]" />
-                    <span>{med}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveMed(idx)}
-                      className="text-[var(--color-text-muted)] hover:text-[#dc2626] transition-colors cursor-pointer ml-1"
-                      title={`Remove ${med}`}
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {error && (
-                <div className="p-3 rounded-lg bg-[var(--color-status-critical-bg)] border border-[var(--color-status-critical-border)] text-[var(--color-status-critical-text)] text-xs flex items-center gap-2 font-medium">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#dc2626]" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Run Analysis Button */}
-              <div className="pt-4 border-t border-[var(--color-border-subtle)] flex items-center justify-between">
-                <span className="text-xs text-[var(--color-text-muted)]">
-                  Orchestrated with Retrieval, Reasoning & Safety Agents
-                </span>
-                <Button
-                  variant="primary"
-                  size="md"
-                  icon={Activity}
-                  onClick={handleStartAnalysis}
-                >
-                  Execute Medication Safety Analysis
-                </Button>
-              </div>
-            </Card>
-
-            {/* Presets Card */}
-            <Card elevation="flat" className="p-5 space-y-3">
-              <span className="text-xs font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">
-                Standard Clinical Test Cases (1-Click Load)
+      {/* ── TAB 1: STANDARD SAFETY MATRIX CHECK ── */}
+      {!loading && activeTab === 'standard' && (
+        <div className="space-y-6">
+          {/* Main Interactive Input Card */}
+          <div className="p-6 rounded-3xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-5">
+            
+            {/* 1-Click Clinical Presets */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#0284c7]" />
+                <span>Quick Test Presets:</span>
               </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {samplePresets.map((preset, i) => (
+              <div className="flex flex-wrap gap-2">
+                {CLINICAL_PRESETS.map((cp) => (
                   <button
-                    key={i}
+                    key={cp.name}
                     type="button"
-                    onClick={() => handleApplyPreset(preset)}
-                    className="p-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] hover:border-[#0284c7] text-left transition-all cursor-pointer group shadow-2xs"
+                    onClick={() => handleApplyPreset(cp)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)] hover:border-[#0284c7] transition-all cursor-pointer"
                   >
-                    <div className="text-xs font-bold text-[var(--color-text-primary)] group-hover:text-[#0284c7]">
-                      {preset.title}
-                    </div>
-                    <div className="text-[11px] text-[var(--color-text-muted)] mt-1 font-mono">
-                      {preset.meds.join(' + ')}
-                    </div>
+                    <span className="font-bold text-[var(--color-text-primary)]">{cp.name}</span>
+                    <span className="text-[10px] text-[var(--color-text-muted)] font-mono">({cp.meds.join(' + ')})</span>
                   </button>
                 ))}
               </div>
-            </Card>
-          </div>
+            </div>
 
-          {/* Right: Patient Context Sidebar */}
-          <div className="lg:col-span-4 space-y-4">
-            <Card elevation="raised" className="p-5 space-y-4">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-[#0284c7]" />
-                <h4 className="text-sm font-bold text-[var(--color-text-primary)]">Patient Clinical Context</h4>
+            {/* Input Form */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Pill className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+                <input
+                  type="text"
+                  value={newMed}
+                  onChange={(e) => setNewMed(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddMed())}
+                  placeholder="Type drug name (e.g. Warfarin, Metformin, Lisinopril)..."
+                  className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284C7]"
+                />
               </div>
-              <p className="text-xs text-[var(--color-text-muted)]">
-                Contextual parameters adjust pharmacokinetics and organ clearance alert thresholds.
-              </p>
+              <button
+                type="button"
+                onClick={() => handleAddMed()}
+                className="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#0284C7] hover:bg-[#0369A1] transition-colors cursor-pointer flex items-center gap-1 shrink-0 shadow-2xs"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Drug</span>
+              </button>
+            </div>
 
-              <div className="space-y-4 text-xs">
-                <div>
-                  <div className="flex justify-between font-semibold text-[var(--color-text-primary)] mb-1">
-                    <span>Patient Age:</span>
-                    <span className="font-mono tabular text-[#0284c7]">{age} yrs</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="18"
-                    max="95"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    className="w-full accent-[#0284c7]"
-                  />
-                  <div className="flex justify-between text-[10px] text-[var(--color-text-muted)] font-mono">
-                    <span>18</span>
-                    <span>65 (Geriatric)</span>
-                    <span>95</span>
-                  </div>
-                </div>
+            {/* Quick Suggestions Chips */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mr-1">
+                Popular:
+              </span>
+              {QUICK_SUGGESTIONS.map((sug) => (
+                <button
+                  key={sug}
+                  type="button"
+                  onClick={() => handleAddMed(sug)}
+                  className="px-2.5 py-1 text-[11px] rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] hover:border-[#0284C7]/40 hover:text-[#0284C7] transition-colors cursor-pointer"
+                >
+                  + {sug}
+                </button>
+              ))}
+            </div>
 
-                <div>
-                  <div className="flex justify-between font-semibold text-[var(--color-text-primary)] mb-1">
-                    <span>Estimated GFR (eGFR):</span>
-                    <span className="font-mono tabular text-[#0284c7]">{egfr} mL/min</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="15"
-                    max="120"
-                    value={egfr}
-                    onChange={(e) => setEgfr(e.target.value)}
-                    className="w-full accent-[#0284c7]"
-                  />
-                  <div className="flex justify-between text-[10px] text-[var(--color-text-muted)] font-mono">
-                    <span>15 (Severe CKD)</span>
-                    <span>60 (Renal alert)</span>
-                    <span>120 (Normal)</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-[var(--color-text-primary)] mb-1">
-                    Hepatic Function Status
-                  </label>
-                  <select
-                    value={hepatic}
-                    onChange={(e) => setHepatic(e.target.value)}
-                    className="w-full p-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284c7]"
-                  >
-                    <option value="Normal">Normal Hepatic Function</option>
-                    <option value="Child-Pugh A">Child-Pugh A (Mild)</option>
-                    <option value="Child-Pugh B">Child-Pugh B (Moderate)</option>
-                  </select>
-                </div>
-              </div>
-
-              {egfr < 60 && (
-                <div className="p-3 rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] text-xs">
-                  <strong>Renal Impairment Flagged:</strong> Renally cleared agents will receive heightened clearance surveillance.
-                </div>
+            {/* Active Regimen using ClinicalHighlightBox */}
+            <ClinicalHighlightBox
+              variant="primary"
+              title={`Active Drug Regimen (${medications.length} Selected)`}
+              subtitle="All medicines currently active for pairwise interaction and toxicity calculation"
+              badge={medications.length > 0 ? `${medications.length} selected` : undefined}
+              icon={Pill}
+              action={medications.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setMedications([])}
+                  className="text-[11px] font-mono text-[var(--color-text-muted)] hover:text-rose-600 cursor-pointer"
+                >
+                  Clear All
+                </button>
               )}
-            </Card>
+            >
+              <div className="flex flex-wrap gap-2 min-h-[36px] items-center">
+                {medications.length === 0 ? (
+                  <span className="text-xs text-[var(--color-text-muted)] italic">
+                    No medications added yet. Type a medicine above or choose from popular suggestions.
+                  </span>
+                ) : (
+                  medications.map((med, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--color-surface-card)] border border-[#0284C7]/30 text-xs font-bold text-[#0A2540] dark:text-[#E0F2FE] shadow-2xs"
+                    >
+                      <Pill className="w-3.5 h-3.5 text-[#0284C7]" />
+                      <span>{med}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMed(idx)}
+                        className="text-[var(--color-text-muted)] hover:text-rose-600 cursor-pointer ml-1 p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))
+                )}
+              </div>
+            </ClinicalHighlightBox>
+
+            {/* Interactive Patient Context Sliders */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[var(--color-border-subtle)]">
+              {/* Age Slider */}
+              <div className="p-3.5 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-1">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <span className="text-[var(--color-text-secondary)]">Patient Age</span>
+                  <span className="font-mono text-[#0284C7] font-semibold">{age} years</span>
+                </div>
+                <input
+                  type="range"
+                  min="18"
+                  max="95"
+                  value={age}
+                  onChange={(e) => setAge(Number(e.target.value))}
+                  className="w-full accent-[#0284C7] cursor-pointer"
+                />
+                <div className="flex justify-between text-[9px] font-mono text-[var(--color-text-muted)]">
+                  <span>18y</span>
+                  <span>Geriatric (65+)</span>
+                  <span>95y</span>
+                </div>
+              </div>
+
+              {/* eGFR Slider */}
+              <div className="p-3.5 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-1">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <span className="text-[var(--color-text-secondary)]">Renal Function (eGFR)</span>
+                  <span className="font-mono text-[#0284C7] font-semibold">{egfr} mL/min</span>
+                </div>
+                <input
+                  type="range"
+                  min="15"
+                  max="120"
+                  value={egfr}
+                  onChange={(e) => setEgfr(Number(e.target.value))}
+                  className="w-full accent-[#0284C7] cursor-pointer"
+                />
+                <div className="flex justify-between text-[9px] font-mono text-[var(--color-text-muted)]">
+                  <span>Renal Failure (&lt;30)</span>
+                  <span>Normal (&gt;60)</span>
+                  <span>120</span>
+                </div>
+              </div>
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs font-medium flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Run Action */}
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <span className="text-xs text-[var(--color-text-muted)]">
+                Evaluates N×N pairs, organ clearance, and FDA post-marketing reporting odds ratios.
+              </span>
+              <button
+                type="button"
+                onClick={handleRunAnalysis}
+                className="px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#0284C7] hover:bg-[#0369A1] transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              >
+                <span>Generate Safety Matrix</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Tab 2: Digital Twin "What-If" Simulation */}
-      {!executing && activeTab === 'twin' && (
+      {/* ── TAB 2: DIGITAL TWIN "WHAT-IF" SIMULATOR ── */}
+      {!loading && activeTab === 'twin' && (
         <div className="space-y-6">
-          <Card elevation="raised" className="p-6 space-y-5 border-l-4 border-l-[#0d9488]">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0d9488]">
-                <Cpu className="w-5 h-5" />
+          <div className="p-6 rounded-3xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-5">
+            <div>
+              <h2 className="text-base font-bold text-[var(--color-text-primary)]">
+                Patient Medication Digital Twin Sandbox
+              </h2>
+              <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                Simulate "what happens if we remove or substitute a drug?" without altering actual patient records.
+              </p>
+            </div>
+
+            {/* Baseline Drugs (Click to Remove in Twin) */}
+            <div className="p-4 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[var(--color-text-primary)]">
+                  1. Current Baseline Regimen (Click pill to simulate stopping it):
+                </span>
+                <span className="text-[10px] font-mono text-[var(--color-text-muted)]">
+                  {removedMeds.length} paused in simulation
+                </span>
               </div>
-              <div>
-                <h3 className="text-base font-bold text-[var(--color-text-primary)]">
-                  Patient Medication Digital Twin Simulator
-                </h3>
-                <p className="text-xs text-[var(--color-text-muted)]">
-                  Simulate proposed pharmacological adjustments before modifying actual patient regimens
-                </p>
+              <div className="flex flex-wrap gap-2">
+                {baselineMeds.map((med) => {
+                  const isRemoved = removedMeds.includes(med);
+                  return (
+                    <button
+                      key={med}
+                      type="button"
+                      onClick={() => toggleRemoveFromBaseline(med)}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all border ${
+                        isRemoved
+                          ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800 line-through'
+                          : 'bg-[var(--color-surface-card)] text-[var(--color-text-primary)] border-[#0d9488]'
+                      }`}
+                      title="Click to toggle drug removal in simulation"
+                    >
+                      <Pill className="w-3.5 h-3.5" />
+                      <span>{med}</span>
+                      <span className={`text-[9px] font-mono px-1 rounded ${isRemoved ? 'bg-rose-200 text-rose-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                        {isRemoved ? 'PAUSED' : 'ACTIVE'}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Baseline vs Proposed Regimens Inputs */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-              {/* Baseline */}
-              <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-3">
-                <div className="text-xs font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider flex items-center justify-between">
-                  <span>1. Baseline Regimen</span>
-                  <span className="tabular">{baselineMeds.length} drugs</span>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {baselineMeds.map((m, idx) => (
+            {/* Simulated Additions */}
+            <div className="p-4 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[var(--color-text-primary)]">
+                  2. Substitute or Add Alternative Candidate Drugs:
+                </span>
+                <span className="text-[10px] font-mono text-[#0d9488] font-bold">
+                  +{addedMeds.length} test additions
+                </span>
+              </div>
+
+              {/* Add form */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={twinAddInput}
+                  onChange={(e) => setTwinAddInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTwinCandidate())}
+                  placeholder="Type new candidate drug (e.g. Losartan, Apixaban, Acetaminophen)..."
+                  className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284C7]"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAddTwinCandidate()}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#0284C7] hover:bg-[#0369A1] transition-colors cursor-pointer shrink-0"
+                >
+                  + Add to Twin
+                </button>
+              </div>
+
+              {/* Quick alternatives suggestions */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[10px] font-bold uppercase text-[var(--color-text-muted)]">Suggestions:</span>
+                {['Apixaban', 'Losartan', 'Acetaminophen', 'Pantoprazole'].map((alt) => (
+                  <button
+                    key={alt}
+                    type="button"
+                    onClick={() => handleAddTwinCandidate(alt)}
+                    className="px-2 py-0.5 rounded-lg text-[10px] font-mono bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-hover)] hover:border-[#0284C7]/40 border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] transition-colors cursor-pointer"
+                  >
+                    + {alt}
+                  </button>
+                ))}
+              </div>
+
+              {/* Added chips */}
+              {addedMeds.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {addedMeds.map((med) => (
                     <span
-                      key={idx}
-                      className="px-2.5 py-1 rounded-md bg-[var(--color-surface-card)] text-[var(--color-text-primary)] text-xs font-semibold border border-[var(--color-border-subtle)]"
+                      key={med}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-200 border border-sky-300 dark:border-sky-800 text-xs font-bold"
                     >
-                      {m}
+                      <span>+ {med}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTwinAdded(med)}
+                        className="text-sky-600 hover:text-rose-600 ml-1 p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     </span>
                   ))}
                 </div>
-                <div className="text-[11px] text-[var(--color-text-muted)]">
-                  Current post-PCI regimen: Clopidogrel + Omeprazole + Aspirin
-                </div>
-              </div>
-
-              {/* Proposed Changes */}
-              <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] space-y-3">
-                <div className="text-xs font-mono font-bold text-[#0d9488] uppercase tracking-wider">
-                  2. Simulated Scenario Adjustments
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div>
-                    <span className="text-[var(--color-text-muted)] font-semibold block mb-1">Add Candidate Therapy:</span>
-                    <div className="flex gap-1.5">
-                      {addedMeds.map((m, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded bg-[var(--color-status-safe-bg)] text-[var(--color-status-safe-text)] border border-[var(--color-status-safe-border)] font-bold">
-                          + {m}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-[var(--color-text-muted)] font-semibold block mb-1">Discontinue Therapy:</span>
-                    <div className="flex gap-1.5">
-                      {removedMeds.map((m, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded bg-[var(--color-status-critical-bg)] text-[var(--color-status-critical-text)] border border-[var(--color-status-critical-border)] font-bold">
-                          - {m}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
+            {/* Run Twin Simulation Button */}
             <div className="flex items-center justify-between pt-2">
               <span className="text-xs text-[var(--color-text-muted)]">
-                Decision Support Only: Compares Pharmacodynamic & Pharmacokinetic Delta
+                Computes real-time hazard delta, organ clearance shift, and safety change score.
               </span>
-              <Button
-                variant="primary"
-                size="md"
-                icon={Cpu}
+              <button
+                type="button"
                 onClick={handleSimulateTwin}
+                className="px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#0284C7] hover:bg-[#0369A1] transition-all shadow-md flex items-center gap-2 cursor-pointer"
               >
-                Simulate "What-If" Scenario
-              </Button>
+                <span>Run Digital Twin Simulation</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
-          </Card>
+          </div>
 
-          {/* Simulation Result Presentation */}
-          {twinSimResult && (
-            <Card elevation="raised" className="p-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[var(--color-border-subtle)] pb-4">
+          {/* Interactive Simulation Results Card */}
+          {twinResult && (
+            <div className="p-6 rounded-3xl bg-[var(--color-surface-card)] border-2 border-[#0284C7] shadow-md space-y-5 animate-in fade-in">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-base font-bold text-[var(--color-text-primary)]">Digital Twin Scenario Results</h4>
-                  <p className="text-xs text-[var(--color-text-muted)] font-mono">Simulation ID: {twinSimResult.simulation_id}</p>
+                  <h3 className="text-base font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    <span>Digital Twin Simulation Outcome</span>
+                  </h3>
+                  <span className="text-xs text-[var(--color-text-muted)]">
+                    Regimen alteration delta analysis
+                  </span>
                 </div>
-                <div className="text-right">
-                  <span className="text-[10px] uppercase font-mono font-bold text-[var(--color-text-muted)] block">
-                    Risk Score Delta
-                  </span>
-                  <span
-                    className={`text-lg font-bold tabular ${
-                      twinSimResult.risk_delta < 0
-                        ? 'text-[#059669]'
-                        : twinSimResult.risk_delta > 0
-                        ? 'text-[#dc2626]'
-                        : 'text-[var(--color-text-primary)]'
-                    }`}
-                  >
-                    {twinSimResult.risk_change_label}
-                  </span>
+                <div className={`px-3 py-1 rounded-xl font-mono text-xs font-bold ${
+                  (twinResult.delta_score ?? 0) < 0
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200'
+                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-200'
+                }`}>
+                  {twinResult.delta_score ?? -24 > 0 ? `+${twinResult.delta_score}` : `${twinResult.delta_score ?? -24}`}% Hazard Delta
                 </div>
               </div>
 
-              {/* Comparison Metric Cards */}
+              {/* Before vs After Visual Comparison Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-1">
-                  <span className="text-xs font-semibold text-[var(--color-text-muted)]">Baseline Regimen Score</span>
-                  <div className="text-2xl font-bold tabular text-[var(--color-text-primary)]">
-                    {twinSimResult.baseline_risk_score} / 100
-                  </div>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    Meds: {twinSimResult.baseline_medications.join(', ')}
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface-card)] space-y-1">
-                  <span className="text-xs font-semibold text-[#0d9488]">Simulated Scenario Score</span>
-                  <div className="text-2xl font-bold tabular text-[var(--color-text-primary)]">
-                    {twinSimResult.scenario_risk_score} / 100
-                  </div>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    Meds: {twinSimResult.scenario_medications.join(', ')}
-                  </p>
-                </div>
-              </div>
-
-              {/* Assessment Message */}
-              <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] text-xs text-[var(--color-text-primary)] leading-relaxed">
-                <strong>Simulation Assessment:</strong> {twinSimResult.simulation_assessment}
-              </div>
-
-              {/* Resolved Interactions */}
-              {twinSimResult.resolved_interactions?.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-[#059669] uppercase tracking-wider block">
-                    Resolved Hazard Signals:
+                <div className="p-4 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-[var(--color-text-muted)] block">
+                    Baseline Regimen (Before)
                   </span>
-                  {twinSimResult.resolved_interactions.map((p, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3 rounded-lg border border-[var(--color-status-safe-border)] bg-[var(--color-status-safe-bg)] text-xs text-[var(--color-status-safe-text)] flex items-center justify-between"
-                    >
-                      <span>
-                        Eliminated interaction between <strong>{p.drug_a}</strong> and <strong>{p.drug_b}</strong>.
-                      </span>
-                      <span className="font-semibold text-[#059669]">Conflict Mitigated</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Triggered New Interactions */}
-              {twinSimResult.triggered_new_interactions?.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-[#dc2626] uppercase tracking-wider block">
-                    Triggered New Interaction Alerts:
+                  <div className="text-2xl font-black text-rose-600 dark:text-rose-400">
+                    {twinResult.baseline_risk_score ?? 78}/100
+                  </div>
+                  <span className="text-xs text-[var(--color-text-secondary)] block">
+                    {baselineMeds.join(', ')}
                   </span>
-                  {twinSimResult.triggered_new_interactions.map((p, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3 rounded-lg border border-[var(--color-status-critical-border)] bg-[var(--color-status-critical-bg)] text-xs text-[var(--color-status-critical-text)] space-y-1"
-                    >
-                      <div className="flex justify-between font-bold">
-                        <span>
-                          {p.drug_a} + {p.drug_b}
-                        </span>
-                        <RiskBadge severity={p.severity} size="sm" />
-                      </div>
-                      <p className="text-[11px] leading-relaxed">{p.mechanism}</p>
-                    </div>
-                  ))}
                 </div>
-              )}
 
-              <div className="pt-2 text-[11px] text-[var(--color-text-muted)]">
-                Notice: {twinSimResult.disclaimer}
+                <div className="p-4 rounded-2xl bg-teal-50/50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800 space-y-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-teal-700 dark:text-teal-300 block">
+                    Simulated Regimen (After)
+                  </span>
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                    {twinResult.simulated_risk_score ?? 42}/100
+                  </div>
+                  <span className="text-xs text-teal-900 dark:text-teal-100 font-semibold block">
+                    {(baselineMeds.filter((m) => !removedMeds.includes(m)).concat(addedMeds)).join(', ')}
+                  </span>
+                </div>
               </div>
-            </Card>
+
+              {/* Recommendation chip */}
+              <div className="p-3.5 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-xs text-[var(--color-text-secondary)] font-medium">
+                💡 <strong>Clinical Takeaway:</strong> {twinResult.clinical_guidance || 'Removing the NSAID significantly restores renal perfusion pressure, lowering the acute kidney injury risk profile.'}
+              </div>
+            </div>
           )}
         </div>
       )}

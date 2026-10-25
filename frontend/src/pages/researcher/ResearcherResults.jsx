@@ -12,7 +12,8 @@ import {
   Dna,
   ShieldAlert,
   HelpCircle,
-  Activity
+  Activity,
+  Zap
 } from 'lucide-react';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
 import RiskBadge from '../../components/RiskBadge';
@@ -20,33 +21,43 @@ import ReportModal from '../../components/ReportModal';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { ClinicalHighlightBox } from '../../components/ui/ClinicalHighlightBox';
 
 export const ResearcherResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [reportModalOpen, setReportModalOpen] = useState(false);
-
-  const data = location.state?.candidateData;
+  const [data, setData] = useState(location.state?.candidateData || null);
 
   if (!data) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
-        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)]">
-          <div className="w-16 h-16 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-600 flex items-center justify-center mx-auto mb-4">
+      <div className="max-w-2xl mx-auto py-12 px-4">
+        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-[#0284C7]/10 border border-[#0284C7]/20 text-[#0284C7] flex items-center justify-center mx-auto">
             <Microscope className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
-            No Repurposing Candidate Selected
-          </h2>
-          <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-md mx-auto">
-            You reached this dossier page directly without selecting a repurposing candidate. Explore target diseases or analyze a biomedical query to inspect evidence rankings and clinical trial dossiers.
-          </p>
-          <div className="flex justify-center gap-3">
+          <div className="space-y-2">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--color-text-primary)]">
+              No Repurposing Candidate Selected
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] max-w-md mx-auto leading-relaxed">
+              Launch a discovery query in the Drug Repurposing Pipeline to evaluate FDA-approved candidates against curated disease target profiles with real biomedical evidence.
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
             <Button
               variant="primary"
               onClick={() => navigate('/researcher/drug-repurposing')}
+              className="!bg-[#0284C7] hover:!bg-[#0369A1]"
             >
-              Go to Drug Repurposing Pipeline
+              Open Drug Repurposing Pipeline
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => navigate('/researcher/dashboard')}
+            >
+              Researcher Dashboard
             </Button>
           </div>
         </Card>
@@ -90,7 +101,7 @@ export const ResearcherResults = () => {
             size="md"
             icon={Share2}
             onClick={() => navigate('/knowledge-graph')}
-            className="!bg-[#0d9488] hover:!bg-[#0f766e]"
+            className="!bg-[#0284C7] hover:!bg-[#0369A1] text-white"
           >
             Inspect Network
           </Button>
@@ -100,7 +111,7 @@ export const ResearcherResults = () => {
       <SafetyDisclaimer variant="compact" />
 
       {/* Hero Dossier Card */}
-      <Card elevation="raised" className="p-6 border-l-4 border-l-[#0d9488]">
+      <Card elevation="raised" className="p-6 border-l-4 border-l-[#0284C7]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -122,7 +133,7 @@ export const ResearcherResults = () => {
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--color-text-muted)] block">
               CureNova Congruence Ranking
             </span>
-            <div className="text-3xl font-extrabold tabular text-[#0d9488]">
+            <div className="text-3xl font-extrabold tabular text-[#0284C7]">
               {data.curenova_ranking}
               <span className="text-sm font-normal text-[var(--color-text-muted)]"> / 100</span>
             </div>
@@ -234,22 +245,24 @@ export const ResearcherResults = () => {
           </Card>
 
           {/* Safety Signals & Contraindications */}
-          <Card elevation="raised" className="p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-[#d97706]" />
-              <CardTitle>Known Safety Signals</CardTitle>
-            </div>
-            <div className="space-y-2 text-xs">
+          <ClinicalHighlightBox
+            variant="warning"
+            title="Known Safety Signals"
+            subtitle="Adverse drug events and black-box warnings flagged for this molecule"
+            icon={ShieldAlert}
+            badge={`${data.safety_signals?.length || 0} signals`}
+          >
+            <div className="space-y-2 text-xs pt-1">
               {data.safety_signals?.map((sig, idx) => (
                 <div
                   key={idx}
-                  className="p-2.5 rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] leading-relaxed"
+                  className="p-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] leading-relaxed"
                 >
                   {sig}
                 </div>
               ))}
             </div>
-          </Card>
+          </ClinicalHighlightBox>
 
           {/* Translational Limitations */}
           <Card elevation="raised" className="p-5 space-y-3">

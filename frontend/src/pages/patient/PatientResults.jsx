@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import {
   HeartHandshake,
@@ -10,38 +10,50 @@ import {
   FileText,
   HelpCircle,
   Pill,
-  CheckSquare
+  CheckSquare,
+  Zap
 } from 'lucide-react';
+import { safetyService } from '../../services/api';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { ClinicalHighlightBox } from '../../components/ui/ClinicalHighlightBox';
 
 export const PatientResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const data = location.state?.patientData;
+  const [data, setData] = useState(location.state?.patientData || null);
 
   if (!data) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
-        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)]">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+      <div className="max-w-2xl mx-auto py-12 px-4">
+        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-[#0284C7]/10 border border-[#0284C7]/20 text-[#0284C7] flex items-center justify-center mx-auto">
             <HeartHandshake className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
-            No Medication Check Selected
-          </h2>
-          <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-md mx-auto">
-            You reached this page without running an active medication safety review. Enter your medications to view plain-language safety insights and discussion questions for your doctor.
-          </p>
-          <div className="flex justify-center gap-3">
+          <div className="space-y-2">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--color-text-primary)]">
+              No Medication Safety Check Found
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] max-w-md mx-auto leading-relaxed">
+              You haven't run a safety check on your medications yet. Add your current medicines to see how they work together in clear, simple language.
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
             <Button
               variant="primary"
               onClick={() => navigate('/patient/medication-safety')}
+              className="!bg-[#0284C7] hover:!bg-[#0369A1] text-white shadow-xs"
             >
-              Start Medication Safety Check
+              Check My Medicines
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => navigate('/patient/dashboard')}
+            >
+              My Medication Home
             </Button>
           </div>
         </Card>
@@ -80,7 +92,7 @@ export const PatientResults = () => {
           size="md"
           icon={Printer}
           onClick={handlePrint}
-          className="shrink-0 !bg-[#059669] hover:!bg-[#047857]"
+          className="shrink-0 !bg-[#0284C7] hover:!bg-[#0369A1] text-white shadow-xs"
         >
           Print Doctor Discussion Sheet
         </Button>
@@ -128,7 +140,7 @@ export const PatientResults = () => {
             <Card key={idx} elevation="raised" className="p-6 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border-subtle)] pb-3">
                 <span className="font-bold text-base text-[var(--color-text-primary)] flex items-center gap-2">
-                  <Pill className="w-4 h-4 text-[#059669]" />
+                  <Pill className="w-4 h-4 text-[#0284C7]" />
                   {item.medications_involved}
                 </span>
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text)] border border-[var(--color-status-warning-border)]">
@@ -155,9 +167,9 @@ export const PatientResults = () => {
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-1">
+                <div className="p-3.5 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-1">
                   <h4 className="font-bold text-xs text-[var(--color-text-primary)] flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#059669]" />
+                    <CheckCircle2 className="w-4 h-4 text-[#0284C7]" />
                     Recommended step for you:
                   </h4>
                   <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
@@ -170,22 +182,19 @@ export const PatientResults = () => {
         </div>
 
         {/* Doctor Discussion Sheet Questions to Ask */}
-        <Card elevation="raised" className="p-6 space-y-4 border-l-4 border-l-[#059669]">
-          <div className="flex items-center gap-2">
-            <HeartHandshake className="w-5 h-5 text-[#059669]" />
-            <CardTitle>Questions to Ask Your Doctor or Pharmacist</CardTitle>
-          </div>
-          <p className="text-xs sm:text-sm text-[var(--color-text-muted)]">
-            Bring this list to your appointment. Check off questions as you discuss them together.
-          </p>
-
-          <div className="space-y-3 pt-2">
+        <ClinicalHighlightBox
+          variant="primary"
+          title="Questions to Ask Your Doctor or Pharmacist"
+          subtitle="Bring this list to your appointment. Check off questions as you discuss them together."
+          icon={HeartHandshake}
+        >
+          <div className="space-y-3 pt-1">
             {data.patient_questions_for_doctor?.map((question, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 p-3.5 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] transition-colors"
+                className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-[#0284C7]/40 transition-colors shadow-2xs"
               >
-                <div className="w-5 h-5 rounded border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-card)] flex items-center justify-center shrink-0 mt-0.5" />
+                <div className="w-5 h-5 rounded-md border-2 border-[#0284C7]/40 bg-[var(--color-surface-card)] flex items-center justify-center shrink-0 mt-0.5" />
                 <p className="text-xs sm:text-sm font-medium text-[var(--color-text-primary)] leading-relaxed">
                   {question}
                 </p>
@@ -200,12 +209,12 @@ export const PatientResults = () => {
               size="sm"
               icon={Printer}
               onClick={handlePrint}
-              className="print:hidden"
+              className="print:hidden text-[#0284C7] hover:bg-[#0284C7]/10"
             >
               Print This Sheet
             </Button>
           </div>
-        </Card>
+        </ClinicalHighlightBox>
       </div>
     </div>
   );

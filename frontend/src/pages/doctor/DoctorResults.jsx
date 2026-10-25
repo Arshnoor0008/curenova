@@ -12,11 +12,13 @@ import {
   HelpCircle,
   Stethoscope,
   Activity,
-  Layers,
   ArrowRight,
   Pill,
-  Share2
+  Share2,
+  Zap,
+  RefreshCw
 } from 'lucide-react';
+import { safetyService } from '../../services/api';
 import InteractionMatrix from '../../components/InteractionMatrix';
 import RiskBadge from '../../components/RiskBadge';
 import SafetyDisclaimer from '../../components/SafetyDisclaimer';
@@ -24,33 +26,43 @@ import ReportModal from '../../components/ReportModal';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { ClinicalHighlightBox } from '../../components/ui/ClinicalHighlightBox';
 
 export const DoctorResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [reportModalOpen, setReportModalOpen] = useState(false);
-
-  const data = location.state?.analysisData;
+  const [data, setData] = useState(location.state?.analysisData || null);
 
   if (!data) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
-        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)]">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-8 h-8" />
+      <div className="max-w-2xl mx-auto py-12 px-4">
+        <Card className="p-8 border border-[var(--color-border-subtle)] bg-[var(--color-surface-card)] text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-[#0284C7]/10 border border-[#0284C7]/20 text-[#0284C7] flex items-center justify-center mx-auto">
+            <Stethoscope className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
-            No Active Polypharmacy Analysis
-          </h2>
-          <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-md mx-auto">
-            You navigated directly to the results view without running an active medication evaluation. Select medications or choose a preset clinical regimen to view comprehensive interaction results.
-          </p>
-          <div className="flex justify-center gap-3">
+          <div className="space-y-2">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--color-text-primary)]">
+              No Active Polypharmacy Dossier Selected
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] max-w-md mx-auto leading-relaxed">
+              To evaluate higher-order drug combinations, view pairwise interaction matrices, and inspect openFDA safety citations, enter a medication regimen in the Medication Safety Analyzer.
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
             <Button
               variant="primary"
               onClick={() => navigate('/doctor/medication-safety')}
+              className="!bg-[#0284C7] hover:!bg-[#0369A1]"
             >
-              Go to Medication Safety Workspace
+              Start Medication Safety Check
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => navigate('/doctor/dashboard')}
+            >
+              Doctor Clinical Dashboard
             </Button>
           </div>
         </Card>
@@ -167,77 +179,97 @@ export const DoctorResults = () => {
               </span>
             </div>
 
-            <div className="space-y-4">
-              {data.pairwise_interactions?.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-3"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-[var(--color-text-primary)]">
-                        {item.drug_a} ↔ {item.drug_b}
-                      </span>
-                      <span className="text-xs text-[var(--color-text-muted)] font-mono">
-                        ({item.interaction_type})
-                      </span>
-                    </div>
-                    <RiskBadge severity={item.severity} size="sm" />
-                  </div>
-
-                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                    {item.mechanism}
-                  </p>
-
-                  <div className="p-3 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-brand-border)] text-xs space-y-1">
-                    <span className="font-bold text-[var(--color-brand-text)] text-[11px] uppercase tracking-wider block">
-                      Clinician Decision Guidance:
-                    </span>
-                    <p className="text-[var(--color-text-primary)] font-medium leading-relaxed">
-                      {item.doctor_guidance}
-                    </p>
-                  </div>
-
-                  {/* Supporting Literature / Regulatory Alerts */}
-                  {item.citations?.length > 0 && (
-                    <div className="pt-2 border-t border-[var(--color-border-subtle)] space-y-2">
-                      <span className="text-[11px] font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">
-                        Grounded Sources & Citations:
-                      </span>
-                      {item.citations.map((cite, cIdx) => (
-                        <div
-                          key={cIdx}
-                          className="text-xs p-3 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] space-y-1"
-                        >
-                          <div className="flex items-center justify-between font-semibold text-[var(--color-text-primary)] text-[11px]">
-                            <span>{cite.source}</span>
-                            {cite.pmid && (
-                              <a
-                                href={`https://pubmed.ncbi.nlm.nih.gov/${cite.pmid}/`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-[var(--color-brand-primary)] hover:underline flex items-center gap-1 font-mono text-[10px] bg-[var(--color-surface-sunken)] px-1.5 py-0.5 rounded border border-[var(--color-border-subtle)]"
-                              >
-                                PMID: {cite.pmid} <ExternalLink className="w-3 h-3" />
-                              </a>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-[var(--color-text-secondary)] font-medium">{cite.title || cite.fda_signal}</p>
-                          <p className="text-[10px] text-[var(--color-text-muted)] italic font-mono">{cite.citation}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {item.uncertainty && (
-                    <div className="text-[11px] text-[var(--color-text-muted)] flex items-center gap-1.5 pt-1">
-                      <HelpCircle className="w-3.5 h-3.5" />
-                      <span>Uncertainty: {item.uncertainty}</span>
-                    </div>
-                  )}
+            {(!data.pairwise_interactions || data.pairwise_interactions.length === 0) ? (
+              <div className="p-6 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-center space-y-3">
+                <div className="w-12 h-12 rounded-xl bg-[#E0F2FE] dark:bg-[#0369A1]/20 text-[#0284C7] flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-6 h-6" />
                 </div>
-              ))}
-            </div>
+                <h4 className="text-sm font-bold text-[var(--color-text-primary)]">
+                  No Documented Pairwise Interactions in Reference Database
+                </h4>
+                <p className="text-xs text-[var(--color-text-secondary)] max-w-lg mx-auto leading-relaxed">
+                  The evaluated medication combination does not show recorded adverse interactions or metabolic conflict within the indexed biomedical literature and openFDA post-marketing safety dataset.
+                </p>
+                <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-xs font-medium text-left flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                  <span className="leading-relaxed">
+                    <strong>Scientific Limitation Notice:</strong> An absence of documented interactions does not establish clinical safety. Uncharacterized pharmacokinetic interactions, renal/hepatic clearance status, and patient-specific variables must always be clinically evaluated.
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {data.pairwise_interactions?.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-sunken)] space-y-3"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-[var(--color-text-primary)]">
+                          {item.drug_a} ↔ {item.drug_b}
+                        </span>
+                        <span className="text-xs text-[var(--color-text-muted)] font-mono">
+                          ({item.interaction_type})
+                        </span>
+                      </div>
+                      <RiskBadge severity={item.severity} size="sm" />
+                    </div>
+
+                    <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                      {item.mechanism}
+                    </p>
+
+                    <div className="p-3 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-brand-border)] text-xs space-y-1">
+                      <span className="font-bold text-[var(--color-brand-text)] text-[11px] uppercase tracking-wider block">
+                        Clinician Decision Guidance:
+                      </span>
+                      <p className="text-[var(--color-text-primary)] font-medium leading-relaxed">
+                        {item.doctor_guidance}
+                      </p>
+                    </div>
+
+                    {/* Supporting Literature / Regulatory Alerts */}
+                    {item.citations?.length > 0 && (
+                      <div className="pt-2 border-t border-[var(--color-border-subtle)] space-y-2">
+                        <span className="text-[11px] font-mono font-bold text-[var(--color-text-muted)] uppercase tracking-wider block">
+                          Grounded Sources & Citations:
+                        </span>
+                        {item.citations.map((cite, cIdx) => (
+                          <div
+                            key={cIdx}
+                            className="text-xs p-3 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] space-y-1"
+                          >
+                            <div className="flex items-center justify-between font-semibold text-[var(--color-text-primary)] text-[11px]">
+                              <span>{cite.source}</span>
+                              {cite.pmid && (
+                                <a
+                                  href={`https://pubmed.ncbi.nlm.nih.gov/${cite.pmid}/`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[var(--color-brand-primary)] hover:underline flex items-center gap-1 font-mono text-[10px] bg-[var(--color-surface-sunken)] px-1.5 py-0.5 rounded border border-[var(--color-border-subtle)]"
+                                >
+                                  PMID: {cite.pmid} <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-[var(--color-text-secondary)] font-medium">{cite.title || cite.fda_signal}</p>
+                            <p className="text-[10px] text-[var(--color-text-muted)] italic font-mono">{cite.citation}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {item.uncertainty && (
+                      <div className="text-[11px] text-[var(--color-text-muted)] flex items-center gap-1.5 pt-1">
+                        <HelpCircle className="w-3.5 h-3.5" />
+                        <span>Uncertainty: {item.uncertainty}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
         </div>
 
@@ -267,48 +299,51 @@ export const DoctorResults = () => {
             </div>
           </Card>
 
-          {/* Clinician Discussion Points */}
-          <Card elevation="raised" className="p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <Stethoscope className="w-4 h-4 text-[#0284c7]" />
-              <CardTitle>Suggested Discussion Points</CardTitle>
-            </div>
-            <p className="text-xs text-[var(--color-text-muted)]">
-              Evidence-based talking points for multidisciplinary clinical rounds and patient visits.
-            </p>
+          {/* Clinician Discussion Points Highlight Box */}
+          <ClinicalHighlightBox
+            variant="primary"
+            title="Suggested Discussion Points"
+            subtitle="Evidence-based talking points for multidisciplinary clinical rounds and patient visits."
+            icon={Stethoscope}
+            badge={`${data.clinician_discussion_points?.length || 0} points`}
+          >
             <div className="space-y-2 pt-1 text-xs">
               {data.clinician_discussion_points?.map((pt, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2 p-2.5 rounded-lg bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)]"
+                  className="flex items-start gap-2 p-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)]"
                 >
-                  <span className="font-bold text-[#0284c7] shrink-0 mt-0.5">•</span>
+                  <span className="font-bold text-[#0284C7] shrink-0 mt-0.5">•</span>
                   <span className="leading-relaxed">{pt}</span>
                 </div>
               ))}
             </div>
-          </Card>
+          </ClinicalHighlightBox>
 
           {/* Patient Context Considerations */}
           {data.patient_context_considerations?.length > 0 && (
-            <Card elevation="raised" className="p-5 space-y-3">
-              <CardTitle>Patient Context Considerations</CardTitle>
+            <ClinicalHighlightBox
+              variant="warning"
+              title="Patient Context Considerations"
+              subtitle="Physiological & metabolic risk factors flagged for this patient profile"
+              badge={`${data.patient_context_considerations.length} alerts`}
+            >
               <div className="space-y-2 text-xs">
                 {data.patient_context_considerations.map((c, i) => (
                   <div
                     key={i}
-                    className="p-2.5 rounded-lg bg-[var(--color-status-warning-bg)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] text-xs leading-relaxed"
+                    className="p-2.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-status-warning-border)] text-[var(--color-status-warning-text)] text-xs leading-relaxed"
                   >
                     {c}
                   </div>
                 ))}
               </div>
-            </Card>
+            </ClinicalHighlightBox>
           )}
 
           {/* Link to Knowledge Graph */}
-          <Card elevation="flat" className="p-5 space-y-3 border-l-4 border-l-[#0284c7]">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-brand-primary)]">
+          <Card elevation="flat" className="p-5 space-y-3 border-l-4 border-l-[#0284C7]">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#0284C7]">
               Biomedical Knowledge Graph
             </h4>
             <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">

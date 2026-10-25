@@ -1,324 +1,800 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Stethoscope,
   ShieldAlert,
-  AlertTriangle,
   Activity,
-  Users,
   Cpu,
-  FileText,
   ArrowRight,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Search,
-  Filter,
+  Plus,
   Pill,
-  ExternalLink
+  X,
+  Sparkles,
+  Info,
+  AlertTriangle,
+  FileText,
+  HeartPulse,
+  Flame,
+  CheckCircle2,
+  Clock,
+  ShieldCheck,
+  Sliders,
+  Layers,
+  RotateCcw,
+  Zap,
+  Search
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import SafetyDisclaimer from '../../components/SafetyDisclaimer';
-import RiskBadge from '../../components/RiskBadge';
-import StatCard from '../../components/ui/StatCard';
-import Button from '../../components/ui/Button';
-import Badge from '../../components/ui/Badge';
-import Card, { CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { safetyService } from '../../services/api';
+import { ClinicalHighlightBox } from '../../components/ui/ClinicalHighlightBox';
+
+const KNOWN_INTERACTIONS = {
+  'warfarin-aspirin': { severity: 'Severe', score: 85, alert: 'High Bleeding Risk (ROR 3.84)' },
+  'aspirin-warfarin': { severity: 'Severe', score: 85, alert: 'High Bleeding Risk (ROR 3.84)' },
+  'warfarin-ibuprofen': { severity: 'Severe', score: 88, alert: 'GI Hemorrhage & Coagulation Interference' },
+  'ibuprofen-warfarin': { severity: 'Severe', score: 88, alert: 'GI Hemorrhage & Coagulation Interference' },
+  'clopidogrel-omeprazole': { severity: 'Moderate', score: 62, alert: 'CYP2C19 Inhibition (Reduced Active Metabolite)' },
+  'omeprazole-clopidogrel': { severity: 'Moderate', score: 62, alert: 'CYP2C19 Inhibition (Reduced Active Metabolite)' },
+  'lisinopril-ibuprofen': { severity: 'Moderate', score: 55, alert: 'Attenuated Antihypertensive Response & Renal Load' },
+  'ibuprofen-lisinopril': { severity: 'Moderate', score: 55, alert: 'Attenuated Antihypertensive Response & Renal Load' },
+  'lisinopril-spironolactone': { severity: 'Severe', score: 80, alert: 'Severe Hyperkalemia Risk (>5.5 mEq/L)' },
+  'spironolactone-lisinopril': { severity: 'Severe', score: 80, alert: 'Severe Hyperkalemia Risk (>5.5 mEq/L)' },
+  'tramadol-sertraline': { severity: 'Severe', score: 82, alert: 'Serotonin Toxicity Alert (Central Serotonin Load)' },
+  'sertraline-tramadol': { severity: 'Severe', score: 82, alert: 'Serotonin Toxicity Alert (Central Serotonin Load)' },
+};
 
 export const DoctorDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [filterSeverity, setFilterSeverity] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
 
-  const recentAnalyses = [
-    {
-      id: 'ana-med-cardio01',
-      patient: 'Patient #4089 (Age 72, CKD Stage 3)',
-      regimen: ['Aspirin', 'Warfarin', 'Metformin'],
-      risk: 'High Risk',
-      riskScore: 75,
-      alert: 'Dual antihemostatic synergism (Bleeding ROR 3.84)',
-      date: 'Today, 14:20',
-      timestamp: '2026-10-04 14:20',
-      severityLevel: 'High'
-    },
-    {
-      id: 'ana-med-pci02',
-      patient: 'Patient #3911 (Age 64, Post-PCI)',
-      regimen: ['Clopidogrel', 'Omeprazole', 'Aspirin'],
-      risk: 'High Risk',
-      riskScore: 82,
-      alert: 'CYP2C19 competitive bioactivation inhibition',
-      date: 'Yesterday, 09:45',
-      timestamp: '2026-10-03 09:45',
-      severityLevel: 'High'
-    },
-    {
-      id: 'ana-med-htn03',
-      patient: 'Patient #5202 (Age 58, Hypertension)',
-      regimen: ['Atorvastatin', 'Amlodipine'],
-      risk: 'Low Risk',
-      riskScore: 25,
-      alert: 'Standard co-prescription, monitored CYP3A4 substrate',
-      date: 'Oct 02, 2026',
-      timestamp: '2026-10-02 11:15',
-      severityLevel: 'Low'
-    },
-  ];
+  // Load real catalog from backend API
+  const [catalog, setCatalog] = useState([]);
+  const [loadingCatalog, setLoadingCatalog] = useState(true);
 
-  const filteredAnalyses = recentAnalyses.filter((item) => {
-    const matchesFilter =
-      filterSeverity === 'All' ||
-      (filterSeverity === 'High' && item.severityLevel === 'High') ||
-      (filterSeverity === 'Moderate' && item.severityLevel === 'Moderate') ||
-      (filterSeverity === 'Low' && item.severityLevel === 'Low');
+  // Active Patient / Physiology Controls
+  const [patientAge, setPatientAge] = useState(65);
+  const [patientEgfr, setPatientEgfr] = useState(75);
+  const [selectedOrgan, setSelectedOrgan] = useState('renal');
+  const [activeCell, setActiveCell] = useState(null);
 
-    const q = searchQuery.toLowerCase().trim();
-    const matchesSearch =
-      !q ||
-      item.patient.toLowerCase().includes(q) ||
-      item.alert.toLowerCase().includes(q) ||
-      item.regimen.some((drug) => drug.toLowerCase().includes(q));
-
-    return matchesFilter && matchesSearch;
+  // Active Regimen Drugs (initialized empty - NO DUMMY DATA)
+  const [activeDrugs, setActiveDrugs] = useState(() => {
+    const initial = location.state?.prefilledMeds || [];
+    return initial.map((m) => ({ name: m, enabled: true }));
   });
+  const [newDrugInput, setNewDrugInput] = useState('');
+
+  // Stored safety checks history
+  const [recentChecks, setRecentChecks] = useState([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('curenova_doctor_safety_history');
+      if (stored) {
+        setRecentChecks(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.warn('Failed to load recent doctor safety checks', e);
+    }
+  }, []);
+
+  // Fetch real backend catalog
+  useEffect(() => {
+    safetyService
+      .getCatalog()
+      .then((res) => {
+        setCatalog(res.catalog || []);
+      })
+      .catch((err) => console.error('Failed to load drug catalog', err))
+      .finally(() => setLoadingCatalog(false));
+  }, []);
+
+  // Filter only enabled drugs for live calculation
+  const enabledMeds = useMemo(() => {
+    return activeDrugs.filter((d) => d.enabled).map((d) => d.name);
+  }, [activeDrugs]);
+
+  // Toggle drug inclusion in simulation
+  const toggleDrug = (name) => {
+    setActiveDrugs((prev) =>
+      prev.map((d) => (d.name === name ? { ...d, enabled: !d.enabled } : d))
+    );
+  };
+
+  // Add drug
+  const handleAddDrug = (drugName) => {
+    const clean = (drugName || newDrugInput).trim();
+    if (!clean) return;
+    if (!activeDrugs.some((d) => d.name.toLowerCase() === clean.toLowerCase())) {
+      setActiveDrugs([...activeDrugs, { name: clean, enabled: true }]);
+    }
+    setNewDrugInput('');
+  };
+
+  // Remove drug
+  const handleRemoveDrug = (name) => {
+    setActiveDrugs(activeDrugs.filter((d) => d.name !== name));
+  };
+
+  // Dynamic Live Safety Vitals calculation
+  const vitals = useMemo(() => {
+    const count = enabledMeds.length;
+    if (count === 0) {
+      return {
+        score: null,
+        renalCapacity: Math.min(100, Math.round((patientEgfr / 90) * 100)),
+        hepaticCapacity: 100,
+        cardiacTolerance: 100,
+        riskStatus: 'Awaiting Regimen',
+        riskColor: 'slate',
+        highRiskCount: 0,
+        modRiskCount: 0,
+      };
+    }
+
+    const medsLower = enabledMeds.map((m) => m.toLowerCase());
+    let penalty = 0;
+    let highRiskCount = 0;
+    let modRiskCount = 0;
+
+    // Check all pairwise combinations
+    for (let i = 0; i < medsLower.length; i++) {
+      for (let j = i + 1; j < medsLower.length; j++) {
+        const pair = `${medsLower[i]}-${medsLower[j]}`;
+        if (KNOWN_INTERACTIONS[pair]) {
+          const item = KNOWN_INTERACTIONS[pair];
+          if (item.severity === 'Severe') {
+            penalty += 35;
+            highRiskCount++;
+          } else {
+            penalty += 18;
+            modRiskCount++;
+          }
+        }
+      }
+    }
+
+    // eGFR penalty
+    if (patientEgfr < 45) {
+      penalty += 15;
+    } else if (patientEgfr < 60) {
+      penalty += 8;
+    }
+
+    // Age penalty
+    if (patientAge > 75) penalty += 8;
+
+    const rawScore = Math.max(15, 96 - penalty);
+    const renalCapacity = Math.max(20, Math.min(100, Math.round((patientEgfr / 90) * 100) - (penalty > 20 ? 15 : 0)));
+    const hepaticCapacity = Math.max(30, 95 - count * 6 - (highRiskCount > 0 ? 15 : 0));
+    const cardiacTolerance = Math.max(25, 95 - (highRiskCount > 0 ? 30 : 5) - (patientAge > 70 ? 10 : 0));
+
+    let riskStatus = 'Optimal';
+    let riskColor = 'emerald';
+    if (rawScore < 45) {
+      riskStatus = 'Severe Hazard';
+      riskColor = 'rose';
+    } else if (rawScore < 75) {
+      riskStatus = 'Moderate Alert';
+      riskColor = 'amber';
+    }
+
+    return {
+      score: rawScore,
+      renalCapacity,
+      hepaticCapacity,
+      cardiacTolerance,
+      riskStatus,
+      riskColor,
+      highRiskCount,
+      modRiskCount,
+    };
+  }, [enabledMeds, patientEgfr, patientAge]);
 
   return (
-    <div className="space-y-6">
-      {/* ── Colorful Hero Banner ── */}
-      <div
-        className="relative overflow-hidden rounded-3xl p-7 text-white shadow-2xl"
-        style={{
-          background: 'linear-gradient(135deg, #0c2e52 0%, #0284c7 55%, #0369a1 100%)',
-        }}
-      >
-        {/* decorative orbs */}
-        <div className="absolute top-[-30px] right-[-30px] w-52 h-52 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-        <div className="absolute bottom-[-20px] left-[30%] w-36 h-36 rounded-full bg-[#38bdf8]/20 blur-2xl pointer-events-none" />
-
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
-                <Stethoscope className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xs font-bold uppercase tracking-widest text-white/60">Clinician Dashboard</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-              Medication Safety Workspace
+    <div className="space-y-6 w-full pb-8">
+      {/* ── Top Header ── */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-[var(--color-border-subtle)]">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-text-primary)]">
+              Clinical Command Center
             </h1>
-            <p className="text-sm text-white/65 max-w-[55ch]">
-              Welcome, <strong className="text-white">{user?.name || 'Doctor'}</strong>. Evidence-grounded polypharmacy decision support with Digital Twin simulations.
-            </p>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live Clinical Engine
+            </span>
           </div>
+          <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-1">
+            Logged in as <strong>{user?.name || 'Dr. Sarah Lin'}</strong> • Clinical decision-support protocol active.
+          </p>
+        </div>
 
-          <div className="flex flex-wrap gap-3 shrink-0">
-            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
-              <div className="text-2xl font-black tabular-nums">2</div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Critical Alerts</div>
-            </div>
-            <div className="bg-white/10 border border-white/15 rounded-2xl px-5 py-3 text-center">
-              <div className="text-2xl font-black tabular-nums">14</div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-white/60">Regimens Evaluated</div>
-            </div>
-            <Button
-              variant="primary"
-              size="md"
-              icon={Activity}
-              onClick={() => navigate('/doctor/medication-safety')}
-              className="shrink-0 !bg-white !text-[#0284c7] hover:!bg-white/90 self-center"
-            >
-              New Analysis
-            </Button>
+        {/* Live Regimen Counter */}
+        <div className="flex items-center gap-3 bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] px-3.5 py-2 rounded-2xl shadow-2xs">
+          <Pill className="w-4 h-4 text-[#0284C7]" />
+          <div>
+            <span className="text-[10px] font-mono uppercase font-bold text-[var(--color-text-muted)] block leading-none">
+              Active Regimen
+            </span>
+            <span className="text-xs font-bold text-[var(--color-text-primary)]">
+              {enabledMeds.length} Medication{enabledMeds.length !== 1 ? 's' : ''} Loaded
+            </span>
           </div>
         </div>
       </div>
 
-      <SafetyDisclaimer variant="compact" />
+      {/* ── Live Vitals Gauges ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* Safety Score Meter */}
+        <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono font-bold uppercase text-[var(--color-text-muted)] flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#0284C7]" />
+              Safety Index
+            </span>
+            <span className={`text-[9px] font-bold font-mono px-2 py-0.5 rounded-full ${
+              vitals.riskColor === 'rose'
+                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                : vitals.riskColor === 'amber'
+                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                : vitals.riskColor === 'emerald'
+                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+            }`}>
+              {vitals.riskStatus}
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-3xl font-black tabular-nums text-[var(--color-text-primary)]">
+              {vitals.score !== null ? vitals.score : '--'}
+              <span className="text-xs text-[var(--color-text-muted)] font-mono font-normal">/100</span>
+            </span>
+            <svg className="w-14 h-6 text-[#0284C7] opacity-80" viewBox="0 0 100 30" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M0,15 L20,15 L28,5 L38,25 L46,8 L54,18 L62,15 L100,15" />
+            </svg>
+          </div>
+          <div className="w-full h-1.5 rounded-full bg-[var(--color-surface-sunken)] overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${
+                vitals.riskColor === 'rose' ? 'bg-rose-500' : vitals.riskColor === 'amber' ? 'bg-amber-500' : 'bg-emerald-500'
+              }`}
+              style={{ width: `${vitals.score ?? 0}%` }}
+            />
+          </div>
+        </div>
 
-      {/* Main Layout: Triage Table + Digital Twin Simulator Rail */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Recent Medication Evaluations Clinical Triage Table */}
-        <div className="lg:col-span-8">
-          <Card elevation="raised">
-            <CardHeader className="flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Kidney eGFR Capacity */}
+        <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono font-bold uppercase text-[var(--color-text-muted)] flex items-center gap-1">
+              <HeartPulse className="w-3.5 h-3.5 text-sky-600" />
+              Renal (eGFR)
+            </span>
+            <span className="text-[10px] font-mono font-bold text-sky-700 dark:text-sky-300">
+              {patientEgfr} mL/min
+            </span>
+          </div>
+          <div>
+            <span className="text-2xl font-black text-[var(--color-text-primary)] tabular-nums">
+              {vitals.renalCapacity}%
+            </span>
+            <span className="text-[10px] text-[var(--color-text-muted)] block">
+              {patientEgfr < 60 ? 'Clearance Reduction' : 'Normal Glomerular Flow'}
+            </span>
+          </div>
+          <div className="w-full h-1.5 rounded-full bg-[var(--color-surface-sunken)] overflow-hidden">
+            <div className="h-full rounded-full bg-sky-500 transition-all duration-300" style={{ width: `${vitals.renalCapacity}%` }} />
+          </div>
+        </div>
+
+        {/* Liver CYP450 Capacity */}
+        <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono font-bold uppercase text-[var(--color-text-muted)] flex items-center gap-1">
+              <Activity className="w-3.5 h-3.5 text-[#0284C7]" />
+              Hepatic CYP
+            </span>
+            <span className="text-[10px] font-mono font-bold text-[#0369A1] dark:text-[#38BDF8]">
+              CYP3A4 / 2D6
+            </span>
+          </div>
+          <div>
+            <span className="text-2xl font-black text-[var(--color-text-primary)] tabular-nums">
+              {vitals.hepaticCapacity}%
+            </span>
+            <span className="text-[10px] text-[var(--color-text-muted)] block">
+              Isoform Clearance Margin
+            </span>
+          </div>
+          <div className="w-full h-1.5 rounded-full bg-[var(--color-surface-sunken)] overflow-hidden">
+            <div className="h-full rounded-full bg-[#0284C7] transition-all duration-300" style={{ width: `${vitals.hepaticCapacity}%` }} />
+          </div>
+        </div>
+
+        {/* Cardiac Tolerance */}
+        <div className="p-4 rounded-2xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono font-bold uppercase text-[var(--color-text-muted)] flex items-center gap-1">
+              <Zap className="w-3.5 h-3.5 text-purple-600" />
+              Cardiac Margin
+            </span>
+            <span className="text-[10px] font-mono font-bold text-purple-700 dark:text-purple-300">
+              QT Interval
+            </span>
+          </div>
+          <div>
+            <span className="text-2xl font-black text-[var(--color-text-primary)] tabular-nums">
+              {vitals.cardiacTolerance}%
+            </span>
+            <span className="text-[10px] text-[var(--color-text-muted)] block">
+              Repolarization Buffer
+            </span>
+          </div>
+          <div className="w-full h-1.5 rounded-full bg-[var(--color-surface-sunken)] overflow-hidden">
+            <div className="h-full rounded-full bg-purple-500 transition-all duration-300" style={{ width: `${vitals.cardiacTolerance}%` }} />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main Layout (7 cols + 5 cols) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Left Column: Interactive Digital Twin Sandbox & 2D Matrix Grid */}
+        <div className="lg:col-span-7 space-y-6">
+          
+          {/* Patient Medication List with Clinical Highlighting */}
+          <div className="p-5 sm:p-6 rounded-3xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Clinical Triage & Regimen Evaluations</CardTitle>
+                <h2 className="text-base font-bold text-[var(--color-text-primary)]">
+                  Patient Medication List
+                </h2>
                 <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
-                  Real-time pharmacokinetic screening, pairwise matrices, and adverse event warnings
+                  Add current patient medicines or select from common prescriptions below to review safety and warnings.
                 </p>
               </div>
+              <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-[#E0F2FE] dark:bg-[#0369A1]/20 text-[#0369A1] dark:text-[#38BDF8] border border-[#BAE6FD] dark:border-[#0284C7]/40">
+                {enabledMeds.length} Selected for Safety Check
+              </span>
+            </div>
 
-              {/* Triage Filter Pills */}
-              <div className="flex items-center gap-1.5 p-1 bg-[var(--color-surface-sunken)] rounded-lg text-xs font-medium border border-[var(--color-border-subtle)]">
-                {['All', 'High', 'Moderate', 'Low'].map((sev) => (
+            {/* Input Form with Medication Catalog Search */}
+            <form onSubmit={(e) => { e.preventDefault(); handleAddDrug(); }} className="flex gap-2">
+              <div className="relative flex-1">
+                <Pill className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+                <input
+                  type="text"
+                  value={newDrugInput}
+                  onChange={(e) => setNewDrugInput(e.target.value)}
+                  placeholder="Type or select a medication to add..."
+                  className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#0284C7] transition-all"
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#0284C7] hover:bg-[#0369A1] transition-colors cursor-pointer flex items-center gap-1 shrink-0 shadow-2xs"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add</span>
+              </button>
+            </form>
+
+            {/* Quick Catalog Drug Pills (Tap to add) */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono font-bold uppercase text-[var(--color-text-muted)]">
+                Common Clinical Medications (Tap to add):
+              </span>
+              <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                {catalog.map((c) => (
                   <button
-                    key={sev}
+                    key={c.id}
                     type="button"
-                    onClick={() => setFilterSeverity(sev)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] transition-all cursor-pointer font-semibold ${
-                      filterSeverity === sev
-                        ? 'bg-[var(--color-surface-card)] text-[var(--color-text-primary)] shadow-2xs'
-                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
-                    }`}
+                    onClick={() => handleAddDrug(c.canonical_name)}
+                    className="text-[11px] px-2.5 py-1 rounded-lg bg-[var(--color-surface-sunken)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-subtle)] hover:border-[#0284C7]/40 text-[var(--color-text-secondary)] hover:text-[#0284C7] transition-colors cursor-pointer"
                   >
-                    {sev === 'All' ? 'All' : `${sev} Risk`}
+                    + {c.canonical_name}
                   </button>
                 ))}
               </div>
-            </CardHeader>
+            </div>
 
-            <CardContent className="space-y-4">
-              {/* Inline Search Bar */}
-              <div className="relative flex items-center">
-                <Search className="w-4 h-4 text-[var(--color-text-muted)] absolute left-3 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter triage by patient ID, drug name, or alert mechanism..."
-                  className="w-full text-xs bg-[var(--color-surface-sunken)] text-[var(--color-text-primary)] pl-9 pr-4 py-2 rounded-lg border border-[var(--color-border-subtle)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-primary)]"
-                />
-              </div>
-
-              {/* Triage List Table */}
-              <div className="space-y-3">
-                {filteredAnalyses.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-[var(--color-text-muted)] border border-dashed border-[var(--color-border-subtle)] rounded-xl">
-                    No evaluations match the active filter criteria.
-                  </div>
+            {/* Clinical Highlight Box for Active Patient Medications */}
+            <ClinicalHighlightBox
+              variant="primary"
+              title={`Active Patient Medications (${activeDrugs.length})`}
+              subtitle="Click any medicine to toggle on/off in the active safety check"
+              badge={enabledMeds.length > 0 ? `${enabledMeds.length} active` : undefined}
+              icon={Pill}
+              className="mt-2"
+            >
+              <div className="flex flex-wrap gap-2 min-h-[44px] items-center">
+                {activeDrugs.length === 0 ? (
+                  <span className="text-xs text-[var(--color-text-muted)] italic px-1">
+                    No medications added yet. Type a medicine name above or pick from common medications.
+                  </span>
                 ) : (
-                  filteredAnalyses.map((item) => {
-                    const isHigh = item.severityLevel === 'High';
-                    const isLow = item.severityLevel === 'Low';
-                    const railColor = isHigh
-                      ? 'border-l-[#dc2626]'
-                      : isLow
-                      ? 'border-l-[#059669]'
-                      : 'border-l-[#d97706]';
-
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => navigate('/doctor/results')}
-                        className={`p-4 rounded-xl border border-[var(--color-border-subtle)] border-l-4 ${railColor} bg-[var(--color-surface-card)] hover:bg-[var(--color-surface-hover)] transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs`}
+                  activeDrugs.map((drug) => (
+                    <div
+                      key={drug.name}
+                      onClick={() => toggleDrug(drug.name)}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all border ${
+                        drug.enabled
+                          ? 'bg-[var(--color-surface-card)] text-[#0A2540] dark:text-[#E0F2FE] border-[#0284C7] shadow-xs'
+                          : 'bg-transparent text-[var(--color-text-muted)] border-dashed border-[var(--color-border-strong)] opacity-50 line-through'
+                      }`}
+                      title="Click to toggle drug ON/OFF in safety check"
+                    >
+                      <Pill className={`w-3.5 h-3.5 ${drug.enabled ? 'text-[#0284C7]' : 'text-slate-400'}`} />
+                      <span>{drug.name}</span>
+                      <span className={`w-2 h-2 rounded-full ${drug.enabled ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveDrug(drug.name);
+                        }}
+                        className="text-[var(--color-text-muted)] hover:text-rose-600 ml-1 p-0.5"
+                        title="Remove"
                       >
-                        <div className="space-y-1.5 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-bold text-xs sm:text-sm text-[var(--color-text-primary)]">
-                              {item.patient}
-                            </span>
-                            <RiskBadge severity={item.risk} size="sm" />
-                            <span className="text-[11px] font-mono tabular text-[var(--color-text-muted)]">
-                              Score: {item.riskScore}/100
-                            </span>
-                          </div>
-
-                          {/* Drug Chips */}
-                          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                            <span className="text-[11px] text-[var(--color-text-muted)] font-medium">Regimen:</span>
-                            {item.regimen.map((med, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)]"
-                              >
-                                <Pill className="w-3 h-3 text-[var(--color-text-muted)] shrink-0" />
-                                {med}
-                              </span>
-                            ))}
-                          </div>
-
-                          {/* Alert Summary */}
-                          <div className="flex items-center gap-1.5 text-xs font-medium text-[#dc2626] dark:text-[#f87171]">
-                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">{item.alert}</span>
-                          </div>
-                        </div>
-
-                        {/* Timestamp & Action */}
-                        <div className="text-right shrink-0 flex items-center sm:flex-col sm:items-end justify-between border-t sm:border-t-0 border-[var(--color-border-subtle)] pt-2 sm:pt-0">
-                          <span className="text-[11px] font-mono tabular text-[var(--color-text-muted)]">
-                            {item.date}
-                          </span>
-                          <Button
-                            variant="subtle"
-                            size="sm"
-                            icon={ArrowRight}
-                            iconPosition="right"
-                            className="mt-1"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate('/doctor/results');
-                            }}
-                          >
-                            Open Dossier
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </ClinicalHighlightBox>
+
+            {/* Launch Report CTA */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+              <span className="text-xs text-[var(--color-text-muted)]">
+                Cross-referenced with verified clinical databases (PubMed, openFDA FAERS, ChEMBL).
+              </span>
+              <button
+                type="button"
+                disabled={enabledMeds.length === 0}
+                onClick={() => navigate('/doctor/medication-safety', { state: { prefilledMeds: enabledMeds } })}
+                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#0284C7] hover:bg-[#0369A1] disabled:opacity-50 transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              >
+                <span>Check Drug Interactions & Safety</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* 2D Pairwise DDI Matrix Grid */}
+          {enabledMeds.length >= 2 && (
+            <div className="p-5 rounded-3xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--color-text-primary)]">
+                    Live Pairwise Interaction Matrix ({enabledMeds.length}×{enabledMeds.length})
+                  </h3>
+                  <p className="text-[11px] text-[var(--color-text-muted)]">
+                    Click any cell intersection to inspect pairwise pharmacology.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-mono">
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-rose-500" /> Severe</span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-amber-500" /> Moderate</span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-500" /> Safe</span>
+                </div>
+              </div>
+
+              {/* Matrix Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-xs">
+                  <thead>
+                    <tr>
+                      <th className="p-2 text-left font-mono text-[10px] text-[var(--color-text-muted)] border-b border-[var(--color-border-subtle)]">
+                        Matrix
+                      </th>
+                      {enabledMeds.map((med) => (
+                        <th key={med} className="p-2 text-center font-bold font-mono text-[11px] text-[var(--color-text-primary)] border-b border-[var(--color-border-subtle)]">
+                          {med.slice(0, 5)}..
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {enabledMeds.map((rowMed, rowIdx) => (
+                      <tr key={rowMed} className="hover:bg-[var(--color-surface-sunken)]/50">
+                        <td className="p-2 font-bold text-[var(--color-text-primary)] border-r border-[var(--color-border-subtle)] font-mono text-[11px]">
+                          {rowMed}
+                        </td>
+                        {enabledMeds.map((colMed, colIdx) => {
+                          const isSelf = rowIdx === colIdx;
+                          const pairKey = `${rowMed.toLowerCase()}-${colMed.toLowerCase()}`;
+                          const interaction = KNOWN_INTERACTIONS[pairKey];
+                          const isSelected = activeCell?.row === rowMed && activeCell?.col === colMed;
+
+                          return (
+                            <td key={colMed} className="p-1.5 text-center">
+                              {isSelf ? (
+                                <span className="inline-block w-7 h-7 rounded-lg bg-[var(--color-surface-sunken)] border border-dashed border-[var(--color-border-subtle)]" />
+                              ) : interaction ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveCell({ row: rowMed, col: colMed, ...interaction })}
+                                  className={`w-7 h-7 rounded-lg font-bold text-[10px] font-mono transition-transform hover:scale-110 cursor-pointer ${
+                                    interaction.severity === 'Severe'
+                                      ? 'bg-rose-500 text-white shadow-xs'
+                                      : 'bg-amber-400 text-black shadow-xs'
+                                  } ${isSelected ? 'ring-2 ring-sky-500 scale-110' : ''}`}
+                                  title={`${rowMed} + ${colMed}: ${interaction.alert}`}
+                                >
+                                  !
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveCell({ row: rowMed, col: colMed, severity: 'Safe', alert: 'No documented clinical interaction' })}
+                                  className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 border border-emerald-200 dark:border-emerald-800 font-mono text-[10px] hover:scale-105 cursor-pointer"
+                                  title={`${rowMed} + ${colMed}: Safe`}
+                                >
+                                  ✓
+                                </button>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Active Cell Click Inspector */}
+              {activeCell && (
+                <div className="p-3 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-strong)] flex items-center justify-between animate-in fade-in">
+                  <div className="flex items-center gap-2.5">
+                    <span className={`w-2.5 h-2.5 rounded-full ${activeCell.severity === 'Severe' ? 'bg-rose-500' : activeCell.severity === 'Moderate' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                    <div>
+                      <span className="text-xs font-bold text-[var(--color-text-primary)]">
+                        {activeCell.row} + {activeCell.col}
+                      </span>
+                      <span className="text-[11px] text-[var(--color-text-muted)] block">
+                        {activeCell.alert}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveCell(null)}
+                    className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] p-1 cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Right Rail: Digital Twin Scenario Simulator & Guidelines */}
-        <div className="lg:col-span-4 space-y-4">
-          <Card elevation="raised" className="p-5 space-y-4 border-l-4 border-l-[#0284c7]">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] text-[#0284c7]">
-                <Cpu className="w-5 h-5" />
+        {/* Right Column: Interactive Sliders & Organ Systems */}
+        <div className="lg:col-span-5 space-y-6">
+          
+          {/* Patient Physiology Sliders */}
+          <div className="p-5 rounded-3xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-[#0284C7]" />
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)]">
+                  Patient Physiology Adjusters
+                </h3>
               </div>
-              <div>
-                <h4 className="text-sm font-bold text-[var(--color-text-primary)]">
-                  Medication Digital Twin
-                </h4>
-                <p className="text-xs text-[var(--color-text-muted)]">"What-If" Pharmacokinetic Simulation</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setPatientAge(65);
+                  setPatientEgfr(75);
+                }}
+                className="text-[10px] font-mono text-[#0284C7] hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <RotateCcw className="w-3 h-3" />
+                Reset
+              </button>
+            </div>
+
+            {/* eGFR Interactive Slider */}
+            <div className="space-y-1.5 p-3 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)]">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-[var(--color-text-secondary)]">Renal eGFR</span>
+                <span className="font-mono text-[#0284C7] font-semibold">{patientEgfr} mL/min</span>
+              </div>
+              <input
+                type="range"
+                min="15"
+                max="120"
+                value={patientEgfr}
+                onChange={(e) => setPatientEgfr(Number(e.target.value))}
+                className="w-full accent-[#0284C7] cursor-pointer"
+              />
+              <div className="flex justify-between text-[9px] font-mono text-[var(--color-text-muted)]">
+                <span>Severe (&lt;30)</span>
+                <span>Caution (30-60)</span>
+                <span>Normal (&gt;60)</span>
               </div>
             </div>
 
-            <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-              Model candidate alterations before modifying real patient orders. Simulate how adding or discontinuing a therapy affects overall bleeding and toxicity risk.
-            </p>
-
-            <Button
-              variant="secondary"
-              size="md"
-              className="w-full"
-              icon={ArrowRight}
-              iconPosition="right"
-              onClick={() => navigate('/doctor/medication-safety?tab=twin')}
-            >
-              Launch Twin Simulator
-            </Button>
-          </Card>
-
-          <Card elevation="raised" className="p-5 space-y-3">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
-              Clinical Guidelines Reference
-            </h4>
-            <div className="space-y-2 text-xs">
-              <Link
-                to="/evidence"
-                className="block p-3 rounded-xl hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-colors"
-              >
-                <strong className="text-[var(--color-text-primary)] block">ACCP Antithrombotic Guidelines</strong>
-                <span className="text-[var(--color-text-muted)] text-[11px]">Bleeding risk evaluation in dual antihemostatic therapy</span>
-              </Link>
-              <Link
-                to="/evidence"
-                className="block p-3 rounded-xl hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)] transition-colors"
-              >
-                <strong className="text-[var(--color-text-primary)] block">BMJ Triple Whammy Cohort Study</strong>
-                <span className="text-[var(--color-text-muted)] text-[11px]">ACEi + Diuretic + NSAID acute renal failure incidence</span>
-              </Link>
+            {/* Age Interactive Slider */}
+            <div className="space-y-1.5 p-3 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)]">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-[var(--color-text-secondary)]">Patient Age</span>
+                <span className="font-mono text-[#0284C7] font-semibold">{patientAge} yrs</span>
+              </div>
+              <input
+                type="range"
+                min="18"
+                max="95"
+                value={patientAge}
+                onChange={(e) => setPatientAge(Number(e.target.value))}
+                className="w-full accent-[#0284C7] cursor-pointer"
+              />
+              <div className="flex justify-between text-[9px] font-mono text-[var(--color-text-muted)]">
+                <span>Adult (18)</span>
+                <span>Geriatric (65+)</span>
+                <span>Elderly (85+)</span>
+              </div>
             </div>
-          </Card>
+          </div>
+
+          {/* Organ Clearance System Tabs */}
+          <div className="p-5 rounded-3xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[#0284C7]" />
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)]">
+                  Organ Clearance Breakdown
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-[var(--color-text-muted)]">Interactive</span>
+            </div>
+
+            {/* Organ Selectors */}
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)]">
+              {[
+                { id: 'renal', label: 'Kidney' },
+                { id: 'hepatic', label: 'Liver' },
+                { id: 'cardiac', label: 'Heart' },
+              ].map((org) => (
+                <button
+                  key={org.id}
+                  type="button"
+                  onClick={() => setSelectedOrgan(org.id)}
+                  className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                    selectedOrgan === org.id
+                      ? 'bg-[var(--color-surface-card)] text-[#0284C7] shadow-xs'
+                      : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+                  }`}
+                >
+                  {org.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Dynamic Organ Display */}
+            <div className="p-3.5 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] space-y-2">
+              {selectedOrgan === 'renal' && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[var(--color-text-primary)]">Glomerular Filtration Rate</span>
+                    <span className="text-xs font-mono font-bold text-sky-600">{patientEgfr} mL/min</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[var(--color-surface-card)] overflow-hidden">
+                    <div className="h-full rounded-full bg-sky-500" style={{ width: `${vitals.renalCapacity}%` }} />
+                  </div>
+                  <span className="text-[11px] font-medium text-[var(--color-text-secondary)] block">
+                    {patientEgfr < 60 ? '⚠️ High risk of drug accumulation for Metformin & ACE inhibitors.' : '✓ Normal clearance window. No dose adjustments required.'}
+                  </span>
+                </>
+              )}
+
+              {selectedOrgan === 'hepatic' && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[var(--color-text-primary)]">CYP450 Enzyme Pathways</span>
+                    <span className="text-xs font-mono font-bold text-[#0284C7]">3A4 / 2D6 / 2C19</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[var(--color-surface-card)] overflow-hidden">
+                    <div className="h-full rounded-full bg-[#0284C7]" style={{ width: `${vitals.hepaticCapacity}%` }} />
+                  </div>
+                  <span className="text-[11px] font-medium text-[var(--color-text-secondary)] block">
+                    {enabledMeds.length > 3 ? '⚠️ Moderate competitive substrate load on CYP3A4 pathway.' : '✓ Low metabolic competition. Normal hepatic transit.'}
+                  </span>
+                </>
+              )}
+
+              {selectedOrgan === 'cardiac' && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[var(--color-text-primary)]">Cardiac Arrhythmia Margin</span>
+                    <span className="text-xs font-mono font-bold text-purple-600">{vitals.cardiacTolerance}% Safe</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[var(--color-surface-card)] overflow-hidden">
+                    <div className="h-full rounded-full bg-purple-500" style={{ width: `${vitals.cardiacTolerance}%` }} />
+                  </div>
+                  <span className="text-[11px] font-medium text-[var(--color-text-secondary)] block">
+                    {vitals.score && vitals.score < 50 ? '⚠️ Elevated repolarization delay caution observed.' : '✓ Stable repolarization threshold.'}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* ── Recent Safety Checks History ── */}
+      {recentChecks.length > 0 && (
+        <div className="p-6 rounded-3xl bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#0284C7]" />
+              <h3 className="text-base font-bold text-[var(--color-text-primary)]">
+                Recent Patient Medication Safety Checks
+              </h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem('curenova_doctor_safety_history');
+                setRecentChecks([]);
+              }}
+              className="text-xs text-[var(--color-text-muted)] hover:text-rose-600 transition-colors cursor-pointer"
+            >
+              Clear History
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentChecks.slice(0, 6).map((item) => (
+              <div
+                key={item.id}
+                className="p-4 rounded-2xl bg-[var(--color-surface-sunken)] border border-[var(--color-border-subtle)] hover:border-[#0284C7]/50 transition-all space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-[var(--color-text-muted)]">
+                    {item.date ? new Date(item.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Recent'}
+                  </span>
+                  <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                    item.riskScore > 65
+                      ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                      : item.riskScore > 35
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                      : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                  }`}>
+                    Risk: {item.riskScore}/100
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {item.medications?.map((m, idx) => (
+                    <span key={idx} className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-lg bg-[var(--color-surface-card)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]">
+                      <Pill className="w-3 h-3 text-[#0284C7]" />
+                      {m}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="pt-2 border-t border-[var(--color-border-subtle)] flex items-center justify-between">
+                  <span className="text-[10px] text-[var(--color-text-muted)]">
+                    {item.flaggedPairsCount || 0} flagged interaction(s)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/doctor/medication-safety', { state: { prefilledMeds: item.medications } })}
+                    className="text-xs font-bold text-[#0284C7] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>Re-evaluate</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

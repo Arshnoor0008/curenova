@@ -51,6 +51,15 @@
   --color-status-info-text: var(--color-status-info-text);
   --color-status-info-rail: var(--color-status-info-rail);
 
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-light: var(--color-accent-light);
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+
   --shadow-base: var(--shadow-base);
   --shadow-raised: var(--shadow-raised);
   --shadow-overlay: var(--shadow-overlay);
@@ -76,74 +85,109 @@
 @utility bg-status-safe-bg { background-color: var(--color-status-safe-bg); }
 @utility bg-status-info-bg { background-color: var(--color-status-info-bg); }
 
+@utility bg-primary-navy { background-color: #0A2540; }
+@utility bg-deep-navy { background-color: #071927; }
+@utility bg-teal-accent { background-color: #0284C7; }
+@utility text-primary-navy { color: #0A2540; }
+@utility text-teal-accent { color: #0284C7; }
+@utility border-teal-accent { border-color: #0284C7; }
+
+@utility bg-medical-blue { background-color: #0284C7; }
+@utility text-medical-blue { color: #0284C7; }
+@utility border-medical-blue { border-color: #0284C7; }
+
+.card-3d-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+}
+
+.card-3d-hover:hover {
+  transform: perspective(1000px) translateY(-2px);
+  box-shadow: 0 10px 24px -4px rgba(10, 37, 64, 0.08), 0 4px 8px -2px rgba(10, 37, 64, 0.04);
+}
+
 @layer base {
   :root {
     color-scheme: light;
 
-    /* Semantic Surfaces (Light) — Tinted slate for richness */
-    --color-surface-ground: #eef2f7;
-    --color-surface-card: #ffffff;
-    --color-surface-overlay: #ffffff;
-    --color-surface-hover: #e2eaf4;
-    --color-surface-sunken: #dde5f0;
+    /* Semantic Surfaces (Light) — Professional Clinical SaaS Palette */
+    --color-surface-ground: #F8FAFC;
+    --color-surface-card: #FFFFFF;
+    --color-surface-overlay: #FFFFFF;
+    --color-surface-hover: #F1F5F9;
+    --color-surface-sunken: #F1F5F9;
 
     /* Semantic Borders (Light) */
-    --color-border-subtle: #c8d6e8;
-    --color-border-strong: #a8bbcf;
-    --color-border-focus: #0284c7;
+    --color-border-subtle: #E2E8F0;
+    --color-border-strong: #CBD5E1;
+    --color-border-focus: #0284C7;
 
     /* Semantic Text (Light) */
-    --color-text-primary: #0b132b;
-    --color-text-secondary: #3a4d66;
-    --color-text-muted: #5b7083;
-    --color-text-inverse: #ffffff;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94A3B8;
+    --color-text-inverse: #FFFFFF;
 
-    /* Brand Primary / Medical Cyan-Teal — more vivid */
-    --color-brand-primary: #0271b0;
-    --color-brand-primary-hover: #025f93;
-    --color-brand-secondary: #0b8b7e;
-    --color-brand-surface: #dbeeff;
-    --color-brand-border: #93cef4;
-    --color-brand-text: #025f93;
+    /* Master Medical Palette Tokens */
+    --color-primary: #0A2540;
+    --color-primary-hover: #071927;
+    --color-primary-dark: #051421;
+    --color-accent: #0284C7;
+    --color-accent-hover: #0369A1;
+    --color-accent-light: #E0F2FE;
+    --color-background: #F8FAFC;
+    --color-surface: #FFFFFF;
 
-    /* Status: Critical Hazard */
-    --color-status-critical: #dc2626;
-    --color-status-critical-bg: #fef2f2;
-    --color-status-critical-border: #fecaca;
-    --color-status-critical-text: #991b1b;
-    --color-status-critical-rail: #b91c1c;
+    /* Brand Primary / Medical Blue Action Colors */
+    --color-brand-primary: #0284C7;
+    --color-brand-primary-hover: #0369A1;
+    --color-brand-secondary: #0A2540;
+    --color-brand-surface: #EFF6FF;
+    --color-brand-border: #BAE6FD;
+    --color-brand-text: #0369A1;
 
-    /* Status: Warning */
-    --color-status-warning: #c96b00;
-    --color-status-warning-bg: #fff7e6;
-    --color-status-warning-border: #fcd89a;
-    --color-status-warning-text: #7c3800;
-    --color-status-warning-rail: #b45309;
+    /* Status: Critical Hazard / Error */
+    --color-status-critical: #DC2626;
+    --color-status-critical-bg: #FEE2E2;
+    --color-status-critical-border: #FECACA;
+    --color-status-critical-text: #B91C1C;
+    --color-status-critical-rail: #DC2626;
+    --color-danger: #DC2626;
 
-    /* Status: Safe / Verified */
-    --color-status-safe: #047857;
-    --color-status-safe-bg: #ecfdf5;
-    --color-status-safe-border: #6ee7b7;
-    --color-status-safe-text: #065f46;
-    --color-status-safe-rail: #059669;
+    /* Status: Warning / Amber Caution */
+    --color-status-warning: #D97706;
+    --color-status-warning-bg: #FEF3C7;
+    --color-status-warning-border: #FDE68A;
+    --color-status-warning-text: #B45309;
+    --color-status-warning-rail: #D97706;
+    --color-warning: #D97706;
+
+    /* Status: Safe / Confirmed Normal */
+    --color-status-safe: #16A34A;
+    --color-status-safe-bg: #DCFCE7;
+    --color-status-safe-border: #BBF7D0;
+    --color-status-safe-text: #15803D;
+    --color-status-safe-rail: #16A34A;
+    --color-success: #16A34A;
 
     /* Status: Info */
-    --color-status-info: #1d4ed8;
-    --color-status-info-bg: #eff6ff;
-    --color-status-info-border: #93c5fd;
-    --color-status-info-text: #1e3a8a;
-    --color-status-info-rail: #2563eb;
+    --color-status-info: #0284C7;
+    --color-status-info-bg: #E0F2FE;
+    --color-status-info-border: #BAE6FD;
+    --color-status-info-text: #0369A1;
+    --color-status-info-rail: #0284C7;
+    --color-info: #0284C7;
 
-    /* Elevation & Shadows — colored glow for depth */
-    --shadow-base: 0 1px 3px 0 rgba(2, 113, 176, 0.08), 0 1px 2px -1px rgba(11, 19, 43, 0.06);
-    --shadow-raised: 0 4px 12px -1px rgba(2, 113, 176, 0.12), 0 2px 6px -2px rgba(11, 19, 43, 0.07);
-    --shadow-overlay: 0 20px 40px -5px rgba(2, 113, 176, 0.18), 0 8px 16px -6px rgba(11, 19, 43, 0.10);
+    /* Elevation & Shadows */
+    --shadow-base: 0 1px 3px 0 rgba(23, 50, 77, 0.06), 0 1px 2px -1px rgba(23, 50, 77, 0.04);
+    --shadow-raised: 0 4px 12px -1px rgba(23, 50, 77, 0.08), 0 2px 6px -2px rgba(23, 50, 77, 0.05);
+    --shadow-overlay: 0 20px 35px -5px rgba(23, 50, 77, 0.14), 0 8px 16px -6px rgba(23, 50, 77, 0.07);
 
     /* Radii */
     --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-xl: 20px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
 
     /* Motion */
     --duration-fast: 150ms;
@@ -155,63 +199,77 @@
   .dark {
     color-scheme: dark;
 
-    /* Semantic Surfaces (Dark) */
-    --color-surface-ground: #070d19;
-    --color-surface-card: #0c1628;
-    --color-surface-overlay: #111e38;
-    --color-surface-hover: #162544;
-    --color-surface-sunken: #050912;
+    /* Semantic Surfaces (Dark - Restrained Navy Slate) */
+    --color-surface-ground: #0A1624;
+    --color-surface-card: #10263A;
+    --color-surface-overlay: #15324C;
+    --color-surface-hover: #1A3C5B;
+    --color-surface-sunken: #07101B;
 
     /* Semantic Borders (Dark) */
-    --color-border-subtle: #1e293b;
-    --color-border-strong: #334155;
-    --color-border-focus: #38bdf8;
+    --color-border-subtle: #1E3A54;
+    --color-border-strong: #2B4E70;
+    --color-border-focus: #0284C7;
 
     /* Semantic Text (Dark) */
-    --color-text-primary: #f8fafc;
-    --color-text-secondary: #cbd5e1;
-    --color-text-muted: #94a3b8;
-    --color-text-inverse: #070d19;
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #64748B;
+    --color-text-inverse: #0A1624;
+
+    /* Master Palette Tokens */
+    --color-primary: #0A2540;
+    --color-primary-hover: #17324D;
+    --color-primary-dark: #0A1624;
+    --color-accent: #0284C7;
+    --color-accent-hover: #38BDF8;
+    --color-accent-light: rgba(2, 132, 199, 0.15);
+    --color-background: #0A1624;
+    --color-surface: #10263A;
 
     /* Brand Primary (Dark) */
-    --color-brand-primary: #38bdf8;
-    --color-brand-primary-hover: #7dd3fc;
-    --color-brand-secondary: #2dd4bf;
-    --color-brand-surface: rgba(56, 189, 248, 0.1);
-    --color-brand-border: rgba(56, 189, 248, 0.25);
-    --color-brand-text: #7dd3fc;
+    --color-brand-primary: #38BDF8;
+    --color-brand-primary-hover: #7DD3FC;
+    --color-brand-secondary: #0284C7;
+    --color-brand-surface: rgba(2, 132, 199, 0.18);
+    --color-brand-border: rgba(56, 189, 248, 0.35);
+    --color-brand-text: #2BD4C9;
 
     /* Status: Critical Hazard (Dark) */
-    --color-status-critical: #f87171;
-    --color-status-critical-bg: rgba(220, 38, 38, 0.15);
+    --color-status-critical: #F87171;
+    --color-status-critical-bg: rgba(185, 28, 28, 0.18);
     --color-status-critical-border: rgba(248, 113, 113, 0.3);
-    --color-status-critical-text: #fca5a5;
-    --color-status-critical-rail: #ef4444;
+    --color-status-critical-text: #FCA5A5;
+    --color-status-critical-rail: #EF4444;
+    --color-danger: #F87171;
 
     /* Status: Warning (Dark) */
-    --color-status-warning: #fbbf24;
-    --color-status-warning-bg: rgba(217, 119, 6, 0.15);
+    --color-status-warning: #FBBF24;
+    --color-status-warning-bg: rgba(180, 83, 9, 0.18);
     --color-status-warning-border: rgba(251, 191, 36, 0.3);
-    --color-status-warning-text: #fde68a;
-    --color-status-warning-rail: #f59e0b;
+    --color-status-warning-text: #FDE68A;
+    --color-status-warning-rail: #F59E0B;
+    --color-warning: #FBBF24;
 
     /* Status: Safe (Dark) */
-    --color-status-safe: #34d399;
-    --color-status-safe-bg: rgba(5, 150, 105, 0.15);
+    --color-status-safe: #34D399;
+    --color-status-safe-bg: rgba(21, 128, 61, 0.18);
     --color-status-safe-border: rgba(52, 211, 153, 0.3);
-    --color-status-safe-text: #a7f3d0;
-    --color-status-safe-rail: #10b981;
+    --color-status-safe-text: #A7F3D0;
+    --color-status-safe-rail: #10B981;
+    --color-success: #34D399;
 
     /* Status: Info (Dark) */
-    --color-status-info: #60a5fa;
-    --color-status-info-bg: rgba(37, 99, 235, 0.15);
+    --color-status-info: #60A5FA;
+    --color-status-info-bg: rgba(37, 99, 235, 0.18);
     --color-status-info-border: rgba(96, 165, 250, 0.3);
-    --color-status-info-text: #bfdbfe;
-    --color-status-info-rail: #3b82f6;
+    --color-status-info-text: #BFDBFE;
+    --color-status-info-rail: #3B82F6;
+    --color-info: #60A5FA;
 
     /* Elevation & Shadows (Dark) */
-    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
-    --shadow-raised: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+    --shadow-raised: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
     --shadow-overlay: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
   }
 
